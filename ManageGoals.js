@@ -81,7 +81,7 @@ const userID = JSON.parse(user).id
         console.error('Error fetching user data:', error);
       }
     };
-  
+  console.log("hi hamza");
     fetchData();
   }, []);
 
