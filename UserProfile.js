@@ -47,8 +47,6 @@ const UserProfile = () => {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
     }
@@ -97,7 +95,7 @@ const UserProfile = () => {
     const blob = await response.blob();
     await uploadBytes(storageRef, blob);
     const downloadURL = await getDownloadURL(storageRef);
-
+      console.log(downloadURL);
     const userDocRef = doc(collection(db, "users"), userData.id);
 
     updateDoc(userDocRef, {
@@ -105,7 +103,7 @@ const UserProfile = () => {
     });
     const updated_local_storage = { ...userData, profile_url: downloadURL };
     const updated_userData = JSON.stringify(updated_local_storage);
-    localStorage.setItem("user", updated_userData);
+    AsyncStorage.setItem("user", updated_userData);
     
       setIsEditMode(false);
     setShowUploadButton(false);
@@ -119,6 +117,7 @@ const UserProfile = () => {
       <Text style={styles.profileHeading}>User Profile</Text>
       <View style={styles.header}>
         <View style={styles.userImageOutline}>
+        <Image source={userData?.profile_url} style={styles.userImage} />
           {selectedImage ? (
             <Image source={{ uri: selectedImage }} style={styles.userImage} />
           ) : userData?.profile_url ? (
