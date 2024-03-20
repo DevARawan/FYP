@@ -48,6 +48,19 @@ export default function LoginScreen() {
                 const userInfo = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
                 if(userInfo){
                   navigation.navigate('main')
+                  const userCollection = firebase.collection('users');
+                  const userDoc = doc(userCollection, userInfo.user.uid);
+                  const userSnapshot = await getDoc(userDoc);
+                  if (userSnapshot.exists()) {
+                    const user = userSnapshot.data();
+                    const userData = {
+                      id: userInfo.user.uid,
+                      ...user
+                    };
+                     await AsyncStorage.setItem('user', JSON.stringify(userData));
+                  }else {
+                    setLoad(false);
+                  }
                 }
                 setLoad(false);
             } catch (error) {
