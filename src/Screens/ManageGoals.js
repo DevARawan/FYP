@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import app from './Components/firebase';
+import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {  doc, getDoc, getFirestore, collection, setDoc ,getDocs} from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const ManageGoals = () => {
+  const app = FIREBASE_APP
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [allGoals, setAllGoals] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);

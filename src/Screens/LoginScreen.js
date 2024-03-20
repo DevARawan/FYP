@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, getDoc } from 'firebase/firestore';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Modal, Pressable } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome5 } from '@expo/vector-icons';
-import myColor from './Components/Color';
-import app from './Components/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firebase } from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
+import { doc, getDoc } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
+
+import { createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+
+import { FIREBASE_APP, FIREBASE_AUTH } from '../../firebaseConfig';
+import myColor from '../Components/Color';
+
+
+
 
 
 const UserIcon = () => {
@@ -23,66 +31,130 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [load, setLoad] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isForgotPasswordEmailValid, setIsForgotPasswordEmailValid] = useState(true)
+  const [isEmailValid, setIsEmailValid] = useState(true)
+  const [validationError, setValidationError] = useState(false)
+  // validation error is used to trigger if or not to show validation error behind text field
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigation = useNavigation();
-
+  const authentication = getAuth();
   const handleLogin = async () => {
-    setLoad(true);
-    const auth = getAuth();
-    const db = getFirestore(app);
-  
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const userCollection = collection(db, 'users');
-      const userDoc = doc(userCollection, userCredential.user.uid);
-      const userSnapshot = await getDoc(userDoc);
-  
-      if (userSnapshot.exists()) {
-        const user = userSnapshot.data();
-        console.log('User:', user);
-        const userData = {
-          id: userCredential.user.uid,
-          ...user
-        };
-         await AsyncStorage.setItem('user', JSON.stringify(userData));
-     
-        setLoad(false);
-        navigation.navigate('main');
-      } else {
-        console.log('User document does not exist.');
-        setLoad(false);
-      }
-    } catch (error) {
-      console.error('Error signing in:', error);
-      setLoad(false);
+    setValidationError(true);
+    if (email.length > 0 && password.length > 0) {
+        if (isEmailValid) {
+            setLoad(true);
+            try {
+                const userInfo = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+                if(userInfo){
+                  navigation.navigate('main')
+                }
+                setLoad(false);
+            } catch (error) {
+                console.error(error);
+                ToastAndroid.show(error.message, ToastAndroid.SHORT);
+                setLoad(false);
+            }
+        } else {
+            ToastAndroid.show('Invalid Email', ToastAndroid.SHORT);
+        }
+    } else {
+        ToastAndroid.show('Empty Email or Password', ToastAndroid.SHORT);
     }
-  };
+};
+
 
 
   const handleRegister = ()=>{
     navigation.navigate('Signup');
   }
-  const handleforget = ()=>{
-    console.log("hi");
+
+
+
+  const handleforget = async()=>{
+    if(forgotPasswordEmail.length > 0 && isForgotPasswordEmailValid){
+      
+        try {
+        setLoad(true)
+         await sendPasswordResetEmail(FIREBASE_AUTH, email)
+          Alert.alert('Password Reset Email Sent', 'Check your email to reset your password.');
+          setLoad(false)
+        } catch (error) {
+          setLoad(false)
+          Alert.alert('Password Reset Failed', error.message);
+        } 
+    }else {
+      ToastAndroid.show('Invalid or Empty Email', ToastAndroid.SHORT)
+    }
   }
 
+  const handleSignInWithGoogle = async () => {
+    try {
+     const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const userCollection = firestore().collection('users');
+      const userDoc = doc(userCollection, userInfo.user.uid);
+      const userSnapshot = await getDoc(userDoc);
+      if (userSnapshot.exists()) {
+        const user = userSnapshot.data();
+        const userData = {
+          id: userInfo.user.uid,
+          ...user
+        };
+         await AsyncStorage.setItem('user', JSON.stringify(userData));
+        setLoad(false);
+        navigation.navigate('main');
+      } else {
+        setLoad(false);
+      }
+    } catch (error) {
+      console.log('error is', error)
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        // some other error happened
+      }
+    }
+  };
+
+  const validateEmail = (email, type) => {
+    setEmail(email)
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Test the email against the regex
+    setIsEmailValid(emailRegex.test(email))
+    return emailRegex.test(email);
+  }
+  const validateForgotPasswordEmail = (email, type) => {
+    setForgotPasswordEmail(email)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsForgotPasswordEmailValid(emailRegex.test(email))
+    return emailRegex.test(email);
+  }
+
+  const handleForgotPasswordClick = () =>{
+ 
+    setPasswordVisible(!passwordVisible)
+  }
   return (
     <View style={styles.container}>
       <UserIcon />
       <View style={styles.formContainer}>
         <Text style={styles.title}>Login</Text>
-
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholder="Enter email"
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={(text) => validateEmail(text)}
           />
           <FontAwesome5 name="envelope" style={styles.icon} />
         </View>
-
+        {!isEmailValid && validationError &&    <Text style={{color:'red', alignSelf:'flex-end', marginBottom:10}}>Please Enter a valid email</Text>}
         <View style={styles.inputContainer}>
           <TextInput
             style={[styles.input, { marginBottom: 5 }]}
@@ -93,7 +165,7 @@ export default function LoginScreen() {
           />
           <TouchableOpacity
             style={styles.icon}
-            onPress={() => setPasswordVisible(!passwordVisible)}>
+            onPress={handleForgotPasswordClick}>
             <FontAwesome5 name={passwordVisible ? 'eye-slash' : 'eye'} />
           </TouchableOpacity>
         </View>
@@ -103,7 +175,7 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <View style={styles.google}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleSignInWithGoogle}>
             <Text style={styles.buttonText}>Login with Google</Text>
           </TouchableOpacity>
         </View>
@@ -131,16 +203,20 @@ export default function LoginScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Enter email"
-                value={email}
-                onChangeText={(text) => setEmail(text)}
+                value={forgotPasswordEmail}
+                onChangeText={(text) => validateForgotPasswordEmail(text)}
               />
-
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Pressable
+              {!isForgotPasswordEmailValid &&   <Text style={{color:'red', fontSize:10, alignSelf:'center', marginBottom:30}}>Please Enter a valid email</Text>}
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' , width:'50%' }}>
+                {
+                  load ? <ActivityIndicator color={'blue'} /> :   <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={handleforget}>
-                  <Text style={styles.textStyle}>Submit</Text>
+                 
+                  <Text style={styles.textStyle}> Submit</Text>
                 </Pressable>
+                }
+              
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => setModalVisible(!modalVisible)}>
@@ -234,9 +310,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22, 
+    width:'100%'
   },
   modalView: {
     margin: 20,
+    width:'90%',
     backgroundColor: 'lightgrey',
     borderRadius: 20,
     padding: 30,

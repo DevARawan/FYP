@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import app from './Components/firebase';
+import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {  doc, getDoc, getFirestore, collection, setDoc } from 'firebase/firestore';
 
@@ -78,11 +78,8 @@ const DataEntry = () => {
   const handleSubmit = async () => {
     const user = await AsyncStorage.getItem('user');
     const userId = JSON.parse(user).id;
-
-    const db = getFirestore(app);
-    const usersCollection = collection(db, "users");
+    const usersCollection = collection(FIREBASE_DB, "users");
     const userDocRef = doc(usersCollection, userId);
-
     // Check if the document exists
     const userDocSnapshot = await getDoc(userDocRef);
     if (userDocSnapshot.exists()) {

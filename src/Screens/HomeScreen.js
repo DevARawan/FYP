@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView } from 
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import Toast from 'react-native-toast-message';
-import app from './Components/firebase';
+import { FIREBASE_APP as app  } from '../../firebaseConfig';
 import {  doc, getDoc, getFirestore, collection, setDoc ,getDocs} from 'firebase/firestore';
-import CircularProgressBar from './Components/Progressbar';
+import CircularProgressBar from '../Components/Progressbar';
+
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(1000);

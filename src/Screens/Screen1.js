@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import myColor from './Components/Color';
+
 import Toast from 'react-native-toast-message';
+import myColor from '../Components/Color';
 
 const FrontScreen = () => {
   const navigation = useNavigation();
@@ -18,7 +19,7 @@ const FrontScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('./Images/myimg1.jpg')}
+        source={require('../Images/myimg1.jpg')}
         style={styles.headerImage}
         resizeMode="cover"
       />
@@ -30,8 +31,8 @@ const FrontScreen = () => {
         </Text>
 
         <View style={styles.iconContainer}>
-          <Image source={require('./Images/budget.png')} style={styles.icon} />
-          <Image source={require('./Images/money.png')} style={styles.icon} />
+          <Image source={require('../Images/budget.png')} style={styles.icon} />
+          <Image source={require('../Images/money.png')} style={styles.icon} />
         </View>
 
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>

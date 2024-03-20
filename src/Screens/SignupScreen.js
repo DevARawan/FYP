@@ -1,14 +1,10 @@
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { setDoc, getFirestore, collection, doc } from 'firebase/firestore';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import app from './Components/firebase';
-import { useState } from 'react';
 import { FontAwesome5 } from '@expo/vector-icons';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-import Toast from 'react-native-toast-message';
+import { StatusBar } from 'expo-status-bar';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
 const UserIcon = () => {
   return (
@@ -19,56 +15,31 @@ const UserIcon = () => {
 }
 
 export default function SignupScreen({navigation}) {
-  // const navigation = useNavigation();
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [load, setLoad] = useState(false);
   
   const handleRegister = async () => {
-    // Set loading state to true when registration starts
+    const auth = FIREBASE_AUTH
     setLoad(true);
-  
-    // Check if password and confirmPassword match
     if (password !== confirmPassword) {
       Alert.alert("Password Mismatch", "Please enter the same password in both fields");
-      // Reset loading state before returning
       setLoad(false);
       return;
     }
-  
-    // Initialize Firebase authentication and Firestore
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-  
-    console.log("Email:", email); // Log email for debugging
-  
     try {
-      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-  
-      console.log("New User UID:", user.uid); // Log UID for debugging
-  
-      // Reference to the 'users' collection
-      const userRef = collection(db, "users");
+      const userRef = collection(FIREBASE_DB, "users");
       // Create a document reference using the user's UID
       const userDoc = doc(userRef, user.uid);
-      console.log("New:", userDoc);
       // Data to be stored in the Firestore document
       const userData = {
         email: email,
-        // You may not want to store the password in plaintext for security reasons.
-        // Consider removing the password field or hashing it before storing.
-        // password: password, 
       };
-  
       // Set data in Firestore document
       await setDoc(userDoc, userData);
-  
-      console.log('User added to Firestore');
-      
       // Navigate to login screen after successful registration
       navigation.navigate('login');
     } catch (error) {
@@ -80,38 +51,6 @@ export default function SignupScreen({navigation}) {
     }
   };
   
-//   const handleRegister = async () => {
-//     setLoad(true);
-//     if (password !== confirmPassword) {
-//       Alert.alert("Password Mismatch", "Please enter the same password in both fields");
-//       return;
-//     }
-
-//     const auth = getAuth(app);
-//     const db = getFirestore(app);
-// console.log(email);
-//     try {
-//       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-//       const user = userCredential.user;
-//       // console.warn(user)
-//       // console.warn(userCredential)
-//       const userRef = collection(db, "users");
-//       const userDoc = doc(userRef, user.uid);
-
-//       await setDoc(userDoc, {
-//         email: email,
-//         password: password,
-//       });
-
-//       navigation.navigate('login');
-//       setLoad(false);
-//       console.log('User added to Firestore');
-//     } catch (error) {
-//       console.log(error.message);
-//       Alert.alert("User registration Failed", error.message);
-//       setLoad(false);
-//     }
-//   };
 
   const goBack = ()=>{
     navigation.navigate('login');

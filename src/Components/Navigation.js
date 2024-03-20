@@ -8,8 +8,8 @@ import { CommonActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, BottomNavigation } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import HomeScreen from '../HomeScreen';
-import Settings from '../Settings';
+import HomeScreen from '../Screens/HomeScreen';
+import Settings from '../Screens/Settings';
 
 const Tab = createBottomTabNavigator();
 
@@ -99,3 +99,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0, // Remove shadow on iOS
   },
 });
+
+
