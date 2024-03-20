@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "114261321056",
+    "firebase_url": "https://budgetsupervisor1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "budgetsupervisor1",
+    "storage_bucket": "budgetsupervisor1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114261321056:android:f5e549a85397c5ec6aaa05",
+        "android_client_info": {
+          "package_name": "com.awan873.BudgetSupervisor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114261321056-v6l0u8qnstt97lbve6ld5q72rvlck69d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOCXar4NHlO5MBZHe0a_UkRX8mxG8d84E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114261321056-v6l0u8qnstt97lbve6ld5q72rvlck69d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
