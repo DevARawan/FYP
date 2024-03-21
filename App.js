@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DataEntry from './src/Screens/DataEntry'
 import LoginScreen from "./src/Screens/LoginScreen";
 import Screen1 from './src/Screens/Screen1';
-import SignupScreen from './src/Screens/SignupScreen';
+import SignUpScreen from "./src/Screens/SignUpScreen/ViewController";
 import ManageGoals from './src/Screens/ManageGoals';
 import UserProfile from './src/Screens/UserProfile';
 import General from "./src/Screens/General";
@@ -155,7 +155,7 @@ const  App = () => {
         />
         <Stack.Screen
           name="Signup"
-          component={SignupScreen}
+          component={SignUpScreen}
           options={({ navigation }) => ({
             title: 'Signup',
             headerLeft: () => (
