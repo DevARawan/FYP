@@ -2,7 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
 import { collection, doc, setDoc } from 'firebase/firestore';
 
@@ -19,8 +19,47 @@ export default function SignupScreen({navigation}) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [load, setLoad] = useState(false);
-  
+  const [isEmailValid, setIsEmailValid] = useState(true)
+  const [isPasswordValid, setIsPasswordValid] = useState(true)
+  const [validationError, setValidationError] = useState(false)
+
+
+  const validateEmail = (email, type) => {
+    setEmail(email)
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Test the email against the regex
+    console.log('email valid', emailRegex.test(email))
+    setIsEmailValid(emailRegex.test(email))
+    return emailRegex.test(email);
+  }
+
+
+  const validatePassword = (password) => {
+    setPassword(password)
+    // Regular expressions for password validation
+    const upperCaseRegex = /[A-Z]/;
+    const lowerCaseRegex = /[a-z]/;
+    const numberRegex = /[0-9]/;
+    const symbolRegex = /[$&+,:;=?@#|'<>.^*()%!-]/;
+    const minLength = 8;
+
+    // Test the password against the regex
+    const isUpperCaseValid = upperCaseRegex.test(password);
+    const isLowerCaseValid = lowerCaseRegex.test(password);
+    const isNumberValid = numberRegex.test(password);
+    const isSymbolValid = symbolRegex.test(password);
+    const isLengthValid = password.length >= minLength;
+    const isPasswordValid = isUpperCaseValid && isLowerCaseValid && isNumberValid && isSymbolValid && isLengthValid;
+    setIsPasswordValid(isPasswordValid)
+};
+
+
+
   const handleRegister = async () => {
+    setValidationError(true)
+    if (email.length > 0 && password.length > 0 && confirmPassword.length > 0) {
+    if(isEmailValid){
     const auth = FIREBASE_AUTH
     setLoad(true);
     if (password !== confirmPassword) {
@@ -49,7 +88,12 @@ export default function SignupScreen({navigation}) {
       // Reset loading state regardless of success or failure
       setLoad(false);
     }
-  };
+  }else {
+    ToastAndroid.show('Invalid Email', ToastAndroid.SHORT);
+  }
+  }else{
+    ToastAndroid.show('Empty Email or Password', ToastAndroid.SHORT);
+  }}
   
 
   const goBack = ()=>{
@@ -68,10 +112,12 @@ export default function SignupScreen({navigation}) {
             style={styles.input}
             placeholder="Email Address"
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={(text) => validateEmail(text)}
           />
          
+         
         </View>
+        {!isEmailValid && validationError &&    <Text style={{color:'red', alignSelf:'flex-end', marginBottom:10 , width:'50%'}}>Please Enter a valid email</Text>}
 
         <View style={styles.inputContainer}>
         <FontAwesome5 name="lock" style={styles.icon} />
@@ -80,11 +126,11 @@ export default function SignupScreen({navigation}) {
             placeholder="Password"
             secureTextEntry={true}
             value={password}
-            onChangeText={(text) => setPassword(text)}
-          />
-          
+            onChangeText={(text) => validatePassword(text)}
+          />    
         </View>
-
+        {!isPasswordValid && validationError &&    
+           <Text style={{color:'red', alignSelf:'flex-end', marginBottom:10, width:'80%'}}>Password needs 8+ characters, a number, symbol, and uppercase letter</Text>}
         <View style={styles.inputContainer}>
         <FontAwesome5 name="lock" style={styles.icon} />
           <TextInput
@@ -96,6 +142,8 @@ export default function SignupScreen({navigation}) {
           />
           
         </View>
+        {password != confirmPassword && validationError &&    
+           <Text style={{color:'red', alignSelf:'flex-end', marginBottom:10, }}>Passwords do not match</Text>}
 
         <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
           {load ? <ActivityIndicator size="small" color="white" /> :
