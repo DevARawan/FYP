@@ -22,9 +22,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 // import { getStorage, ref, uploadBytes } from 'firebase/storage';
 import { ActionSheet } from "@expo/react-native-action-sheet";
-
+import firebase from "@firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
+import app from "./Components/firebase";
 import * as ImagePicker from "expo-image-picker";
 
 
@@ -86,8 +86,8 @@ const UserProfile = () => {
   };
 
   const handleSaveProfile = async () => {
-    const storage = getStorage(FIREBASE_APP);
-    const db = FIREBASE_DB
+    const storage = getStorage(app);
+    const db = getFirestore(app);
     const timestamp = new Date().getTime();
     const fileExtension = selectedImage.split(".").pop().toLowerCase();
     const fileName = `userProfiles_${timestamp}.${fileExtension}`;
@@ -97,6 +97,7 @@ const UserProfile = () => {
     const blob = await response.blob();
     await uploadBytes(storageRef, blob);
     const downloadURL = await getDownloadURL(storageRef);
+
     const userDocRef = doc(collection(db, "users"), userData.id);
 
     updateDoc(userDocRef, {
@@ -105,7 +106,8 @@ const UserProfile = () => {
     const updated_local_storage = { ...userData, profile_url: downloadURL };
     const updated_userData = JSON.stringify(updated_local_storage);
     localStorage.setItem("user", updated_userData);
-    setIsEditMode(false);
+    
+      setIsEditMode(false);
     setShowUploadButton(false);
   } catch(error){
     console.log("error is", error);
