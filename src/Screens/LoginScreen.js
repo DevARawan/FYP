@@ -37,8 +37,7 @@ export default function LoginScreen() {
   // validation error is used to trigger if or not to show validation error behind text field
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const navigation = useNavigation();
-  const authentication = getAuth();
+  const navigation = useNavigation();;
   const handleLogin = async () => {
     setValidationError(true);
     if (email.length > 0 && password.length > 0) {
@@ -47,7 +46,7 @@ export default function LoginScreen() {
             try {
                 const userInfo = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
                 if(userInfo){
-                  navigation.navigate('main')
+                  navigation.replace('main')
                   const userCollection = firebase.collection('users');
                   const userDoc = doc(userCollection, userInfo.user.uid);
                   const userSnapshot = await getDoc(userDoc);
@@ -76,13 +75,9 @@ export default function LoginScreen() {
     }
 };
 
-
-
   const handleRegister = ()=>{
     navigation.navigate('Signup');
   }
-
-
 
   const handleforget = async()=>{
     if(forgotPasswordEmail.length > 0 && isForgotPasswordEmailValid){

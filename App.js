@@ -23,10 +23,8 @@ const  App = () => {
   const [userExist, setUserExist] = useState(null);
   GoogleSignin.configure();
   useEffect(() => {
-    const getUserFromAsync = async () => {
-      
+    const getUserFromAsync = async () => {  
       let user = await AsyncStorage.getItem('user');
-      console.log(user);
       setUserExist(JSON.parse(user) );
     };
     getUserFromAsync();
@@ -79,20 +77,10 @@ const  App = () => {
           component={Screen1}
           options={({ navigation }) => ({
             title: 'BudgetSupervisor',
-            // headerLeft: () => (
-            //   <TouchableOpacity onPress={() => navigation.goBack()}>
-            //     <View style={{ marginLeft: 10 }}>
-            //     </View>
-            //   </TouchableOpacity>
-            // ),
             headerRight: () => <Logo />,
           })}
         />
-        
-        
-        
         <Stack.Screen
-        
         name="data Entry"
         component={MyComponent}
         options={({ navigation }) => ({
@@ -121,7 +109,6 @@ const  App = () => {
             headerRight: () => <Logo />,
           })}
         />
-
           <Stack.Screen
           name="manageGoals"
           component={ManageGoals}
@@ -137,7 +124,6 @@ const  App = () => {
             headerRight: () => <Logo />,
           })}
         />
-
         <Stack.Screen
           name="login"
           component={LoginScreen}
@@ -168,8 +154,7 @@ const  App = () => {
             headerRight: () => <Logo />,
           })}
         />
-
-          <Stack.Screen
+        <Stack.Screen
            name="profile"
            component={UserProfile}
            options={({ navigation }) => ({
@@ -184,8 +169,8 @@ const  App = () => {
              headerRight: () => <Logo />,
            })}
          />
-          <Stack.Screen
-           name="general"
+        <Stack.Screen
+          name="general"
            component={General}
            options={({ navigation }) => ({
              title: 'General Settings',
@@ -197,9 +182,8 @@ const  App = () => {
                </TouchableOpacity>
              ),
              headerRight: () => <Logo />,
-           })}
-            />
-
+          })}
+         />
         <Stack.Screen
         name="Achievements"
         component={Achievements}
@@ -215,7 +199,7 @@ const  App = () => {
           ),
           headerRight: () => <Logo />,
         })}
-      />
+       />
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -43,41 +43,32 @@ const userID = JSON.parse(user).id
   };
 
   useEffect(() => {
+    console.log('myuser.id', myuser.id)
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const myuser1 = await AsyncStorage.getItem('user');
         const myuser = JSON.parse(myuser1);
-  
         // Get user document from Firestore
         const userCollection = collection(db, 'users');
         const userDoc = doc(userCollection, myuser.id);
-        
         // Get goals collection from user document
         const goalsRef = collection(userDoc, 'goals');
-        
         // Fetch documents from goals collection
         const goalsSnapshot = await getDocs(goalsRef);
-        
         console.log("Data fetched successfully");
-        
         // Store goals data in an array
         const goalsData = goalsSnapshot.docs.map(doc => {
           const goalData = doc.data();
-         
           goals.push({id: doc.id,
             goalName: goalData.newGoal.goalName,
             goalDescription: goalData.newGoal.description,
             totalAmount: goalData.newGoal.totalAmount,
             dueDate: goalData.newGoal.dueDate || null,})
-            
-          
         });
-  
         setAllGoals(goals);
         setIsLoading(false);
-        // Do whatever you need with goalsData here
-        
+        // Do whatever you need with goalsData here 
       } catch (error) {
         console.error('Error fetching user data:', error);
       }

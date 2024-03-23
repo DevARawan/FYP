@@ -10,6 +10,7 @@ import { Text, BottomNavigation } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeScreen from '../Screens/HomeScreen';
 import Settings from '../Screens/Settings';
+import AdminScreen from '../Screens/Admin/ViewController';
 
 const Tab = createBottomTabNavigator();
 
@@ -73,7 +74,9 @@ export default function MyComponent() {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        // options={{headerShown:"false"}}
+        options={{
+          tabBarLabel: 'Home',
+        }}
       />
       <Tab.Screen
         name="Settings"
@@ -81,7 +84,14 @@ export default function MyComponent() {
         options={{
           tabBarLabel: 'Settings',
         }}
-      />
+      />    
+      <Tab.Screen
+        name="Admin"
+        component={AdminScreen}
+        options={{
+          tabBarLabel: 'Settings',
+        }}
+    />
     </Tab.Navigator>
   );
 }
