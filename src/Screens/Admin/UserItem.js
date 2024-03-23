@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Menu, Provider } from 'react-native';
+import { View, Text, TouchableOpacity, Menu, Provider , StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import icon library (optional)
 
 const UserItem = ({ user, onOptionPress }) => {

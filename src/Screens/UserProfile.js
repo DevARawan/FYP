@@ -24,7 +24,8 @@ import { useNavigation } from "@react-navigation/native";
 import { ActionSheet } from "@expo/react-native-action-sheet";
 import firebase from "@firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import app from "./Components/firebase";
+
+import { FIREBASE_APP } from "../../firebaseConfig";
 import * as ImagePicker from "expo-image-picker";
 
 
@@ -86,6 +87,7 @@ const UserProfile = () => {
   };
 
   const handleSaveProfile = async () => {
+    const app = FIREBASE_APP
     const storage = getStorage(app);
     const db = getFirestore(app);
     const timestamp = new Date().getTime();
