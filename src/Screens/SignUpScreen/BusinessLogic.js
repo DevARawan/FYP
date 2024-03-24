@@ -58,6 +58,7 @@ const SignUpBusinessLogic = ({children, navigation}) => {
           // Data to be stored in the Firestore document
           const userData = {
             email: email,
+            user_id:user.uid
           };
           // Set data in Firestore document
           await setDoc(userDoc, userData);

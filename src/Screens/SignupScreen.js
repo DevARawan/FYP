@@ -76,8 +76,10 @@ export default function SignupScreen({navigation}) {
       // Data to be stored in the Firestore document
       const userData = {
         email: email,
+        user_id:user.uid
       };
       // Set data in Firestore document
+      console.log("userData is", userData)
       await setDoc(userDoc, userData);
       // Navigate to login screen after successful registration
       navigation.navigate('login');
