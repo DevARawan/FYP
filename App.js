@@ -6,11 +6,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import DataEntry from './src/Screens/DataEntry'
 import LoginScreen from "./src/Screens/LoginScreen";
-import Screen1 from './src/Screens/Screen1';
+// import Screen1 from './src/Screens/IntroScreen';
+import FrontScreen from "./src/Screens/IntroScreen";
 import SignUpScreen from "./src/Screens/SignUpScreen/ViewController";
 import ManageGoals from './src/Screens/ManageGoals';
 import UserProfile from './src/Screens/UserProfile';
-import General from "./src/Screens/General";
+// import General from "./src/Screens/CurrencyPreferences";
+import CurrencyPreferences from "./src/Screens/CurrencyPreferences";
 import Achievements from "./src/Screens/Achievements";
 import { View, TouchableOpacity, Image } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons'; 
@@ -35,12 +37,12 @@ const  App = () => {
 
   const RenderInitialScreen = () => {
     if (userExist === null) {
-      return <Screen1 />;
+      return <FrontScreen />;
       
     } else if (userExist) {
       return <MyComponent />;
     } else {
-      return <Screen1 />;
+      return <FrontScreen />;
     }
   };
   return (
@@ -75,8 +77,8 @@ const  App = () => {
           })}
         />
         <Stack.Screen
-          name="screen1"
-          component={Screen1}
+          name="FrontScreen"
+          component={FrontScreen}
           options={({ navigation }) => ({
             title: 'BudgetSupervisor',
             // headerLeft: () => (
@@ -185,8 +187,8 @@ const  App = () => {
            })}
          />
           <Stack.Screen
-           name="general"
-           component={General}
+           name="CurrencyPreferences"
+           component={CurrencyPreferences}
            options={({ navigation }) => ({
              title: 'General Settings',
              headerLeft: () => (

@@ -40,7 +40,7 @@ const Settings = () => {
 
   const handleLogout = () => {
     AsyncStorage.removeItem("user");
-    navigation.navigate("screen1");
+    navigation.navigate("FrontScreen");
   };
 
   const handleAchievements = () => {
@@ -52,7 +52,7 @@ const Settings = () => {
   };
 
   const handleGeneral = () => {
-    navigation.navigate("general");
+    navigation.navigate("CurrencyPreferences");
   };
 
   return (

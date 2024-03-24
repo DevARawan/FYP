@@ -31,7 +31,7 @@ const Dropdown = ({ data, selectedValue, onSelect }) => {
   );
 };
 
-const General = () => {
+const CurrencyPreferences = () => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [selectedTheme, setSelectedTheme] = useState('light'); // Default theme
   const [currencies, setCurrencies] = useState([]);
@@ -133,4 +133,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default General;
+export default CurrencyPreferences;
