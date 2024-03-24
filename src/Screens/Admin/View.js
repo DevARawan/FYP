@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAuthContext } from "../../Hooks/UseAuth";
 
 const AdminView = ({
   navigation,
@@ -21,6 +22,9 @@ const AdminView = ({
   handleOptions,
   handleDeleteUser,
 }) => {
+
+  const { currentUser } = useAuthContext();
+  console.log('currentUser',currentUser)
   const renderItem = ({ item }) => (
     <View style={styles.item}>
       <Text>{item.email}</Text>

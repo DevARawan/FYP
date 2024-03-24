@@ -11,7 +11,7 @@ import { ActivityIndicator, Alert, Modal, Pressable, StyleSheet, Text, TextInput
 
 import { createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
 
-import { FIREBASE_APP, FIREBASE_AUTH } from '../../firebaseConfig';
+import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from '../../firebaseConfig';
 import myColor from '../Components/Color';
 
 
@@ -47,19 +47,6 @@ export default function LoginScreen() {
                 const userInfo = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
                 if(userInfo){
                   navigation.replace('main')
-                  const userCollection = firebase.collection('users');
-                  const userDoc = doc(userCollection, userInfo.user.uid);
-                  const userSnapshot = await getDoc(userDoc);
-                  if (userSnapshot.exists()) {
-                    const user = userSnapshot.data();
-                    const userData = {
-                      id: userInfo.user.uid,
-                      ...user
-                    };
-                     await AsyncStorage.setItem('user', JSON.stringify(userData));
-                  }else {
-                    setLoad(false);
-                  }
                 }
                 setLoad(false);
 

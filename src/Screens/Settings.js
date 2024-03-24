@@ -11,6 +11,8 @@ import { useNavigation } from "@react-navigation/native";
 // import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LottieView from 'lottie-react-native';
+import { useAuthContext } from "../Hooks/UseAuth";
+
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -18,7 +20,7 @@ const Settings = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedRow, setSelectedRow] = useState("");
-
+  const { signOut } = useAuthContext();
   const handleProfile = () => {
     navigation.navigate("profile");
   };
@@ -38,8 +40,8 @@ const Settings = () => {
     setSelectedRow(option === selectedOption ? "" : option);
   };
 
-  const handleLogout = () => {
-    AsyncStorage.removeItem("user");
+  const handleLogout = async() => {
+    await signOut()
     navigation.navigate("screen1");
   };
 
