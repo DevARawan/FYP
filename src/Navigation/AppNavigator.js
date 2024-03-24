@@ -1,8 +1,11 @@
-import { NavigationContainer } from "@react-navigation/native";
-import React, { useState } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
-import MyComponent from "../Components/Navigation";
+import { Logo } from "../Components/Logo";
+import Home from "../Components/Navigation";
+import { useAuthContext } from "../Hooks/UseAuth";
 import Achievements from "../Screens/Achievements";
 import DataEntry from "../Screens/DataEntry";
 import General from "../Screens/General";
@@ -11,9 +14,6 @@ import ManageGoals from "../Screens/ManageGoals";
 import Screen1 from "../Screens/Screen1";
 import SignUpScreen from "../Screens/SignUpScreen/ViewController";
 import UserProfile from "../Screens/UserProfile";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Logo } from "../Components/Logo";
-import { useAuthContext } from "../Hooks/UseAuth";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -23,7 +23,7 @@ const AppNavigator = () => {
     if (currentUser === null) {
       return <Screen1 />;
     } else if (currentUser) {
-      return <MyComponent />;
+      return <Home />;
     } else {
       return <Screen1 />;
     }
@@ -46,7 +46,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen
           name="main"
-          component={MyComponent}
+          component={Home}
           options={({ navigation }) => ({
             title: "BudgetSupervisor",
             headerLeft: () => (
@@ -67,7 +67,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen
           name="data Entry"
-          component={MyComponent}
+          component={Home}
           options={({ navigation }) => ({
             title: "my App",
             headerLeft: () => (

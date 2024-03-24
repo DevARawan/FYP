@@ -14,7 +14,7 @@ import AdminScreen from '../Screens/Admin/ViewController';
 
 const Tab = createBottomTabNavigator();
 
-export default function MyComponent() {
+export default function Home() {
   return (
     <Tab.Navigator
       screenOptions={{
