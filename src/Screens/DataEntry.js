@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  ToastAndroid
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
@@ -89,11 +90,21 @@ const DataEntry = () => {
         await setDoc(expenceDocRef, {
             expenseAmounts,
         });
+        showToast('Data submitted successfully!');
     } else {
         console.error("User document not found");
     }
 }
 
+const showToast = (message) => {
+  ToastAndroid.showWithGravityAndOffset(
+    message,
+    ToastAndroid.LONG, // Use LONG duration for increased visibility
+    ToastAndroid.CENTER, // Show the toast at the center of the screen
+    0, // No horizontal offset
+    0 // No vertical offset
+  );
+};
 
   return (
     <ScrollView style={styles.container}>

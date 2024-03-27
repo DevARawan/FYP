@@ -14,6 +14,7 @@ import ManageGoals from "../Screens/ManageGoals";
 import FrontScreen from "../Screens/IntroScreen";
 import SignUpScreen from "../Screens/SignUpScreen/ViewController";
 import UserProfile from "../Screens/UserProfile";
+import PrivacyPolicy from "../Screens/PrivacyPolicy";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -173,6 +174,24 @@ const AppNavigator = () => {
           component={General}
           options={({ navigation }) => ({
             title: "General Settings",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <View style={{ marginLeft: 10 }}>
+                  <FontAwesome5
+                    name="arrow-left"
+                    style={{ fontSize: 24, color: "black" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ),
+            headerRight: () => <Logo />,
+          })}
+        />
+        <Stack.Screen
+          name="PrivacyPolicy"
+          component={PrivacyPolicy}
+          options={({ navigation }) => ({
+            title: "Privacy Policy",
             headerLeft: () => (
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <View style={{ marginLeft: 10 }}>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Linking, Animated } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import LottieView from 'lottie-react-native';
 
 const Achievements = () => {
   const [shareDialogVisible, setShareDialogVisible] = useState(false);
@@ -63,8 +64,15 @@ const Achievements = () => {
         }) }] }]}>
         <FontAwesome name="star" size={20} color="#ffd700" style={{ position: 'absolute', top: 100, left: 50 }} />
         <FontAwesome name="star" size={20} color="#ffd700" style={{ position: 'absolute', top: 200, left: 150 }} />
+        <FontAwesome name="star" size={20} color="#ffd700" style={{ position: 'absolute', top: 200, left: 250 }} />
+        <FontAwesome name="star" size={20} color="#ffd700" style={{ position: 'absolute', top: 200, left: 350 }} />
+        <FontAwesome name="star" size={20} color="#ffd700" style={{ position: 'absolute', top: 200, left: 450 }} />
         {/* Add more stars as needed */}
       </Animated.View>
+
+      <LottieView style={{width:200, height:150, alignSelf:'center', marginBottom:7}}
+        source={require('../../Animations/Achievement1 - 1711564516751.json')} autoPlay loop 
+        />
 
       <Text style={styles.screenHeading}>Achievements</Text>
 
