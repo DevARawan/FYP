@@ -39,7 +39,7 @@ const AdminView = ({
       <FlatList
         data={users}
         renderItem={renderItem}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.email}
       />
       <Modal
         animationType="slide"

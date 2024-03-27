@@ -4,14 +4,22 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Animated
 } from "react-native";
-import { MaterialIcons, FontAwesome5, FontAwesome } from "@expo/vector-icons";
+import {
+  MaterialIcons,
+  FontAwesome5,
+  FontAwesome,
+  MaterialCommunityIcons
+} from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 // import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LottieView from "lottie-react-native";
 import { useAuthContext } from "../Hooks/UseAuth";
+import { Button, TextInput } from "react-native-paper";
+import { BottomSheet } from "react-native-elements";
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -19,7 +27,30 @@ const Settings = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedRow, setSelectedRow] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+  const handleSubmit = async () => {
+    if (newPassword !== confirmPassword) {
+      alert("New passwords do not match!");
+      return;
+    }
+
+    try {
+      const user = auth.currentUser;
+      // ... (placeholder logic for reauthenticateWithCredential)
+      const credential = await reauthenticateWithCredential(user /* ... */);
+      await updatePassword(user, newPassword);
+      // Show success message
+    } catch (error) {
+      console.error(error);
+      // Show error message based on error code
+    }
+  };
   const { signOut } = useAuthContext();
+  const [blinkAnimation] = useState(new Animated.Value(0));
+
   const handleProfile = () => {
     navigation.navigate("profile");
   };
@@ -33,15 +64,23 @@ const Settings = () => {
   };
   const handleOptionSelect = (option) => {
     setSelectedOption(option === selectedOption ? "" : option);
+    startBlinkingAnimation();
+    setTimeout(() => {
+      setShowNotifications(false); // Close the dropdown after 1 second
+    }, 100);
   };
 
   const handleOption = (option) => {
     setSelectedRow(option === selectedOption ? "" : option);
+    startBlinkingAnimation();
+    setTimeout(() => {
+      setShowGenerateOptions(false); // Close the dropdown after 1 second
+    }, 100);
   };
 
   const handleLogout = async () => {
     await signOut();
-    navigation.navigate("screen1");
+    navigation.navigate("FrontScreen");
   };
 
   const handleAchievements = () => {
@@ -49,11 +88,95 @@ const Settings = () => {
   };
 
   const handlePolicy = () => {
-    navigation.navigate("policy");
+    navigation.navigate("privacy policy");
   };
 
   const handleGeneral = () => {
-    navigation.navigate("general");
+    navigation.navigate("CurrencyPreferences");
+  };
+
+  const ChangePasswordBottomSheet = () => {
+    return (
+      <View style={styles.resetContainer}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={styles.title}>Change Password</Text>
+          <MaterialIcons
+            onPress={() => {
+              setIsBottomSheetVisible(false);
+            }}
+            name="close"
+            size={30}
+          />
+        </View>
+        <View>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="lock-outline"
+              size={24}
+              color="black"
+              style={styles.icon}
+            />
+            <TextInput
+              value={oldPassword}
+              onChangeText={(value) => setOldPassword(value)}
+              placeholder="Current Password"
+              style={styles.textInput}
+              secureTextEntry
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="lock-plus"
+              size={24}
+              color="black"
+              style={styles.icon}
+            />
+            <TextInput
+              value={newPassword}
+              onChangeText={setNewPassword}
+              mask="..."
+              placeholder="New Password"
+              style={styles.textInput}
+              secureTextEntry
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="lock-check"
+              size={24}
+              color="black"
+              style={styles.icon}
+            />
+            <TextInput
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              mask="..."
+              placeholder="Re-enter New Password"
+              style={styles.textInput}
+              secureTextEntry
+            />
+          </View>
+          <Button title="Submit" onPress={handleSubmit} />
+          <Button title="Cancel" color="grey" />
+        </View>
+      </View>
+    );
+  };
+  const startBlinkingAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnimation, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true
+        }),
+        Animated.timing(blinkAnimation, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true
+        })
+      ])
+    ).start();
   };
 
   return (
@@ -61,7 +184,12 @@ const Settings = () => {
       <View style={styles.header}>
         {/* <MaterialIcons name="settings" style={styles.headerIcon} /> */}
         <LottieView
-          style={{ width: 200, height: 200 }}
+            style={{
+            width: 200,
+            height: 150,
+            alignSelf: "center",
+            marginBottom: 50
+          }}
           source={require("../../Animation1 - 1710499066508.json")}
           autoPlay
           loop
@@ -115,6 +243,17 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "black" }]}
         />
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => setIsBottomSheetVisible(true)}
+      >
+        <Text style={styles.link}>Change Password</Text>
+        <MaterialIcons
+          name={showGenerateOptions ? "keyboard-arrow-up" : "chevron-right"}
+          style={[styles.rowIcon, { color: "black" }]}
+        />
+      </TouchableOpacity>
       {showGenerateOptions && (
         <View style={styles.dropdown}>
           <TouchableOpacity
@@ -149,10 +288,6 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "#3498DB" }]}
         />
       </TouchableOpacity>
-      {/* <TouchableOpacity style={styles.row}>
-                <Text style={styles.link}>Currency</Text>
-                <FontAwesome name="money" style={[styles.rowIcon, { color: '#F1C40F' }]} />
-            </TouchableOpacity> */}
 
       <TouchableOpacity style={styles.row} onPress={handleAchievements}>
         <Text style={styles.link}>Achievements</Text>
@@ -162,7 +297,7 @@ const Settings = () => {
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.row}>
-        <Text style={styles.link}>Help and FAQs</Text>
+        <Text style={styles.link}>About us</Text>
         <MaterialIcons
           name="description"
           style={[styles.rowIcon, { color: "#607D8B" }]}
@@ -185,6 +320,9 @@ const Settings = () => {
       {/* <Button icon="logout" mode="contained" style={styles.logoutButton} onPress={handleLogout}>
       Logout
     </Button> */}
+      <BottomSheet isVisible={isBottomSheetVisible}>
+        <ChangePasswordBottomSheet />
+      </BottomSheet>
     </ScrollView>
   );
 };
@@ -264,6 +402,33 @@ const styles = StyleSheet.create({
   selectedOption: {
     backgroundColor: "#d4ebf2",
     width: "100%"
+
+  },
+  resetContainer: {
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    height: "100%",
+    justifyContent: "space-between"
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10
+  },
+  icon: {
+    marginRight: 10
+  },
+  textInput: {
+    flex: 1,
+    borderBottomWidth: 1,
+    paddingBottom: 5
+>>>>>>> main
   }
 });
 

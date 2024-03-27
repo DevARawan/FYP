@@ -22,6 +22,37 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { firebase } from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
+
+import { useNavigation } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import { doc, getDoc } from "firebase/firestore";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  View
+} from "react-native";
+
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword
+} from "firebase/auth";
+
+import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
+import myColor from "../Components/Color";
 
 import {
   createUserWithEmailAndPassword,
@@ -112,36 +143,36 @@ export default function LoginScreen() {
   };
 
   const handleSignInWithGoogle = async () => {
-    try {
-      const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      const userCollection = firestore().collection("users");
-      const userDoc = doc(userCollection, userInfo.user.uid);
-      const userSnapshot = await getDoc(userDoc);
-      if (userSnapshot.exists()) {
-        const user = userSnapshot.data();
-        const userData = {
-          id: userInfo.user.uid,
-          ...user
-        };
-        await AsyncStorage.setItem("user", JSON.stringify(userData));
-        setLoad(false);
-        navigation.navigate("main");
-      } else {
-        setLoad(false);
-      }
-    } catch (error) {
-      console.error(error);
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-      } else {
-        // some other error happened
-      }
-    }
+    //  ' try {
+    //    const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
+    //     const userInfo = await GoogleSignin.signIn();
+    //     const userCollection = firestore().collection('users');
+    //     const userDoc = doc(userCollection, userInfo.user.uid);
+    //     const userSnapshot = await getDoc(userDoc);
+    //     if (userSnapshot.exists()) {
+    //       const user = userSnapshot.data();
+    //       const userData = {
+    //         id: userInfo.user.uid,
+    //         ...user
+    //       };
+    //        await AsyncStorage.setItem('user', JSON.stringify(userData));
+    //       setLoad(false);
+    //       navigation.navigate('main');
+    //     } else {
+    //       setLoad(false);
+    //     }
+    //   } catch (error) {
+    //     console.log('error is', error)
+    //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    //       // user cancelled the login flow
+    //     } else if (error.code === statusCodes.IN_PROGRESS) {
+    //       // operation (e.g. sign in) is in progress already
+    //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    //       // play services not available or outdated
+    //     } else {
+    //       // some other error happened
+    //     }
+    //   }'
   };
 
   const validateEmail = (email, type) => {
