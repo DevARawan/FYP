@@ -18,7 +18,6 @@ import UserProfile from "../Screens/UserProfile";
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
   const { currentUser } = useAuthContext();
-  console.log('currentUser',currentUser)
   const RenderInitialScreen = () => {
     if (currentUser === null) {
       return <Screen1 />;

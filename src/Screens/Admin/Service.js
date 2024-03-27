@@ -42,7 +42,6 @@ const AdminService = ({ children, navigation }) => {
   React.useEffect(() => {
     const fetchData = async () => {
       const allUsers = await fetchAllUsers();
-      console.log("all users", allUsers);
       setUsers(allUsers);
     };
     fetchData();

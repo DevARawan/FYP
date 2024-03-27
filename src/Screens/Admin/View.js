@@ -24,7 +24,6 @@ const AdminView = ({
 }) => {
 
   const { currentUser } = useAuthContext();
-  console.log('currentUser',currentUser)
   const renderItem = ({ item }) => (
     <View style={styles.item}>
       <Text>{item.email}</Text>
@@ -41,7 +40,7 @@ const AdminView = ({
       <FlatList
         data={users}
         renderItem={renderItem}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.email}
       />
       <Modal
         animationType="slide"
