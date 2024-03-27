@@ -2,7 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { firebase } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+
 import { useNavigation } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { doc, getDoc } from 'firebase/firestore';
@@ -85,36 +85,36 @@ export default function LoginScreen() {
   }
 
   const handleSignInWithGoogle = async () => {
-    try {
-     const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      const userCollection = firestore().collection('users');
-      const userDoc = doc(userCollection, userInfo.user.uid);
-      const userSnapshot = await getDoc(userDoc);
-      if (userSnapshot.exists()) {
-        const user = userSnapshot.data();
-        const userData = {
-          id: userInfo.user.uid,
-          ...user
-        };
-         await AsyncStorage.setItem('user', JSON.stringify(userData));
-        setLoad(false);
-        navigation.navigate('main');
-      } else {
-        setLoad(false);
-      }
-    } catch (error) {
-      console.log('error is', error)
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-      } else {
-        // some other error happened
-      }
-    }
+  //  ' try {
+  //    const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
+  //     const userInfo = await GoogleSignin.signIn();
+  //     const userCollection = firestore().collection('users');
+  //     const userDoc = doc(userCollection, userInfo.user.uid);
+  //     const userSnapshot = await getDoc(userDoc);
+  //     if (userSnapshot.exists()) {
+  //       const user = userSnapshot.data();
+  //       const userData = {
+  //         id: userInfo.user.uid,
+  //         ...user
+  //       };
+  //        await AsyncStorage.setItem('user', JSON.stringify(userData));
+  //       setLoad(false);
+  //       navigation.navigate('main');
+  //     } else {
+  //       setLoad(false);
+  //     }
+  //   } catch (error) {
+  //     console.log('error is', error)
+  //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+  //       // user cancelled the login flow
+  //     } else if (error.code === statusCodes.IN_PROGRESS) {
+  //       // operation (e.g. sign in) is in progress already
+  //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+  //       // play services not available or outdated
+  //     } else {
+  //       // some other error happened
+  //     }
+  //   }'
   };
 
   const validateEmail = (email, type) => {

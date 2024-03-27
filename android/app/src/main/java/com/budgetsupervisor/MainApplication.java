@@ -1,4 +1,4 @@
-package com.awan873.BudgetSupervisor;
+package com.budgetsupervisor;
 
 import android.app.Application;
 import android.content.res.Configuration;

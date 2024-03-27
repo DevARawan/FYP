@@ -1,78 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 const Dropdown = ({ data, selectedValue, onSelect }) => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   return (
     <View style={styles.dropdown}>
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Text>{selectedValue}</Text>
+      <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
+        <View style={styles.dropdownField}>
+          <Text>{selectedValue}</Text>
+          <Ionicons name={dropdownVisible ? 'caret-up-outline' : 'caret-down-outline'} size={24} color="black" />
+        </View>
       </TouchableOpacity>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-      >
-        <View style={styles.modal}>
+      {dropdownVisible && (
+        <View style={styles.dropdownMenu}>
           <FlatList
             data={data}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => { onSelect(item.value); setModalVisible(false); }}>
-                <Text style={styles.modalItem}>{item.label}</Text>
+              <TouchableOpacity onPress={() => { onSelect(item.value); setDropdownVisible(false); }}>
+                <Text style={styles.dropdownMenuItem}>{item.label}</Text>
               </TouchableOpacity>
             )}
             keyExtractor={(item) => item.value}
           />
         </View>
-      </Modal>
+      )}
     </View>
   );
 };
 
 const General = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [selectedCurrency, setSelectedCurrency] = useState('');
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
   const [selectedTheme, setSelectedTheme] = useState('light'); // Default theme
-  const [languages, setLanguages] = useState([]);
   const [currencies, setCurrencies] = useState([]);
 
   useEffect(() => {
-    // Load languages and currencies
-    loadLanguages();
+    // Load currencies
     loadCurrencies();
   }, []);
 
-  const loadLanguages = async () => {
-    const languagesData = [
-      { label: 'English', value: 'en' },
-      { label: 'Urdu', value: 'ur' },
-      { label: 'Punjabi', value: 'pa' },
-      { label: 'Sindhi', value: 'sd' },
-      { label: 'Pashto', value: 'ps' },
-      { label: 'Balochi', value: 'bal' },
-      { label: 'Spanish', value: 'es' },
-      { label: 'Italian', value: 'it' },
-      // Add more languages as needed
-    ];
-    setLanguages(languagesData);
-    const storedLanguage = await AsyncStorage.getItem('selectedLanguage');
-    if (storedLanguage) setSelectedLanguage(storedLanguage);
-  };
 
   const loadCurrencies = async () => {
     const currenciesData = [
       { label: 'USD - US Dollar', value: 'USD' },
       { label: 'EUR - Euro', value: 'EUR' },
-      { label: 'GBP - British Pound', value: 'GBP' },
       { label: 'PKR - Pakistani Rupee', value: 'PKR' },
       { label: 'INR - Indian Rupee', value: 'INR' },
-      { label: 'JPY - Japanese Yen', value: 'JPY' },
-      { label: 'CNY - Chinese Yuan', value: 'CNY' },
       // Add more currencies as needed
     ];
     setCurrencies(currenciesData);
@@ -80,10 +55,6 @@ const General = () => {
     if (storedCurrency) setSelectedCurrency(storedCurrency);
   };
 
-  const handleLanguageChange = async (value) => {
-    setSelectedLanguage(value);
-    await AsyncStorage.setItem('selectedLanguage', value);
-  };
 
   const handleCurrencyChange = async (value) => {
     setSelectedCurrency(value);
@@ -97,14 +68,6 @@ const General = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.heading}>Select Language</Text>
-        <Dropdown
-          data={languages}
-          selectedValue={selectedLanguage}
-          onSelect={handleLanguageChange}
-        />
-      </View>
 
       <View style={styles.section}>
         <Text style={styles.heading}>Select Currency</Text>
@@ -132,10 +95,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingVertical: 40, paddingTop:90,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 80,
   },
   heading: {
     fontSize: 18,
@@ -146,21 +109,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    padding: 10,
+    overflow: 'hidden', 
   },
-  modal: {
-    flex: 1,
-    justifyContent: 'center',
+  dropdownField: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    backgroundColor: '#fff',
   },
-  modalItem: {
-    padding: 10,
-    fontSize: 18,
+  dropdownMenu: {
+    backgroundColor: '#fff',
+    maxHeight: 250,
+    overflow: 'scroll',
+  },
+  dropdownMenuItem: {
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    fontSize: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    width: '100%',
-    textAlign: 'center',
   },
 });
 

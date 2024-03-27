@@ -8,10 +8,10 @@ import Home from "../Components/Navigation";
 import { useAuthContext } from "../Hooks/UseAuth";
 import Achievements from "../Screens/Achievements";
 import DataEntry from "../Screens/DataEntry";
-import General from "../Screens/General";
+import General from "../Screens/CurrencyPreferences";
 import LoginScreen from "../Screens/LoginScreen";
 import ManageGoals from "../Screens/ManageGoals";
-import Screen1 from "../Screens/Screen1";
+import FrontScreen from "../Screens/IntroScreen";
 import SignUpScreen from "../Screens/SignUpScreen/ViewController";
 import UserProfile from "../Screens/UserProfile";
 
@@ -20,11 +20,11 @@ const AppNavigator = () => {
   const { currentUser } = useAuthContext();
   const RenderInitialScreen = () => {
     if (currentUser === null) {
-      return <Screen1 />;
+      return <FrontScreen />;
     } else if (currentUser) {
       return <Home />;
     } else {
-      return <Screen1 />;
+      return <FrontScreen />;
     }
   };
   return (
@@ -57,8 +57,8 @@ const AppNavigator = () => {
           })}
         />
         <Stack.Screen
-          name="screen1"
-          component={Screen1}
+          name="FrontScreen"
+          component={FrontScreen}
           options={({ navigation }) => ({
             title: "BudgetSupervisor",
             headerRight: () => <Logo />,
@@ -168,7 +168,7 @@ const AppNavigator = () => {
           })}
         />
         <Stack.Screen
-          name="general"
+          name="CurrencyPreferences"
           component={General}
           options={({ navigation }) => ({
             title: "General Settings",
