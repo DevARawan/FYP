@@ -184,7 +184,7 @@ const Settings = () => {
       <View style={styles.header}>
         {/* <MaterialIcons name="settings" style={styles.headerIcon} /> */}
         <LottieView
-            style={{
+          style={{
             width: 200,
             height: 150,
             alignSelf: "center",
@@ -402,7 +402,6 @@ const styles = StyleSheet.create({
   selectedOption: {
     backgroundColor: "#d4ebf2",
     width: "100%"
-
   },
   resetContainer: {
     padding: 20,
@@ -428,7 +427,6 @@ const styles = StyleSheet.create({
     flex: 1,
     borderBottomWidth: 1,
     paddingBottom: 5
->>>>>>> main
   }
 });
 

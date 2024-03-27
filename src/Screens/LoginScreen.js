@@ -1,35 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { firebase } from "@react-native-firebase/auth";
-import firestore from "@react-native-firebase/firestore";
-import {
-  GoogleSignin,
-  statusCodes
-} from "@react-native-google-signin/google-signin";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { doc, getDoc } from "firebase/firestore";
-import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  View
-} from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { firebase } from "@react-native-firebase/auth";
-import firestore from "@react-native-firebase/firestore";
-
-import { useNavigation } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
-import { doc, getDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -45,24 +16,13 @@ import {
 } from "react-native";
 
 import {
-  createUserWithEmailAndPassword,
-  getAuth,
   sendPasswordResetEmail,
   signInWithEmailAndPassword
 } from "firebase/auth";
 
-import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
+import { FIREBASE_AUTH } from "../../firebaseConfig";
 import myColor from "../Components/Color";
 
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword
-} from "firebase/auth";
-
-import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
-import myColor from "../Components/Color";
 import { useAuthContext } from "../Hooks/UseAuth";
 
 const UserIcon = () => {
