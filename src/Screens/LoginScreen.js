@@ -32,6 +32,7 @@ import {
 
 import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
 import myColor from "../Components/Color";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const UserIcon = () => {
   return (
@@ -54,6 +55,7 @@ export default function LoginScreen() {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigation = useNavigation();
+  const { signOut } = useAuthContext();
   const handleLogin = async () => {
     setValidationError(true);
     if (email.length > 0 && password.length > 0) {
@@ -65,10 +67,12 @@ export default function LoginScreen() {
             email,
             password
           );
+
           if (userInfo.user.emailVerified) {
             navigation.replace("main");
           } else {
             Alert.alert("please verify you email");
+            signOut();
           }
           setLoad(false);
         } catch (error) {

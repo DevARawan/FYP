@@ -1,6 +1,10 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendSignInLinkToEmail
+} from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -38,7 +42,6 @@ export default function SignupScreen({ navigation }) {
     // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // Test the email against the regex
-    console.log("email valid", emailRegex.test(email));
     setIsEmailValid(emailRegex.test(email));
     return emailRegex.test(email);
   };
@@ -68,7 +71,6 @@ export default function SignupScreen({ navigation }) {
   };
 
   const handleRegister = async () => {
-    console.log("okay");
     setValidationError(true);
     if (email.length > 0 && password.length > 0 && confirmPassword.length > 0) {
       if (isEmailValid) {
@@ -83,28 +85,17 @@ export default function SignupScreen({ navigation }) {
           return;
         }
         try {
-          const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
+          // const userCredential = await createUserWithEmailAndPassword(
+          //   auth,
+          //   email,
+          //   password
+          // );
 
-          const user = userCredential.user;
+          // const user = userCredential.user;
           // await firebase.auth().currentUser.sendEmailVerification();
-          await firebaseAuth.sendEmailVerification();
-          Alert.alert("please check your email");
-
-          const userRef = collection(FIREBASE_DB, "users");
-          // Create a document reference using the user's UID
-          const userDoc = doc(userRef, user.uid);
-          // Data to be stored in the Firestore document
-          const userData = {
-            email: email,
-            user_id: user.uid
-          };
 
           // Set data in Firestore document
-          await setDoc(userDoc, userData);
+
           // Navigate to login screen after successful registration
           navigation.navigate("login");
         } catch (error) {

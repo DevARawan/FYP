@@ -5,17 +5,17 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
-  StyleSheet,
+  StyleSheet
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { FontAwesome5 } from "@expo/vector-icons";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 import {
   getAuth,
   updatePassword,
   EmailAuthProvider,
-  reauthenticateWithCredential,
+  reauthenticateWithCredential
 } from "firebase/auth";
 import { getFirestore, doc, updateDoc, collection } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -27,8 +27,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import { FIREBASE_APP } from "../../firebaseConfig";
 import * as ImagePicker from "expo-image-picker";
-
-
 
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -45,10 +43,8 @@ const UserProfile = () => {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 1
     });
-
-    console.log(result);
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
@@ -60,7 +56,6 @@ const UserProfile = () => {
       try {
         let storedUserData = await AsyncStorage.getItem("user");
         storedUserData = JSON.parse(storedUserData);
-        console.log("user data: ", storedUserData);
         if (storedUserData) {
           // const userData = JSON.parse(storedUserData);
           setUserData(storedUserData);
@@ -68,7 +63,7 @@ const UserProfile = () => {
           setPassword(storedUserData.password);
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching user data 3:", error);
       }
     };
     fetchData();
@@ -79,41 +74,37 @@ const UserProfile = () => {
     setShowUploadButton(!isEditMode);
   };
 
-  
   const handleLogout = () => {
     AsyncStorage.removeItem("user");
     navigation.navigate("screen1");
-    // console.log("hi");
   };
 
   const handleSaveProfile = async () => {
-    const app = FIREBASE_APP
+    const app = FIREBASE_APP;
     const storage = getStorage(app);
     const db = getFirestore(app);
     const timestamp = new Date().getTime();
     const fileExtension = selectedImage.split(".").pop().toLowerCase();
     const fileName = `userProfiles_${timestamp}.${fileExtension}`;
     const storageRef = ref(storage, `userProfiles/${fileName}`);
-    try{
-    const response = await fetch(selectedImage);
-    const blob = await response.blob();
-    await uploadBytes(storageRef, blob);
-    const downloadURL = await getDownloadURL(storageRef);
+    try {
+      const response = await fetch(selectedImage);
+      const blob = await response.blob();
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
 
-    const userDocRef = doc(collection(db, "users"), userData.id);
+      const userDocRef = doc(collection(db, "users"), userData.id);
 
-    updateDoc(userDocRef, {
-      profile_url: downloadURL,
-    });
-    const updated_local_storage = { ...userData, profile_url: downloadURL };
-    const updated_userData = JSON.stringify(updated_local_storage);
-    localStorage.setItem("user", updated_userData);
-    
+      updateDoc(userDocRef, {
+        profile_url: downloadURL
+      });
+      const updated_local_storage = { ...userData, profile_url: downloadURL };
+      const updated_userData = JSON.stringify(updated_local_storage);
+      localStorage.setItem("user", updated_userData);
+
       setIsEditMode(false);
-    setShowUploadButton(false);
-  } catch(error){
-    console.log("error is", error);
-  }
+      setShowUploadButton(false);
+    } catch (error) {}
   };
 
   return (
@@ -140,7 +131,7 @@ const UserProfile = () => {
       </View>
       <View style={styles.profileInfo}>
         <View style={styles.inputContainer}>
-        <MaterialIcons
+          <MaterialIcons
             name="email"
             size={24}
             color="black"
@@ -153,15 +144,14 @@ const UserProfile = () => {
             onChangeText={setEmail}
             editable={false}
           />
-         
         </View>
         <View style={styles.inputContainer}>
-        <FontAwesome5
-    name="key"
-    size={24}
-    color="black"
-    style={styles.icon}
-  />
+          <FontAwesome5
+            name="key"
+            size={24}
+            color="black"
+            style={styles.icon}
+          />
           <TextInput
             style={styles.input}
             placeholder="change password"
@@ -197,17 +187,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 50
   },
   profileHeading: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 20
   },
   header: {
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 20
   },
   userImageOutline: {
     width: 150,
@@ -216,27 +206,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
     // marginBottom: 12,
   },
   userImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 80,
+    width: "100%",
+    height: "100%",
+    borderRadius: 80
   },
   uploadButton: {
     backgroundColor: "blue",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 10
   },
   uploadButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 16
   },
   profileInfo: {
-    marginBottom: 20,
+    marginBottom: 20
   },
   inputContainer: {
     flexDirection: "row",
@@ -244,32 +234,32 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 17,
     borderBottomWidth: 1,
-    borderBottomColor: "grey",
+    borderBottomColor: "grey"
   },
   icon: {
-    marginRight: 10,
+    marginRight: 10
   },
   logoutIcon: {
     fontSize: 20,
-    color: "#ffffff",
+    color: "#ffffff"
   },
   input: {
     flex: 1,
     height: 40,
     paddingHorizontal: 10,
-    color:'black',
+    color: "black"
   },
   manageProfileButton: {
     backgroundColor: "blue",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 20
   },
   manageProfileButtonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "bold"
   },
   logoutButton: {
     flexDirection: "row",
@@ -279,13 +269,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 40,
+    marginTop: 40
   },
   logoutButtonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "bold",
-  },
+    fontWeight: "bold"
+  }
 });
 
 export default UserProfile;

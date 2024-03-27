@@ -18,7 +18,6 @@ import UserProfile from "../Screens/UserProfile";
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
   const { currentUser } = useAuthContext();
-  console.log('currentUser',currentUser)
   const RenderInitialScreen = () => {
     if (currentUser === null) {
       return <Screen1 />;
@@ -41,7 +40,7 @@ const AppNavigator = () => {
                 <View style={{ marginLeft: 10 }}></View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -54,7 +53,7 @@ const AppNavigator = () => {
                 <View style={{ marginLeft: 10 }}></View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -62,7 +61,7 @@ const AppNavigator = () => {
           component={Screen1}
           options={({ navigation }) => ({
             title: "BudgetSupervisor",
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -75,7 +74,7 @@ const AppNavigator = () => {
                 <View style={{ marginLeft: 10 }}></View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -93,7 +92,7 @@ const AppNavigator = () => {
                 </View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -111,7 +110,7 @@ const AppNavigator = () => {
                 </View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -129,7 +128,7 @@ const AppNavigator = () => {
                 </View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -147,7 +146,7 @@ const AppNavigator = () => {
                 </View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -165,7 +164,7 @@ const AppNavigator = () => {
                 </View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -183,7 +182,7 @@ const AppNavigator = () => {
                 </View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
         <Stack.Screen
@@ -202,11 +201,11 @@ const AppNavigator = () => {
                 </View>
               </TouchableOpacity>
             ),
-            headerRight: () => <Logo />,
+            headerRight: () => <Logo />
           })}
         />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
-export default AppNavigator
+export default AppNavigator;

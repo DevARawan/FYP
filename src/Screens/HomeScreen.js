@@ -20,6 +20,7 @@ import {
   getDocs
 } from "firebase/firestore";
 import CircularProgressBar from "../Components/Progressbar";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(1000);
@@ -32,46 +33,42 @@ const HomeScreen = () => {
 
   // const firestore = firebase.firestore();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const myuser1 = await AsyncStorage.getItem("user");
-        const myuser = JSON.parse(myuser1);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const { currentUser } = useAuthContext();
+  //       // Get user document from Firestore
+  //       const userCollection = collection(db, "users");
+  //       const userDoc = doc(userCollection, currentUser.uid);
 
-        // Get user document from Firestore
-        const userCollection = collection(db, "users");
-        const userDoc = doc(userCollection, myuser.id);
+  //       // Get goals collection from user document
+  //       const goalsRef = collection(userDoc, "goals");
 
-        // Get goals collection from user document
-        const goalsRef = collection(userDoc, "goals");
+  //       // Fetch documents from goals collection
+  //       const goalsSnapshot = await getDocs(goalsRef);
 
-        // Fetch documents from goals collection
-        const goalsSnapshot = await getDocs(goalsRef);
+  //       // Store goals data in an array
+  //       const goalsData = goalsSnapshot.docs.map((doc) => {
+  //         const goalData = doc.data();
 
-        console.log("Data fetched successfully");
+  //         goals.push({
+  //           id: doc.id,
+  //           goalName: goalData.newGoal.goalName,
+  //           goalDescription: goalData.newGoal.description,
+  //           totalAmount: goalData.newGoal.totalAmount,
+  //           dueDate: goalData.newGoal.dueDate || null
+  //         });
+  //       });
 
-        // Store goals data in an array
-        const goalsData = goalsSnapshot.docs.map((doc) => {
-          const goalData = doc.data();
+  //       setAllGoals(goals);
+  //       // Do whatever you need with goalsData here
+  //     } catch (error) {
+  //       console.error("Error fetching user data 1:", error);
+  //     }
+  //   };
 
-          goals.push({
-            id: doc.id,
-            goalName: goalData.newGoal.goalName,
-            goalDescription: goalData.newGoal.description,
-            totalAmount: goalData.newGoal.totalAmount,
-            dueDate: goalData.newGoal.dueDate || null
-          });
-        });
-
-        setAllGoals(goals);
-        // Do whatever you need with goalsData here
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   //-----------------------------------------------------------------------------------------------
 

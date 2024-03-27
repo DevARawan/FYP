@@ -1,4 +1,7 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification
+} from "firebase/auth";
 import { collection, doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { Alert, ToastAndroid } from "react-native";
@@ -8,6 +11,7 @@ import {
   FIREBASE_DB
 } from "../../../firebaseConfig";
 import { firebase } from "@react-native-firebase/firestore";
+import { useAuthContext } from "../../Hooks/UseAuth";
 
 const SignUpBusinessLogic = ({ children, navigation }) => {
   const [email, setEmail] = useState("");
@@ -17,13 +21,12 @@ const SignUpBusinessLogic = ({ children, navigation }) => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [validationError, setValidationError] = useState(false);
-
+  const { signOut } = useAuthContext();
   const validateEmail = (email, type) => {
     setEmail(email);
     // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // Test the email against the regex
-    console.log("email valid", emailRegex.test(email));
     setIsEmailValid(emailRegex.test(email));
   };
   const validatePassword = (password) => {
@@ -49,61 +52,61 @@ const SignUpBusinessLogic = ({ children, navigation }) => {
     setIsPasswordValid(isPasswordValid);
   };
   const handleRegister = async () => {
-    setValidationError(true);
+    setValidationError(true); // Reset validation state
+
+    // Validate email, password, and confirm password
     if (email.length > 0 && password.length > 0 && confirmPassword.length > 0) {
       if (isEmailValid) {
         const auth = FIREBASE_AUTH;
-        setLoad(true);
+        setLoad(true); // Set loading state
+
         if (password !== confirmPassword) {
           Alert.alert(
             "Password Mismatch",
             "Please enter the same password in both fields"
           );
-          setLoad(false);
+          setLoad(false); // Reset loading state on error
           return;
         }
+
         try {
-          const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-          );
-          const user = userCredential.user;
-          const userEmail = firebase.auth().currentUser;
-          userEmail
-            .sendEmailVerification()
-            .then(async () => {
-              console.log("Verification email sent successfully!");
-              const userRef = collection(FIREBASE_DB, "users");
-              // Create a document reference using the user's UID
-              const userDoc = doc(userRef, user.uid);
-              // Data to be stored in the Firestore document
-              const userData = {
-                email: email,
-                user_id: user.uid
-              };
-              // Set data in Firestore document
-              await setDoc(userDoc, userData);
-              // Navigate to login screen after successful registration
+          createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              return userCredential.user;
+            }) // Access user object
+            .then((user) => {
+              sendEmailVerification(user);
+            })
+            .then((res) => {
+              Alert.alert("Email Sent Successful"); // Inform user
+            })
+            .then(() => {
+              signOut();
+            })
+            .then(() => {
               navigation.navigate("login");
             })
             .catch((error) => {
-              console.error("Error sending verification email:", error);
+              console.error("Registration Failed:", error);
+              Alert.alert("Registration Failed", error.message);
+            })
+            .finally(() => {
+              setLoad(false); // Reset loading state regardless of success/failure
             });
         } catch (error) {
           console.error("Registration Failed:", error);
           Alert.alert("Registration Failed", error.message);
         } finally {
-          // Reset loading state regardless of success or failure
-          setLoad(false);
+          setLoad(false); // Ensure loading state is reset even on exceptions
         }
       } else {
-        ToastAndroid.show("Invalid Email", ToastAndroid.SHORT);
+        ToastAndroid.show("Invalid Email", ToastAndroid.SHORT); // Inform user of invalid email
       }
     } else {
-      ToastAndroid.show("Empty Email or Password", ToastAndroid.SHORT);
+      ToastAndroid.show("Empty Email or Password", ToastAndroid.SHORT); // Inform user of missing fields
     }
   };
+
   const goBack = () => {
     navigation.navigate("login");
   };

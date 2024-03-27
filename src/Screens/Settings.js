@@ -4,15 +4,14 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  ScrollView
 } from "react-native";
 import { MaterialIcons, FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 // import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import LottieView from 'lottie-react-native';
+import LottieView from "lottie-react-native";
 import { useAuthContext } from "../Hooks/UseAuth";
-
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -40,8 +39,8 @@ const Settings = () => {
     setSelectedRow(option === selectedOption ? "" : option);
   };
 
-  const handleLogout = async() => {
-    await signOut()
+  const handleLogout = async () => {
+    await signOut();
     navigation.navigate("screen1");
   };
 
@@ -61,7 +60,12 @@ const Settings = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         {/* <MaterialIcons name="settings" style={styles.headerIcon} /> */}
-        <LottieView style={{width:200, height:200}} source={require('../../Animation1 - 1710499066508.json')} autoPlay loop />
+        <LottieView
+          style={{ width: 200, height: 200 }}
+          source={require("../../Animation1 - 1710499066508.json")}
+          autoPlay
+          loop
+        />
       </View>
       <TouchableOpacity style={styles.row} onPress={handleProfile}>
         <Text style={styles.link}>My Profile</Text>
@@ -82,7 +86,7 @@ const Settings = () => {
           <TouchableOpacity
             style={[
               styles.dropdownOption,
-              selectedOption === "Goal progress" && styles.selectedOption,
+              selectedOption === "Goal progress" && styles.selectedOption
             ]}
             onPress={() => handleOptionSelect("Goal progress")}
           >
@@ -92,7 +96,7 @@ const Settings = () => {
           <TouchableOpacity
             style={[
               styles.dropdownOption,
-              selectedOption === "Achieving goal" && styles.selectedOption,
+              selectedOption === "Achieving goal" && styles.selectedOption
             ]}
             onPress={() => handleOptionSelect("Achieving goal")}
           >
@@ -118,7 +122,7 @@ const Settings = () => {
               styles.dropdownOption,
               selectedRow === "Generate Financial Report"
                 ? styles.selectedOption
-                : null,
+                : null
             ]}
             onPress={() => handleOption("Generate Financial Report")}
           >
@@ -129,7 +133,7 @@ const Settings = () => {
               styles.dropdownOption,
               selectedRow === "Generate Expense Report"
                 ? styles.selectedOption
-                : null,
+                : null
             ]}
             onPress={() => handleOption("Generate Expense Report")}
           >
@@ -190,22 +194,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
     paddingHorizontal: 13,
-    paddingTop: 20,
+    paddingTop: 20
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginBottom: 10
   },
   headerText: {
     fontSize: 20,
     fontWeight: "bold",
-    marginRight: 10,
+    marginRight: 10
   },
   headerIcon: {
     fontSize: 65,
-    color: "#666666",
+    color: "#666666"
   },
   row: {
     flexDirection: "row",
@@ -213,25 +217,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
-    paddingVertical: 15,
+    paddingVertical: 15
   },
   link: {
     fontSize: 16,
-    color: "#333333",
+    color: "#333333"
   },
   rowIcon: {
     fontSize: 22,
-    color: "#666666",
+    color: "#666666"
   },
   dropdown: {
     backgroundColor: "#f9f9f9",
     marginTop: 5,
     paddingTop: 10,
     paddingBottom: 10,
-    borderRadius: 5,
+    borderRadius: 5
   },
   dropdownOption: {
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   logoutButton: {
     flexDirection: "row",
@@ -242,25 +246,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginTop: 70,
-    marginBottom: 35,
+    marginBottom: 35
   },
   logoutButtonText: {
     color: "#ffffff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "bold"
   },
   logoutIcon: {
     fontSize: 20,
-    color: "#ffffff",
+    color: "#ffffff"
   },
   dropdownOption: {
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 10
   },
   selectedOption: {
     backgroundColor: "#d4ebf2",
-    width: "100%",
-  },
+    width: "100%"
+  }
 });
 
 export default Settings;
