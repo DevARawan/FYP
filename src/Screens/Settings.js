@@ -88,7 +88,7 @@ const Settings = () => {
       <View style={styles.header}>
         {/* <MaterialIcons name="settings" style={styles.headerIcon} /> */}
         <LottieView style={{width:200, height:150, alignSelf:'center', marginBottom:50}}
-        source={require('./Animations/settings - 1710606317630.json')} autoPlay loop 
+        source={require('F:\React-Native-EXPO\FYP\Animations\settings - 1710606317630.json')} autoPlay loop 
         />
       </View>
       <TouchableOpacity style={styles.row} onPress={handleProfile}>
