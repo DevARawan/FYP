@@ -2572,10 +2572,10 @@
     opencollective-postinstall "^2.0.3"
     superstruct "^0.6.2"
 
-"@react-native-firebase/auth@^19.0.1":
-  version "19.0.1"
-  resolved "https://registry.yarnpkg.com/@react-native-firebase/auth/-/auth-19.0.1.tgz#70f0103b41fe407ca120bef224f170c78f1c3584"
-  integrity sha512-7p/AMHm96sCgeERKTGn/PgO/16CUGSeAK3EFVUwr5kVBLfwragDPprUh1x7LaX/irbwbrZwlr2LEHpXNG/4j1g==
+"@react-native-firebase/auth@^19.1.1":
+  version "19.1.1"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/auth/-/auth-19.1.1.tgz#c91a82279b5641d6a12e055e270cda21e8bdb02e"
+  integrity sha512-Mc/0iNltkZFLOBWODZDpsfeuwNumSpcbMQqQMIwMIyEJPtHcco9FneEiKPhPHKY+bPXrY9+V6xKDqPlxUIJ9Bg==
   dependencies:
     plist "^3.1.0"
 
