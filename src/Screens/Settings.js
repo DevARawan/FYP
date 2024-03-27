@@ -4,15 +4,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  ScrollView, Animated
 } from "react-native";
 import { MaterialIcons, FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 // import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import LottieView from 'lottie-react-native';
-import { useAuthContext } from "../Hooks/UseAuth";
-
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -20,7 +18,8 @@ const Settings = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedRow, setSelectedRow] = useState("");
-  const { signOut } = useAuthContext();
+  const [blinkAnimation] = useState(new Animated.Value(0));
+
   const handleProfile = () => {
     navigation.navigate("profile");
   };
@@ -34,14 +33,22 @@ const Settings = () => {
   };
   const handleOptionSelect = (option) => {
     setSelectedOption(option === selectedOption ? "" : option);
+    startBlinkingAnimation();
+    setTimeout(() => {
+      setShowNotifications(false); // Close the dropdown after 1 second
+    }, 100);
   };
 
   const handleOption = (option) => {
     setSelectedRow(option === selectedOption ? "" : option);
+    startBlinkingAnimation();
+    setTimeout(() => {
+      setShowGenerateOptions(false); // Close the dropdown after 1 second
+    }, 100);
   };
 
-  const handleLogout = async() => {
-    await signOut()
+  const handleLogout = () => {
+    AsyncStorage.removeItem("user");
     navigation.navigate("screen1");
   };
 
@@ -50,18 +57,39 @@ const Settings = () => {
   };
 
   const handlePolicy = () => {
-    navigation.navigate("policy");
+    navigation.navigate("privacy policy");
   };
 
   const handleGeneral = () => {
     navigation.navigate("general");
   };
 
+  const startBlinkingAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnimation, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blinkAnimation, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         {/* <MaterialIcons name="settings" style={styles.headerIcon} /> */}
-        <LottieView style={{width:200, height:200}} source={require('../../Animation1 - 1710499066508.json')} autoPlay loop />
+        <LottieView style={{width:200, height:150, alignSelf:'center', marginBottom:50}}
+        source={require('./Animations/settings - 1710606317630.json')} autoPlay loop 
+        />
       </View>
       <TouchableOpacity style={styles.row} onPress={handleProfile}>
         <Text style={styles.link}>My Profile</Text>
@@ -99,7 +127,7 @@ const Settings = () => {
             <Text>Achieving goal</Text>
           </TouchableOpacity>
         </View>
-      )}
+      )} 
 
       <TouchableOpacity
         style={styles.row}
@@ -145,10 +173,6 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "#3498DB" }]}
         />
       </TouchableOpacity>
-      {/* <TouchableOpacity style={styles.row}>
-                <Text style={styles.link}>Currency</Text>
-                <FontAwesome name="money" style={[styles.rowIcon, { color: '#F1C40F' }]} />
-            </TouchableOpacity> */}
 
       <TouchableOpacity style={styles.row} onPress={handleAchievements}>
         <Text style={styles.link}>Achievements</Text>
@@ -158,7 +182,7 @@ const Settings = () => {
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.row}>
-        <Text style={styles.link}>Help and FAQs</Text>
+        <Text style={styles.link}>About us</Text>
         <MaterialIcons
           name="description"
           style={[styles.rowIcon, { color: "#607D8B" }]}
