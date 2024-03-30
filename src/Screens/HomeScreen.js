@@ -5,12 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  ScrollView
+  ScrollView,
+  Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import Toast from 'react-native-toast-message';
-import { FIREBASE_APP as app } from "../../firebaseConfig";
+import { FIREBASE_APP as app, FIREBASE_DB } from "../../firebaseConfig";
 import {
   doc,
   getDoc,
@@ -23,8 +24,9 @@ import CircularProgressBar from "../Components/Progressbar";
 import { useAuthContext } from "../Hooks/UseAuth";
 
 const HomeScreen = () => {
-  const [savingsAmount, setSavingsAmount] = useState(1000);
+  const [savingsAmount, setSavingsAmount] = useState("");
   const [allGoals, setAllGoals] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation();
   const db = getFirestore(app);
@@ -84,6 +86,81 @@ const HomeScreen = () => {
   //   navigation.navigate('screen11')
   // }
 
+  const getAllExpenseDetail = async () => {
+    const user = await AsyncStorage.getItem("user");
+    const userId = JSON.parse(user)?.user?.uid;
+    const what = collection(FIREBASE_DB, `users`, userId, "expenses");
+    const snapshot = await getDocs(what);
+    let payload = [];
+    snapshot.forEach((doc) => {
+      try {
+        // console.log(doc.data());
+        const userData = doc.data();
+        if (userData[`user_id`] == userId) {
+          payload.push(userData);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      // Process each document as needed
+    });
+    const totalIncome = payload.reduce(
+      (acc, data) => Number(acc) + Number(data.income),
+      0
+    );
+
+    const totalExpense = payload.reduce((accumulator, currentValue) => {
+      const expenses = currentValue.expenseAmounts;
+      const expenseValues = Object.values(expenses);
+      const expenseSum = expenseValues.reduce(
+        (sum, value) => sum + Number(value),
+        0
+      );
+      return accumulator + expenseSum;
+    }, 0);
+    console.log(totalExpense, totalIncome);
+    setSavingsAmount(totalIncome - totalExpense);
+  };
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const myuser1 = await AsyncStorage.getItem("user");
+      const myuser = JSON.parse(myuser1);
+      // Get user document from Firestore
+      const userCollection = collection(db, "users");
+      const userDoc = doc(userCollection, myuser.user.uid);
+      // Get goals collection from user document
+      const goalsRef = collection(userDoc, "goals");
+      // Fetch documents from goals collection
+      const goalsSnapshot = await getDocs(goalsRef);
+      // Store goals data in an array
+      let goals = [];
+      const goalsData = goalsSnapshot.docs.map((doc) => {
+        const goalData = doc.data();
+        console.log("now what i ", goalData);
+        if (goalData.user_id == myuser.user.uid) {
+          goals.push({
+            id: doc.id,
+            goalName: goalData.newGoal.goalName,
+            goalDescription: goalData.newGoal.description,
+            totalAmount: goalData.newGoal.totalAmount,
+            dueDate: goalData.newGoal.dueDate || null
+          });
+        }
+      });
+      setAllGoals(goals);
+      setIsLoading(false);
+      // Do whatever you need with goalsData here
+    } catch (error) {
+      console.error("Error fetching user data 2:", error);
+    }
+  };
+  useEffect(() => {
+    getAllExpenseDetail();
+    fetchData();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
@@ -100,7 +177,11 @@ const HomeScreen = () => {
 
       <Text style={styles.heading}>Dashboard</Text>
       <View style={{ alignSelf: "center" }}>
-        <CircularProgressBar />
+        <CircularProgressBar
+          currentGoal={allGoals[0]}
+          savingIncome={savingsAmount}
+          current
+        />
       </View>
 
       <View style={styles.savingsContainer}>
