@@ -23,6 +23,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import DatePicker from "react-native-date-picker";
 import moment from "moment";
+import uuid from "react-native-uuid";
 
 let controlRender = true;
 
@@ -81,17 +82,19 @@ const ManageGoals = () => {
 
   const handleAddGoal = async () => {
     try {
+      const goal_id = uuid.v4();
       const user = await AsyncStorage.getItem("user");
       const userId = JSON.parse(user)?.user?.uid;
       const db = getFirestore(app);
       const usersCollection = collection(db, "users");
       const userDocRef = doc(usersCollection, userId);
       const goalsCollection = collection(userDocRef, "goals");
-      const goalsDocRef = doc(goalsCollection);
+      const goalsDocRef = doc(goalsCollection, goal_id);
       console.log("what i have send now", newGoal);
       setDoc(goalsDocRef, {
         newGoal,
-        user_id: userId
+        user_id: userId,
+        goal_id
       });
       setNewGoal({
         goalName: "",

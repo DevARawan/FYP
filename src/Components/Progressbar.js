@@ -1,22 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Svg, { Circle, Text as SvgText, G } from "react-native-svg";
-
-const CircularProgressBar = () => {
-  const [progress, setProgress] = useState(100); // Initial progress in seconds
+import ProgressCircle from "react-native-progress-circle";
+const CircularProgressBar = ({
+  currentGoal,
+  savingIncome,
+  nextGoal,
+  ForwardToAchieveHandler,
+  celebrationHandler
+}) => {
+  const [progress, setProgress] = useState(0); // Initial progress in seconds
   const radius = 50;
   const strokeWidth = 20;
   const circumference = 2 * Math.PI * radius;
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (progress > 0) {
-        setProgress((prev) => prev - 1);
-      }
-    }, 1000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (progress > 0) {
+  //       setProgress((prev) => prev - 1);
+  //     }
+  //   }, 1000);
 
-    return () => clearInterval(interval);
-  }, [progress]);
+  //   return () => clearInterval(interval);
+  // }, [progress]);
+
+  useEffect(() => {
+    if (savingIncome >= currentGoal?.totalAmount) {
+      setProgress(100);
+      nextGoal(currentGoal, setProgress);
+      ForwardToAchieveHandler(currentGoal);
+      celebrationHandler(true);
+    } else if (savingIncome < currentGoal?.totalAmount) {
+      let progressValue = (savingIncome / currentGoal?.totalAmount) * 100;
+      setProgress(progressValue);
+    }
+  }, [currentGoal, savingIncome]);
 
   const calculateStrokeOffset = () => {
     const percentage = (progress / 60) * 100;
@@ -25,46 +43,16 @@ const CircularProgressBar = () => {
 
   return (
     <View style={styles.container}>
-      <Svg height="200" width="200">
-        <G rotation="0" origin="100, 100">
-          {/* Gray Circle */}
-          <Circle
-            r={radius}
-            cx="100"
-            cy="100"
-            stroke="#ddd"
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
-
-          {/* Green Circle (Progress) */}
-          <Circle
-            r={radius}
-            cx="100"
-            cy="100"
-            stroke="#15AF75"
-            strokeWidth={strokeWidth}
-            strokeDasharray={circumference}
-            strokeDashoffset={calculateStrokeOffset()}
-            fill="none"
-            strokeLinecap="round"
-          />
-
-          {/* Text in the center */}
-          <SvgText
-            x="100"
-            y="100"
-            textAnchor="middle"
-            alignmentBaseline="middle"
-            fontSize="18"
-            fontWeight="bold"
-            fill="#313A68"
-            fontFamily="OpenSans_600SemiBold"
-          >
-            {Math.round((progress / 60) * 100)}%
-          </SvgText>
-        </G>
-      </Svg>
+      <ProgressCircle
+        percent={progress}
+        radius={50}
+        borderWidth={8}
+        color="#3399FF"
+        shadowColor="#999"
+        bgColor="#fff"
+      >
+        <Text style={{ fontSize: 18 }}>{`${progress.toFixed(1)}%`}</Text>
+      </ProgressCircle>
     </View>
   );
 };
