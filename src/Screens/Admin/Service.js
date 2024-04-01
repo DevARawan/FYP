@@ -31,6 +31,8 @@ const AdminService = ({ children, navigation }) => {
         (u) => u.user_id !== selectedUser.user_id
       );
       setUsers(updatedUsers);
+
+      console.log("User deleted successfully!");
     } catch (error) {
       console.error("Error deleting user:", error);
     } finally {
@@ -40,6 +42,7 @@ const AdminService = ({ children, navigation }) => {
   React.useEffect(() => {
     const fetchData = async () => {
       const allUsers = await fetchAllUsers();
+      console.log("all users", allUsers);
       setUsers(allUsers);
     };
     fetchData();
@@ -53,7 +56,7 @@ const AdminService = ({ children, navigation }) => {
     users,
     setUsers,
     handleOptions,
-    handleDeleteUser
+    handleDeleteUser,
   });
 };
 export default AdminService;

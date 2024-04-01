@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import * as firebaseAuth from "firebase/auth";
-import { FIREBASE_AUTH } from "../../firebaseConfig"; // Assuming your Firebase config is in firebaseConfig
+import React, { useState, useEffect, useContext } from 'react';
+import * as firebaseAuth from 'firebase/auth';
+import { FIREBASE_AUTH } from '../../firebaseConfig'; // Assuming your Firebase config is in firebaseConfig
 
 const AuthContext = React.createContext();
 
@@ -8,16 +8,9 @@ export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = firebaseAuth.onAuthStateChanged(
-      FIREBASE_AUTH,
-      async (user) => {
-        try {
-          setCurrentUser(user);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    );
+    const unsubscribe = firebaseAuth.onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      setCurrentUser(user);
+    });
 
     return unsubscribe; // Cleanup function to prevent memory leaks
   }, []);
@@ -28,7 +21,7 @@ export const useAuth = () => {
       await firebaseAuth.signOut(FIREBASE_AUTH);
       setCurrentUser(null); // Update state after successful signout
     } catch (error) {
-      console.error("Error signing out:", error);
+      console.error('Error signing out:', error);
       // Handle signout errors (optional)
     }
   };
