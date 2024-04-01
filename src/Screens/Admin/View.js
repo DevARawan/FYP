@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { useAuthContext } from "../../Hooks/UseAuth";
 
@@ -20,11 +20,9 @@ const AdminView = ({
   users,
   setUsers,
   handleOptions,
-  handleDeleteUser,
+  handleDeleteUser
 }) => {
-
   const { currentUser } = useAuthContext();
-  console.log('currentUser',currentUser)
   const renderItem = ({ item }) => (
     <View style={styles.item}>
       <Text>{item.email}</Text>
@@ -41,7 +39,7 @@ const AdminView = ({
       <FlatList
         data={users}
         renderItem={renderItem}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.email}
       />
       <Modal
         animationType="slide"
@@ -66,7 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5F5F5",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   item: {
     flexDirection: "row",
@@ -74,9 +72,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#ccc"
   },
   optionsButton: {
-    marginLeft: 10,
-  },
+    marginLeft: 10
+  }
 });

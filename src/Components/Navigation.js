@@ -89,7 +89,7 @@ export default function Home() {
         name="Admin"
         component={AdminScreen}
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: 'Admin',
         }}
     />
     </Tab.Navigator>

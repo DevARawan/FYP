@@ -1,12 +1,16 @@
-
 import { initializeApp } from "firebase/app";
-import { getAuth, initializeAuth ,getReactNativePersistence} from "firebase/auth";
+import {
+  getAuth,
+  initializeAuth,
+  getReactNativePersistence
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 const firebaseConfig = {
   apiKey: "AIzaSyAYlnGOdRvsTaC6pwWw9d4Jnyeb3SrTeNQ",
   authDomain: "budgetsupervisor1.firebaseapp.com",
-  databaseURL: "https://budgetsupervisor1-default-rtdb.asia-southeast1.firebasedatabase.app",
+  databaseURL:
+    "https://budgetsupervisor1-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "budgetsupervisor1",
   storageBucket: "budgetsupervisor1.appspot.com",
   messagingSenderId: "114261321056",

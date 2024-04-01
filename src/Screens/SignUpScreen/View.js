@@ -1,7 +1,15 @@
-import { FontAwesome5 } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FontAwesome5 } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 
 const UserIcon = () => {
   return (
@@ -9,29 +17,29 @@ const UserIcon = () => {
       <FontAwesome5 name="user" style={styles.userIcon} />
     </View>
   );
-}
+};
 
-const SignupView = ({  
+const SignupView = ({
   navigation,
   email,
   setEmail,
   password,
   setPassword,
   confirmPassword,
-  setConfirmPassword, 
+  setConfirmPassword,
   load,
   setLoad,
-  isEmailValid, 
+  isEmailValid,
   setIsEmailValid,
-  isPasswordValid, 
-  setIsPasswordValid, 
+  isPasswordValid,
+  setIsPasswordValid,
   validationError,
   setValidationError,
   validateEmail,
   validatePassword,
   handleRegister,
   goBack
-})  => {
+}) => {
   return (
     <View style={styles.container}>
       <UserIcon />
@@ -39,32 +47,51 @@ const SignupView = ({
         <Text style={styles.title}>Create an Account</Text>
 
         <View style={styles.inputContainer}>
-        <FontAwesome5 name="envelope" style={styles.icon} />
+          <FontAwesome5 name="envelope" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Email Address"
             value={email}
             onChangeText={(text) => validateEmail(text)}
           />
-         
-         
         </View>
-        {!isEmailValid && validationError &&    <Text style={{color:'red', alignSelf:'flex-end', marginBottom:10 , width:'50%'}}>Please Enter a valid email</Text>}
+        {!isEmailValid && validationError && (
+          <Text
+            style={{
+              color: "red",
+              alignSelf: "flex-end",
+              marginBottom: 10,
+              width: "50%"
+            }}
+          >
+            Please Enter a valid email
+          </Text>
+        )}
 
         <View style={styles.inputContainer}>
-        <FontAwesome5 name="lock" style={styles.icon} />
+          <FontAwesome5 name="lock" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Password"
             secureTextEntry={true}
             value={password}
             onChangeText={(text) => validatePassword(text)}
-          />    
+          />
         </View>
-        {!isPasswordValid && validationError &&    
-           <Text style={{color:'red', alignSelf:'flex-end', marginBottom:10, width:'80%'}}>Password needs 8+ characters, a number, symbol, and uppercase letter</Text>}
+        {!isPasswordValid && validationError && (
+          <Text
+            style={{
+              color: "red",
+              alignSelf: "flex-end",
+              marginBottom: 10,
+              width: "80%"
+            }}
+          >
+            Password needs 8+ characters, a number, symbol, and uppercase letter
+          </Text>
+        )}
         <View style={styles.inputContainer}>
-        <FontAwesome5 name="lock" style={styles.icon} />
+          <FontAwesome5 name="lock" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Confirm Password"
@@ -72,14 +99,24 @@ const SignupView = ({
             value={confirmPassword}
             onChangeText={(text) => setConfirmPassword(text)}
           />
-          
         </View>
-        {password != confirmPassword && validationError &&    
-           <Text style={{color:'red', alignSelf:'flex-end', marginBottom:10, }}>Passwords do not match</Text>}
+        {password != confirmPassword && validationError && (
+          <Text
+            style={{ color: "red", alignSelf: "flex-end", marginBottom: 10 }}
+          >
+            Passwords do not match
+          </Text>
+        )}
 
-        <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-          {load ? <ActivityIndicator size="small" color="white" /> :
-            <Text style={styles.buttonText}>Register</Text>}
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={handleRegister}
+        >
+          {load ? (
+            <ActivityIndicator size="small" color="white" />
+          ) : (
+            <Text style={styles.buttonText}>Register</Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.google}>
@@ -89,93 +126,98 @@ const SignupView = ({
         </View>
 
         <TouchableOpacity style={styles.back} onPress={goBack}>
-          <Text style={{ fontSize: 15, color: 'blue' }}>Already have an account? Sign in</Text>
+          <Text style={{ fontSize: 15, color: "blue" }}>
+            Already have an account? Sign in
+          </Text>
         </TouchableOpacity>
       </View>
 
       <StatusBar style="auto" />
     </View>
   );
-}
-export default SignupView
+};
+export default SignupView;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#F5F5F5",
+    alignItems: "center",
+    justifyContent: "center"
   },
   userIconContainer: {
-    backgroundColor: '#5fa9c7',
+    backgroundColor: "#5fa9c7",
     width: 100,
     height: 100,
     borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 15, marginTop:'10%',
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 15,
+    marginTop: "10%"
   },
   userIcon: {
     fontSize: 60,
-    color: 'white',
+    color: "white"
   },
   formContainer: {
-    width: '90%',
-    backgroundColor: 'white',
+    width: "90%",
+    backgroundColor: "white",
     borderRadius: 15,
     padding: 20,
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center"
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontWeight: "bold",
+    marginBottom: 20
   },
   input: {
     flex: 1,
     height: 40,
     paddingLeft: 10,
-    color: 'black',
+    color: "black"
   },
 
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between', 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBottomColor: 'lightgray',
+    borderBottomColor: "lightgray",
     marginBottom: 20,
-    position: 'relative', 
+    position: "relative"
   },
   registerButton: {
-    backgroundColor: 'blue',
+    backgroundColor: "blue",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 5,
-    marginTop: 20, width:110,
+    marginTop: 20,
+    width: 110
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
   },
   back: {
-    marginTop: 15,
+    marginTop: 15
   },
   icon: {
     fontSize: 20,
     marginRight: 10,
-    color: 'gray',
+    color: "gray"
   },
   google: {
-    width: '70%',
+    width: "70%",
     height: 45,
     borderRadius: 30,
-    backgroundColor: 'blue',
-    marginTop: 30, marginBottom:20,
+    backgroundColor: "blue",
+    marginTop: 30,
+    marginBottom: 20,
     padding: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    alignItems: "center",
+    justifyContent: "center"
+  }
 });
