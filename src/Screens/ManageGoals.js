@@ -21,11 +21,6 @@ import {
   getDocs
 } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
-import DatePicker from "react-native-date-picker";
-import moment from "moment";
-import uuid from "react-native-uuid";
-
-let controlRender = true;
 
 const ManageGoals = () => {
   const app = FIREBASE_APP;
@@ -34,8 +29,6 @@ const ManageGoals = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
-  const [date, setDate] = useState(null);
-  const [open, setOpen] = useState(false);
   const db = getFirestore(app);
   let goals = [];
   const [newGoal, setNewGoal] = useState({
@@ -45,24 +38,37 @@ const ManageGoals = () => {
     dueDate: ""
   });
 
-  const fetchData = async () => {
-    setIsLoading(true);
-    try {
-      const myuser1 = await AsyncStorage.getItem("user");
-      const myuser = JSON.parse(myuser1);
-      // Get user document from Firestore
-      const userCollection = collection(db, "users");
-      const userDoc = doc(userCollection, myuser.user.uid);
-      // Get goals collection from user document
-      const goalsRef = collection(userDoc, "goals");
-      // Fetch documents from goals collection
-      const goalsSnapshot = await getDocs(goalsRef);
-      // Store goals data in an array
-      let goals = [];
-      const goalsData = goalsSnapshot.docs.map((doc) => {
-        const goalData = doc.data();
-        console.log("now what i ", goalData);
-        if (goalData.user_id == myuser.user.uid) {
+  const handleAddGoal = async () => {
+    const user = await AsyncStorage.getItem("user");
+    const userID = JSON.parse(user).id;
+    const db = getFirestore(app);
+    const usersCollection = collection(db, "users");
+    const userDocRef = doc(usersCollection, userID);
+    const goalsCollection = collection(userDocRef, "goals");
+    const goalsDocRef = doc(goalsCollection);
+    setDoc(goalsDocRef, {
+      newGoal
+    });
+
+    setShowAddGoal(false);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const myuser1 = await AsyncStorage.getItem("user");
+        const myuser = JSON.parse(myuser1);
+        // Get user document from Firestore
+        const userCollection = collection(db, "users");
+        const userDoc = doc(userCollection, myuser.id);
+        // Get goals collection from user document
+        const goalsRef = collection(userDoc, "goals");
+        // Fetch documents from goals collection
+        const goalsSnapshot = await getDocs(goalsRef);
+        // Store goals data in an array
+        const goalsData = goalsSnapshot.docs.map((doc) => {
+          const goalData = doc.data();
           goals.push({
             id: doc.id,
             goalName: goalData.newGoal.goalName,
@@ -70,48 +76,14 @@ const ManageGoals = () => {
             totalAmount: goalData.newGoal.totalAmount,
             dueDate: goalData.newGoal.dueDate || null
           });
-        }
-      });
-      setAllGoals(goals);
-      setIsLoading(false);
-      // Do whatever you need with goalsData here
-    } catch (error) {
-      console.error("Error fetching user data 2:", error);
-    }
-  };
-
-  const handleAddGoal = async () => {
-    try {
-      const goal_id = uuid.v4();
-      const user = await AsyncStorage.getItem("user");
-      const userId = JSON.parse(user)?.user?.uid;
-      const db = getFirestore(app);
-      const usersCollection = collection(db, "users");
-      const userDocRef = doc(usersCollection, userId);
-      const goalsCollection = collection(userDocRef, "goals");
-      const goalsDocRef = doc(goalsCollection, goal_id);
-      console.log("what i have send now", newGoal);
-      setDoc(goalsDocRef, {
-        newGoal,
-        user_id: userId,
-        goal_id
-      });
-      setNewGoal({
-        goalName: "",
-        description: "",
-        totalAmount: "",
-        dueDate: ""
-      });
-      fetchData();
-      controlRender = true;
-      setShowAddGoal(false);
-    } catch (error) {
-      setShowAddGoal(false);
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
+        });
+        setAllGoals(goals);
+        setIsLoading(false);
+        // Do whatever you need with goalsData here
+      } catch (error) {
+        console.error("Error fetching user data 2:", error);
+      }
+    };
     fetchData();
   }, []);
 
@@ -121,14 +93,7 @@ const ManageGoals = () => {
     // Set message to display
     setMessage(message);
   };
-  // if (date != null) {
-  //   if (controlRender) {
-  //     setNewGoal({ ...newGoal, dueDate: date });
-  //     controlRender = false;
-  //   }
-  // }
 
-  console.log("date", newGoal.dueDate);
   return (
     <ScrollView style={styles.container}>
       <View style={styles.allGoals}>
@@ -171,7 +136,7 @@ const ManageGoals = () => {
               <Text style={styles.goalDetailLabel}>Due Date:</Text>
               <View style={styles.textbox}>
                 <Text style={styles.goalDetailValue}>
-                  {newGoal.dueDate == "" ? "No Due Date" : newGoal.dueDate}
+                  {newGoal.dueDate || "No Due Date"}
                 </Text>
               </View>
             </View>
@@ -203,42 +168,14 @@ const ManageGoals = () => {
               setNewGoal({ ...newGoal, totalAmount: text })
             }
           />
-          {/* <TextInput
+          <TextInput
             style={styles.input}
             placeholder="Due Date (Optional)"
             onChangeText={(text) => setNewGoal({ ...newGoal, dueDate: text })}
-          /> */}
-          <TouchableOpacity
-            style={styles.input}
-            placeholder="Due Date (Optional)"
-            onPress={() => {
-              setOpen(true);
-            }}
-            onChangeText={(text) => setNewGoal({ ...newGoal, dueDate: text })}
-          >
-            <Text>
-              {newGoal.dueDate == "" ? "Due Date (Optional)" : newGoal.dueDate}
-            </Text>
-          </TouchableOpacity>
+          />
           <TouchableOpacity style={styles.addButton} onPress={handleAddGoal}>
             <Text style={styles.buttonText}>Add</Text>
           </TouchableOpacity>
-
-          <DatePicker
-            modal
-            open={open}
-            date={new Date()}
-            onConfirm={(date) => {
-              setOpen(false);
-              setNewGoal({
-                ...newGoal,
-                dueDate: JSON.stringify(moment(date).format("l"))
-              });
-            }}
-            onCancel={() => {
-              setOpen(false);
-            }}
-          />
         </View>
       )}
 
@@ -281,11 +218,10 @@ const ManageGoals = () => {
                 <Text style={styles.goalDetailLabel}>Due Date:</Text>
                 <View style={styles.textbox}>
                   <Text style={styles.goalDetailValue}>
-                    {goal.dueDate == null ? "No Due Date" : goal.dueDate}
+                    {goal.dueDate || "No Due Date"}
                   </Text>
                 </View>
               </View>
-
               <View style={styles.row}>
                 <TouchableOpacity>
                   <FontAwesome
