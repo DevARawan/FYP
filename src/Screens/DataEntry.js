@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,26 +6,37 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ToastAndroid
+  ToastAndroid, Alert
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+ 
+import { Feather } from "@expo/vector-icons";
 import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {  doc, getDoc, getFirestore, collection, setDoc } from 'firebase/firestore';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  collection,
+  setDoc,
+  getDocs
+} from "firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
 
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
-  const [incomeAmount, setIncomeAmount] = useState('50000');
+  const [incomeAmount, setIncomeAmount] = useState(null);
   const [expenseAmounts, setExpenseAmounts] = useState({
-    Electricity: '',
-    Gas: '',
-    Grocery: '',
-    Fuel: '',
-    Clothes: '',
-    Other: '',
+    Electricity: "",
+    Gas: "",
+    Grocery: "",
+    Fuel: "",
+    Clothes: "",
+    Other: ""
   });
   const [plusIcon, setPlusIcon] = useState(true);
+  const [isButtonDistable, setIsButtonDistable] = useState(false);
+  const navigation = useNavigation();
 
   const renderAddIncome = () => {
     if (showAddIncome) {
@@ -61,7 +72,7 @@ const DataEntry = () => {
               onChangeText={(text) =>
                 setExpenseAmounts((prevAmounts) => ({
                   ...prevAmounts,
-                  [category]: text,
+                  [category]: text
                 }))
               }
             />
@@ -77,6 +88,7 @@ const DataEntry = () => {
   };
 
   const handleSubmit = async () => {
+
     const user = await AsyncStorage.getItem('user');
     const userId = JSON.parse(user).id;
     const usersCollection = collection(FIREBASE_DB, "users");
@@ -93,8 +105,14 @@ const DataEntry = () => {
         showToast('Data submitted successfully!');
     } else {
         console.error("User document not found");
+
+    setIsButtonDistable(true);
+    if (!incomeAmount) {
+      Alert.alert("Please provide income details");
+      setIsButtonDistable(false);
+      return;
     }
-}
+
 
 const showToast = (message) => {
   ToastAndroid.showWithGravityAndOffset(
@@ -106,23 +124,74 @@ const showToast = (message) => {
   );
 };
 
+    let totalExpense = 0;
+    for (const key in expenseAmounts) {
+      const value = expenseAmounts[key];
+      if (!isNaN(value) && value !== "") {
+        totalExpense += parseFloat(value);
+      }
+    }
+
+    if (incomeAmount < totalExpense) {
+      Alert.alert("Your expenses exceed your income");
+      setIsButtonDistable(false);
+      return;
+    }
+
+    try {
+      const user = await AsyncStorage.getItem("user");
+      const userId = JSON.parse(user)?.user?.uid;
+      if (!userId) {
+        setIsButtonDistable(false);
+        throw new Error("User ID not found");
+      }
+
+      const usersCollection = collection(FIREBASE_DB, "users");
+      console.log("userid", userId);
+
+      const userDocRef = doc(usersCollection, userId);
+      // const userDocRef = doc(collection(FIREBASE_DB, "users"), userId);
+      const userDocSnapshot = await getDoc(userDocRef);
+
+      console.log("data", JSON.stringify(userDocSnapshot.data()));
+
+      if (userDocSnapshot.exists()) {
+        const expensesCollection = collection(userDocRef, "expenses");
+        const expenseDocRef = doc(expensesCollection);
+
+        await setDoc(expenseDocRef, {
+          expenseAmounts,
+          income: incomeAmount,
+          user_id: userId
+        });
+        console.log("Expense document added successfully");
+        navigation.navigate("main");
+        setIsButtonDistable(false);
+      } else {
+        setIsButtonDistable(false);
+        throw new Error("User document not found");
+      }
+    } catch (error) {
+      setIsButtonDistable(false);
+      console.error("Error occurred:", error);
+      Alert.alert("Error occurred while processing the request");
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.heading}>Add Income and Expenses</Text>
 
-      <TouchableOpacity
-        style={styles.row} 
-        onPress={handleToggleIcon}
-      >
+      <TouchableOpacity style={styles.row} onPress={handleToggleIcon}>
         <View style={styles.categoryContainer}>
           <Text style={styles.category}>My Income:</Text>
           <Text style={styles.value}>{incomeAmount}</Text>
-        
+
           <Feather
-            name={plusIcon ? 'plus' : 'minus'}
+            name={plusIcon ? "plus" : "minus"}
             size={28}
             color="#007AFF"
-            style={{ marginLeft: 5 }} 
+            style={{ marginLeft: 5 }}
           />
         </View>
       </TouchableOpacity>
@@ -130,7 +199,11 @@ const showToast = (message) => {
       {renderAddIncome()}
 
       <View style={styles.column}>
-        <Text style={[styles.categoryLabel, {fontSize:20, marginBottom:15}]}>Expenses:</Text>
+        <Text
+          style={[styles.categoryLabel, { fontSize: 20, marginBottom: 15 }]}
+        >
+          Expenses:
+        </Text>
         <View style={styles.row}>
           <Text style={styles.categoryLabel}>Categories</Text>
           <Text style={styles.amountLabel}>Amount</Text>
@@ -138,7 +211,11 @@ const showToast = (message) => {
         {renderAddExpenses()}
       </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+      <TouchableOpacity
+        disabled={isButtonDistable}
+        style={styles.submitButton}
+        onPress={handleSubmit}
+      >
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -148,80 +225,82 @@ const showToast = (message) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 20
   },
   heading: {
     fontSize: 20,
-    fontWeight: 'bold',
-    alignSelf: 'center',
+    fontWeight: "bold",
+    alignSelf: "center",
     marginBottom: 40,
-    marginTop:7,
+    marginTop: 7
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10
   },
   column: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    marginBottom: 20,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    marginBottom: 20
   },
   label: {
     fontSize: 18,
-    marginBottom: 5,
+    marginBottom: 5
   },
   categoryLabel: {
     fontSize: 18,
-    fontWeight:'bold',
-    marginRight: 10,
+    fontWeight: "bold",
+    marginRight: 10
   },
   amountLabel: {
     fontSize: 18,
-    fontWeight: 'bold',
-    width: '30%', // Adjust the width as needed
-    marginLeft:45,
+    fontWeight: "bold",
+    width: "30%", // Adjust the width as needed
+    marginLeft: 45
   },
   categoryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10, marginRight:20,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    marginRight: 20
   },
   category: {
     fontSize: 16,
     marginRight: 1,
-    width: '40%', // Adjust the width as needed
+    width: "40%" // Adjust the width as needed
   },
   value: {
     fontSize: 16,
     borderWidth: 1,
     borderRadius: 10,
     padding: 9,
-    width: '52%', // Adjust the width as needed
+    width: "52%" // Adjust the width as needed
   },
   inputContainer: {
-    width: '59.5%', // Adjust the width as needed
-    marginBottom: 10,
+    width: "59.5%", // Adjust the width as needed
+    marginBottom: 10
   },
   input: {
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    width: '100%', // Ensure the input takes the full width
+    width: "100%" // Ensure the input takes the full width
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     padding: 15,
     borderRadius: 10,
-    marginTop: 5, marginBottom:30,
-    alignItems: 'center',
+    marginTop: 5,
+    marginBottom: 30,
+    alignItems: "center"
   },
   submitButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: 'bold',
-  },
+    fontWeight: "bold"
+  }
 });
 
 export default DataEntry;

@@ -20,10 +20,12 @@ import {
   signInWithEmailAndPassword
 } from "firebase/auth";
 
-import { FIREBASE_AUTH } from "../../firebaseConfig";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
 import myColor from "../Components/Color";
 
 import { useAuthContext } from "../Hooks/UseAuth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 
 const UserIcon = () => {
   return (
@@ -58,9 +60,33 @@ export default function LoginScreen() {
             email,
             password
           );
-
           if (userInfo.user.emailVerified) {
-            navigation.replace("main");
+            try {
+              await AsyncStorage.setItem("user", JSON.stringify(userInfo));
+              const usersCollection = collection(FIREBASE_DB, "users");
+              const userDocRef = doc(usersCollection, userInfo.user.uid);
+              const userDocSnapshot = await getDoc(userDocRef);
+
+              if (userDocSnapshot.exists()) {
+                navigation.replace("main");
+              } else {
+                try {
+                  // Define the data to be stored in the document
+                  const userData = {
+                    email: userInfo.user.email,
+                    user_id: userInfo.user.uid
+                    // Add any additional user information you want to store
+                  };
+                  // Set the document data in Firestore
+                  await setDoc(userDocRef, userData);
+                  navigation.replace("main");
+                } catch (error) {
+                  console.error("Error storing user information:", error);
+                }
+              }
+            } catch (error) {
+              console.error(error);
+            }
           } else {
             Alert.alert("please verify you email");
             signOut();
