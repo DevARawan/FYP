@@ -66,7 +66,6 @@ export default function LoginScreen() {
               const usersCollection = collection(FIREBASE_DB, "users");
               const userDocRef = doc(usersCollection, userInfo.user.uid);
               const userDocSnapshot = await getDoc(userDocRef);
-
               if (userDocSnapshot.exists()) {
                 navigation.replace("main");
               } else {

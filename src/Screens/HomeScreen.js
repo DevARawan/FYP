@@ -290,8 +290,9 @@ const HomeScreen = () => {
           WE ARE LOADING YOUR GOALS.
         </Text>
       )}
-
-      <ConfettiCannon fadeOut={true} count={1000} origin={{ x: 10, y: 0 }} />
+      {showCelebration && (
+        <ConfettiCannon fadeOut={true} count={1000} origin={{ x: 10, y: 0 }} />
+      )}
     </ScrollView>
   );
 };
