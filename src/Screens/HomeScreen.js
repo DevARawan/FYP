@@ -5,8 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
-  ScrollView,
-  Alert
+  ScrollView
 } from "react-native";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 
