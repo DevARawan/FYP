@@ -31,6 +31,7 @@ const HomeScreen = () => {
   const [allGoals, setAllGoals] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCelebration, setshowCelebration] = useState(false);
+  const [achieveStatus, setAchieveStatus] = useState("silver");
 
   const navigation = useNavigation();
   const db = getFirestore(app);
@@ -137,6 +138,7 @@ const HomeScreen = () => {
       const goalsRef = collection(userDoc, "goals");
       // Fetch documents from goals collection
       const goalsSnapshot = await getDocs(goalsRef);
+      console.log("JSON", JSON.stringify(goalsSnapshot.size));
       // Store goals data in an array
       let goals = [];
       const goalsData = goalsSnapshot.docs.map((doc) => {
@@ -164,8 +166,13 @@ const HomeScreen = () => {
     getAllExpenseDetail();
     fetchData();
   }, [useIsFocused()]);
-
+  let count = 0;
   const ForwardToAchieveHandler = async (goal) => {
+    ++count;
+    if (count == 2) {
+      count = 0;
+      return;
+    }
     const achievementId = uuid.v4();
     let achieve = {
       ...goal,
@@ -185,6 +192,7 @@ const HomeScreen = () => {
       });
       console.log("new collection created");
       fetchData();
+      Reward();
     } catch (error) {
       console.error(error);
     }
@@ -213,9 +221,43 @@ const HomeScreen = () => {
     }
   };
 
+  const Reward = async () => {
+    try {
+      const user = await AsyncStorage.getItem("user");
+      const userId = JSON.parse(user)?.user?.uid;
+      const db = getFirestore(app);
+      const usersCollection = collection(db, "users");
+      const userDocRef = doc(usersCollection, userId);
+      const goalsCollection = collection(userDocRef, "achieve");
+      const achieveSnapshot = await getDocs(goalsCollection);
+      console.log("achieveStatus", achieveSnapshot.size);
+      console.log("userID", userId);
+      if (achieveSnapshot.size >= 3 && achieveSnapshot.size <= 5) {
+        setAchieveStatus("matel");
+      } else if (achieveSnapshot.size >= 8) {
+        setAchieveStatus("gold");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    Reward();
+  }, []);
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
+      <View style={{ alignItems: "flex-end", paddingHorizontal: 10 }}>
+        <Text style={{ color: "red" }}>
+          {achieveStatus == "silver"
+            ? "🥈"
+            : achieveStatus == "matel"
+            ? "🥉"
+            : "🏅"}
+        </Text>
+      </View>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={handleDataEntry}>
           <Text style={styles.navButtonText}>Manage Data Entry</Text>
