@@ -76,7 +76,7 @@ const ManageGoals = () => {
       setIsLoading(false);
       // Do whatever you need with goalsData here
     } catch (error) {
-      console.error("Error fetching user data 2:", error);
+      console.error("Error fetching user data 3:", error);
     }
   };
 
