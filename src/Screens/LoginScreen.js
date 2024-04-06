@@ -1,6 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import firestore from "@react-native-firebase/firestore";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -60,12 +61,16 @@ export default function LoginScreen() {
             email,
             password
           );
+
           if (userInfo.user.emailVerified) {
             try {
               await AsyncStorage.setItem("user", JSON.stringify(userInfo));
-              const usersCollection = collection(FIREBASE_DB, "users");
+
+              const usersCollection = firestore().collection("Users");
               const userDocRef = doc(usersCollection, userInfo.user.uid);
+
               const userDocSnapshot = await getDoc(userDocRef);
+
               if (userDocSnapshot.exists()) {
                 navigation.replace("main");
               } else {

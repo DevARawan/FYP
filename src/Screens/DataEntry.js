@@ -116,13 +116,10 @@ const DataEntry = () => {
       }
 
       const usersCollection = collection(FIREBASE_DB, "users");
-      console.log("userid", userId);
 
       const userDocRef = doc(usersCollection, userId);
       // const userDocRef = doc(collection(FIREBASE_DB, "users"), userId);
       const userDocSnapshot = await getDoc(userDocRef);
-
-      console.log("data", JSON.stringify(userDocSnapshot.data()));
 
       if (userDocSnapshot.exists()) {
         const expensesCollection = collection(userDocRef, "expenses");
@@ -133,7 +130,7 @@ const DataEntry = () => {
           income: incomeAmount,
           user_id: userId
         });
-        console.log("Expense document added successfully");
+
         navigation.navigate("main");
         setIsButtonDistable(false);
       } else {

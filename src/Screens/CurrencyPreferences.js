@@ -1,7 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
+import { useSelector } from "react-redux";
 
 const Dropdown = ({ data, selectedValue, onSelect }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -11,7 +19,11 @@ const Dropdown = ({ data, selectedValue, onSelect }) => {
       <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
         <View style={styles.dropdownField}>
           <Text>{selectedValue}</Text>
-          <Ionicons name={dropdownVisible ? 'caret-up-outline' : 'caret-down-outline'} size={24} color="black" />
+          <Ionicons
+            name={dropdownVisible ? "caret-up-outline" : "caret-down-outline"}
+            size={24}
+            color="black"
+          />
         </View>
       </TouchableOpacity>
       {dropdownVisible && (
@@ -19,7 +31,12 @@ const Dropdown = ({ data, selectedValue, onSelect }) => {
           <FlatList
             data={data}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => { onSelect(item.value); setDropdownVisible(false); }}>
+              <TouchableOpacity
+                onPress={() => {
+                  onSelect(item.value);
+                  setDropdownVisible(false);
+                }}
+              >
                 <Text style={styles.dropdownMenuItem}>{item.label}</Text>
               </TouchableOpacity>
             )}
@@ -30,60 +47,56 @@ const Dropdown = ({ data, selectedValue, onSelect }) => {
     </View>
   );
 };
+const ClosedDropdown = ({ text, iconName = "caret-down-outline", onPress }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.customDropDown}>
+      <Text style={styles.customDropDownText}>{text}</Text>
+      <Ionicons
+        name={iconName}
+        size={24}
+        color="black"
+        style={styles.customDropDownIcon}
+      />
+    </TouchableOpacity>
+  );
+};
 
 const General = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
-  const [selectedTheme, setSelectedTheme] = useState('light'); // Default theme
-  const [currencies, setCurrencies] = useState([]);
+  // const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [selectedTheme, setSelectedTheme] = useState("light"); // Default theme
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
 
-  useEffect(() => {
-    // Load currencies
-    loadCurrencies();
-  }, []);
-
-
-  const loadCurrencies = async () => {
-    const currenciesData = [
-      { label: 'USD - US Dollar', value: 'USD' },
-      { label: 'EUR - Euro', value: 'EUR' },
-      { label: 'PKR - Pakistani Rupee', value: 'PKR' },
-      { label: 'INR - Indian Rupee', value: 'INR' },
-      // Add more currencies as needed
-    ];
-    setCurrencies(currenciesData);
-    const storedCurrency = await AsyncStorage.getItem('selectedCurrency');
-    if (storedCurrency) setSelectedCurrency(storedCurrency);
-  };
-
-
-  const handleCurrencyChange = async (value) => {
-    setSelectedCurrency(value);
-    await AsyncStorage.setItem('selectedCurrency', value);
-  };
+  // const storedCurrency = await AsyncStorage.getItem("selectedCurrency");
+  // if (storedCurrency) setSelectedCurrency(storedCurrency);
 
   const handleThemeChange = async (value) => {
     setSelectedTheme(value);
-    await AsyncStorage.setItem('selectedTheme', value);
+    await AsyncStorage.setItem("selectedTheme", value);
   };
-
+  const selectedCurrency = useSelector((state) => state.currency.currency); // A
   return (
     <View style={styles.container}>
-
       <View style={styles.section}>
         <Text style={styles.heading}>Select Currency</Text>
-        <Dropdown
-          data={currencies}
-          selectedValue={selectedCurrency}
-          onSelect={handleCurrencyChange}
+        <ClosedDropdown
+          text={selectedCurrency.name}
+          onPress={() => setShowCurrencyModal(true)}
         />
       </View>
 
       <View style={styles.section}>
         <Text style={styles.heading}>Select Theme</Text>
         <Dropdown
-          data={[{ label: "Light Mode", value: "light" }, { label: "Dark Mode", value: "dark" }]}
+          data={[
+            { label: "Light Mode", value: "light" },
+            { label: "Dark Mode", value: "dark" }
+          ]}
           selectedValue={selectedTheme}
           onSelect={handleThemeChange}
+        />
+        <CurrencySelectionModal
+          visible={showCurrencyModal}
+          onClose={() => setShowCurrencyModal(false)}
         />
       </View>
     </View>
@@ -93,44 +106,62 @@ const General = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 20,
-    paddingVertical: 40, paddingTop:90,
+    paddingVertical: 40,
+    paddingTop: 90
   },
   section: {
-    marginBottom: 80,
+    marginBottom: 80
   },
   heading: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontWeight: "bold",
+    marginBottom: 10
   },
   dropdown: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
-    overflow: 'hidden', 
+    overflow: "hidden"
   },
   dropdownField: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff"
   },
   dropdownMenu: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     maxHeight: 250,
-    overflow: 'scroll',
+    overflow: "scroll"
   },
   dropdownMenuItem: {
     paddingHorizontal: 10,
     paddingVertical: 15,
     fontSize: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc"
   },
+  customDropDown: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5
+  },
+  customDropDownText: {
+    // Renamed the text style
+    flex: 1 // Makes text occupy most of the space
+  },
+  customDropDownIcon: {
+    // Renamed the icon style
+    marginLeft: 10 // Adds some space between text and icon
+  }
 });
 
 export default General;

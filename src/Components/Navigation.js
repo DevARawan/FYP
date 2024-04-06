@@ -1,16 +1,15 @@
-
 //------------------------------------------------------------------------------------------------------
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect } from "react";
+import { View, StyleSheet } from "react-native";
 
-import { CommonActions } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, BottomNavigation } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import HomeScreen from '../Screens/HomeScreen';
-import Settings from '../Screens/Settings';
-import AdminScreen from '../Screens/Admin/ViewController';
+import { CommonActions } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Text, BottomNavigation } from "react-native-paper";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import HomeScreen from "../Screens/HomeScreen";
+import Settings from "../Screens/Settings";
+import AdminScreen from "../Screens/Admin/ViewController";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +17,7 @@ export default function Home() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false,
+        headerShown: false
       }}
       tabBar={({ navigation, state, descriptors, insets }) => (
         <BottomNavigation.Bar
@@ -28,9 +27,9 @@ export default function Home() {
           tabBarStyle={styles.tabBar}
           onTabPress={({ route, preventDefault }) => {
             const event = navigation.emit({
-              type: 'tabPress',
+              type: "tabPress",
               target: route.key,
-              canPreventDefault: true,
+              canPreventDefault: true
             });
 
             if (event.defaultPrevented) {
@@ -38,7 +37,7 @@ export default function Home() {
             } else {
               navigation.dispatch({
                 ...CommonActions.navigate(route.name, route.params),
-                target: state.key,
+                target: state.key
               });
             }
           }}
@@ -47,12 +46,12 @@ export default function Home() {
             let iconName;
             let iconColor;
 
-            if (route.name === 'Home') {
-              iconName = focused ? 'home' : 'home-outline';
-              iconColor = focused ? 'blue' : 'gray';
-            } else if (route.name === 'Settings') {
-              iconName = focused ? 'cog' : 'cog-outline';
-              iconColor = focused ? 'blue' : 'gray';
+            if (route.name === "Home") {
+              iconName = focused ? "home" : "home-outline";
+              iconColor = focused ? "blue" : "gray";
+            } else if (route.name === "Settings") {
+              iconName = focused ? "cog" : "cog-outline";
+              iconColor = focused ? "blue" : "gray";
             }
 
             return <Icon name={iconName} size={24} color={iconColor} />;
@@ -75,39 +74,37 @@ export default function Home() {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: "Home"
         }}
       />
       <Tab.Screen
         name="Settings"
         component={Settings}
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: "Settings"
         }}
-      />    
+      />
       <Tab.Screen
         name="Admin"
         component={AdminScreen}
         options={{
-          tabBarLabel: 'Admin',
+          tabBarLabel: "Admin"
         }}
-    />
+      />
     </Tab.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
   bottomNavContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopWidth: 1, // Add a top border
-    borderTopColor: '#ddd', // Border color
+    borderTopColor: "#ddd", // Border color
     borderRadius: 25, // Curved ends
-    overflow: 'hidden', // Hide overflow content
+    overflow: "hidden" // Hide overflow content
   },
   tabBar: {
     elevation: 0, // Remove shadow on Android
-    shadowOpacity: 0, // Remove shadow on iOS
-  },
+    shadowOpacity: 0 // Remove shadow on iOS
+  }
 });
-
-
