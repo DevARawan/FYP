@@ -1,8 +1,5 @@
-//------------------------------------------------------------------------------------------------------
-
 import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
-
 import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text, BottomNavigation } from "react-native-paper";
@@ -10,10 +7,63 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import HomeScreen from "../Screens/HomeScreen";
 import Settings from "../Screens/Settings";
 import AdminScreen from "../Screens/Admin/ViewController";
+import messaging from "@react-native-firebase/messaging";
+import { PermissionsAndroid } from "react-native";
+import { useAuthContext } from "../Hooks/UseAuth";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { FIREBASE_DB } from "../../firebaseConfig";
+import firestore from "@react-native-firebase/firestore";
 
 const Tab = createBottomTabNavigator();
 
 export default function Home() {
+  const { currentUser } = useAuthContext();
+  const handleSaveToken = async (token) => {
+    try {
+      const usersCollection = firestore().collection("token_ids");
+      const docRef = usersCollection.doc(currentUser.uid);
+
+      // Check if the document exists
+      const docSnap = await docRef.get();
+
+      if (docSnap.exists) {
+        const currentData = docSnap.data();
+        if (currentData.fcm_token !== token) {
+          // If the token has changed, update the document
+          await docRef.update({
+            fcm_token: token,
+            email: currentUser.email,
+            user_id: currentUser.uid
+          });
+          console.log("Document updated:", currentUser.uid);
+        } else {
+          console.log("Token is unchanged, no update needed.");
+        }
+      } else {
+        // If the document doesn't exist, create it with the new data
+        await docRef.set({
+          fcm_token: token,
+          email: currentUser.email,
+          user_id: currentUser.uid
+        });
+        console.log("Document added:", currentUser.uid);
+      }
+    } catch (error) {
+      console.error("Error adding or updating document:", error);
+    }
+  };
+
+  const getDeviceToken = async () => {
+    PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+    );
+    await messaging().registerDeviceForRemoteMessages();
+    const token = await messaging().getToken();
+    handleSaveToken(token);
+  };
+  useEffect(() => {
+    getDeviceToken();
+  }, []);
   return (
     <Tab.Navigator
       screenOptions={{

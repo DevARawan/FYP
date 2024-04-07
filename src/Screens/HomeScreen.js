@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 // import Toast from 'react-native-toast-message';
 import { FIREBASE_APP as app, FIREBASE_DB } from "../../firebaseConfig";
+import messaging from "@react-native-firebase/messaging";
 import {
   doc,
   getDoc,

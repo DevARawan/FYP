@@ -1,4 +1,4 @@
-package com.budgetsupervisor;
+package com.awan873.BudgetSupervisor;
 
 import android.os.Build;
 import android.os.Bundle;
