@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import currencyList from "./CurrenciesList"; // assuming you have the currency list object
 import { useDispatch } from "react-redux";
-import { setCurrency } from "../Store /reducers/currenncyReducer";
+import { setCurrency } from "../Store/reducers/currenncyReducer";
 const CurrencySelectionModal = ({ visible, onClose }) => {
   const dispatch = useDispatch();
   const handleSetCurrency = async (currencyCode) => {

@@ -4,7 +4,7 @@ import { PersistGate } from "redux-persist/es/integration/react";
 import { AuthProvider } from "./src/Hooks/UseAuth";
 import AppNavigator from "./src/Navigation/AppNavigator";
 import { Provider } from "react-redux";
-import { store, persistor } from "./src/Store ";
+import { store, persistor } from "./src/Store";
 import { initializeApp } from "firebase/app";
 import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
