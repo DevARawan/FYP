@@ -65,12 +65,9 @@ export default function LoginScreen() {
           if (userInfo.user.emailVerified) {
             try {
               await AsyncStorage.setItem("user", JSON.stringify(userInfo));
-
               const usersCollection = firestore().collection("Users");
               const userDocRef = doc(usersCollection, userInfo.user.uid);
-
               const userDocSnapshot = await getDoc(userDocRef);
-
               if (userDocSnapshot.exists()) {
                 navigation.replace("main");
               } else {

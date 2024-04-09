@@ -26,10 +26,10 @@ const CircularProgressBar = ({
 
   useEffect(() => {
     if (savingIncome >= currentGoal?.totalAmount) {
+      celebrationHandler(true);
       setProgress(100);
       nextGoal(currentGoal, setProgress);
       ForwardToAchieveHandler(currentGoal);
-      celebrationHandler(true);
     } else if (savingIncome < currentGoal?.totalAmount) {
       let progressValue = (savingIncome / currentGoal?.totalAmount) * 100;
       setProgress(progressValue);

@@ -15,6 +15,7 @@ import com.facebook.soloader.SoLoader;
 
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
+import io.invertase.firebase.app.ReactNativeFirebaseAppPackage;
 
 import java.util.List;
 

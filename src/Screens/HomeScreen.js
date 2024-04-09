@@ -20,19 +20,21 @@ import {
   collection,
   setDoc,
   getDocs,
-  deleteDoc
+  deleteDoc,
+  updateDoc
 } from "firebase/firestore";
 import CircularProgressBar from "../Components/Progressbar";
 import { useAuthContext } from "../Hooks/UseAuth";
 import uuid from "react-native-uuid";
 import ConfettiCannon from "react-native-confetti-cannon";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
+import LottieView from "lottie-react-native";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState("");
   const [allGoals, setAllGoals] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showCelebration, setshowCelebration] = useState(false);
+  const [showCelebration, setshowCelebration] = useState(true);
   const [achieveStatus, setAchieveStatus] = useState("silver");
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
 
@@ -77,7 +79,38 @@ const HomeScreen = () => {
       );
       return accumulator + expenseSum;
     }, 0);
-    setSavingsAmount(totalIncome - totalExpense);
+
+    try {
+      const usersCollection = collection(FIREBASE_DB, "savingAmount");
+      const userDocRef = doc(usersCollection, userId);
+      const currentUser = await getDoc(userDocRef);
+      if (currentUser.exists()) {
+        updateDoc(userDocRef, {
+          savingsAmount: totalIncome - totalExpense
+        });
+        getCurrentSaveAmount();
+      } else {
+        setSavingsAmount(totalIncome - totalExpense);
+        await setDoc(userDocRef, {
+          savingsAmount: totalIncome - totalExpense
+        });
+      }
+      // const userDocRef = doc(collection(FIREBASE_DB, "users"), userId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getCurrentSaveAmount = async () => {
+    try {
+      const usersCollection = collection(FIREBASE_DB, "savingAmount");
+      const userDocRef = doc(usersCollection, userId);
+      const currentUser = await getDoc(userDocRef);
+      const currentUserSaving = currentUser.data();
+      console.log("current saving", currentUserSaving);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const fetchData = async () => {
@@ -121,7 +154,7 @@ const HomeScreen = () => {
     fetchData();
   }, [useIsFocused()]);
   let count = 0;
-  const ForwardToAchieveHandler = async (goal) => {
+  const ForwardToAchieveHandler = async (goal, progressHandler) => {
     ++count;
     if (count == 2) {
       count = 0;
@@ -145,7 +178,28 @@ const HomeScreen = () => {
         achieve
       });
 
+      //update current user profile with achievement
+
+      const dbb = getFirestore(app);
+      const _usersCollection = collection(dbb, "users");
+      const _userDocRef = doc(_usersCollection, userId);
+      const get = await getDoc(_userDocRef);
+      if (get.exists()) {
+        const payload = get.data();
+        const update = {
+          ...payload,
+          goalAchieve:
+            payload?.goalAchieve == undefined || payload?.goalAchieve == null
+              ? 1
+              : Number(payload?.goalAchieve) + 1
+        };
+
+        await updateDoc(userDocRef, update);
+      }
+
       fetchData();
+      setshowCelebration(false);
+      progressHandler(0);
       Reward();
     } catch (error) {
       console.error(error);
@@ -153,7 +207,6 @@ const HomeScreen = () => {
   };
 
   const NextGoalHandler = async (goal, progressHandler) => {
-    setshowCelebration(false);
     setAllGoals(allGoals.filter((data) => data.goalName != goal.goalName));
 
     try {
@@ -166,9 +219,7 @@ const HomeScreen = () => {
 
       const goalDocRef = doc(goalsCollection, goal?.goal_id); // Assuming goalId is the ID of the goal you want to delete
       await deleteDoc(goalDocRef);
-      ForwardToAchieveHandler(goal);
-
-      progressHandler(0);
+      ForwardToAchieveHandler(goal, progressHandler);
     } catch (error) {
       console.error("Error deleting goal:", error);
     }
@@ -176,29 +227,57 @@ const HomeScreen = () => {
   const selectedCurrency = useSelector((state) => state.currency.currency);
   const Reward = async () => {
     try {
-      const user = await AsyncStorage.getItem("user");
-      const userId = JSON.parse(user)?.user?.uid;
-      const db = getFirestore(app);
-      const usersCollection = collection(db, "users");
-      const userDocRef = doc(usersCollection, userId);
-      const goalsCollection = collection(userDocRef, "achieve");
-      const achieveSnapshot = await getDocs(goalsCollection);
-
-      if (achieveSnapshot.size >= 3 && achieveSnapshot.size <= 5) {
-        setAchieveStatus("matel");
-      } else if (achieveSnapshot.size >= 8) {
-        setAchieveStatus("gold");
+      const dbb = getFirestore(app);
+      const _usersCollection = collection(dbb, "users");
+      const _userDocRef = doc(_usersCollection, userId);
+      const get = await getDoc(_userDocRef);
+      if (get.exists()) {
+        const payload = get.data();
+        if (Number(payload.goalAchieve) == 5) {
+        }
       }
     } catch (error) {
       console.error(error);
     }
   };
-
   const fetchUserCurrency = () => {};
   useEffect(() => {
     Reward();
     fetchUserCurrency();
   }, []);
+
+  const CustomAlert = () => {
+    return (
+      <View
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 50,
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+      >
+        <View
+          style={{
+            width: "95%",
+            height: "20%",
+            // backgroundColor: "blue",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 20,
+            borderColor: "#3498db",
+            borderWidth: 1
+          }}
+        >
+          <Text
+            style={{ color: "#3498db", fontSize: 18 }}
+          >{`congrat you have achieved ${allGoals[0]?.goalName}`}</Text>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -290,8 +369,31 @@ const HomeScreen = () => {
         </Text>
       )}
       {showCelebration && (
-        <ConfettiCannon fadeOut={true} count={1000} origin={{ x: 10, y: 0 }} />
+        <View
+          style={{
+            flex: 1,
+            position: "absolute",
+            height: "100%",
+            width: "100%",
+            backgroundColor: "transparent"
+          }}
+        >
+          <LottieView
+            style={{
+              width: "100%",
+              height: "100%",
+              alignSelf: "center",
+              marginBottom: 50
+            }}
+            source={require("../../Animation.json")}
+            autoPlay
+            loop
+          />
+        </View>
       )}
+
+      {showCelebration && <CustomAlert />}
+
       <CurrencySelectionModal
         visible={showCurrencyModal}
         onClose={() => setShowCurrencyModal(false)}
