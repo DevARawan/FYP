@@ -22,6 +22,7 @@ const ChangePasswordBottomSheet = ({ setIsBottomSheetVisible }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isStrongPassword, setIsStrongPassword] = useState(false); // State to track password strength
   const { currentUser } = useAuthContext();
 
   useEffect(() => {}, []);
@@ -29,14 +30,10 @@ const ChangePasswordBottomSheet = ({ setIsBottomSheetVisible }) => {
   const updatePasswords = async () => {
     try {
       setIsLoading(true);
-
-      // Get current password from user input (replace with your logic)
-
-      // Validate new password strength (optional)
-      if (!validatePassword(newPassword)) {
+      // Check if the password is strong enough
+      if (!isStrongPassword) {
         throw new Error("New password doesn't meet complexity requirements.");
       }
-
       // Create credential object for re-authentication
       const credential = EmailAuthProvider.credential(
         currentUser.email,
@@ -47,12 +44,8 @@ const ChangePasswordBottomSheet = ({ setIsBottomSheetVisible }) => {
       await updatePassword(FIREBASE_AUTH.currentUser, newPassword);
       // Update password with new password
       ToastAndroid.show("Password updated successfully!", 1000);
-      console.log("Password updated successfully!");
     } catch (error) {
       ToastAndroid.show("Error updating password:" + error, 1000);
-      console.error("Error updating password:", error);
-      setIsLoading(false);
-      // Handle errors appropriately (e.g., invalid password, network issues)
     } finally {
       setIsLoading(false);
       setIsBottomSheetVisible(false); // Close the bottom sheet after updating password
@@ -75,6 +68,12 @@ const ChangePasswordBottomSheet = ({ setIsBottomSheetVisible }) => {
     );
   };
 
+  // Event handler for new password field change
+  const handleNewPasswordChange = (value) => {
+    setNewPassword(value);
+    setIsStrongPassword(validatePassword(value)); // Update isStrongPassword state based on password strength
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -95,11 +94,18 @@ const ChangePasswordBottomSheet = ({ setIsBottomSheetVisible }) => {
         />
         <TextInput
           value={newPassword}
-          onChangeText={(value) => setNewPassword(value)}
+          onChangeText={handleNewPasswordChange}
           placeholder="New Password"
           style={styles.input}
           secureTextEntry
         />
+        {/* Display password strength feedback */}
+        {newPassword !== "" && !isStrongPassword && (
+          <Text style={styles.passwordStrength}>
+            Password should contain at least 8 characters, including uppercase,
+            lowercase, numbers, and special characters.
+          </Text>
+        )}
         <TextInput
           value={confirmPassword}
           onChangeText={(value) => setConfirmPassword(value)}
@@ -108,7 +114,11 @@ const ChangePasswordBottomSheet = ({ setIsBottomSheetVisible }) => {
           secureTextEntry
         />
       </View>
-      <Button title="Submit" onPress={updatePasswords} disabled={isLoading} />
+      <Button
+        title="Submit"
+        onPress={updatePasswords}
+        disabled={isLoading || !isStrongPassword}
+      />
       <Loader isLoading={isLoading} />
     </View>
   );
@@ -139,6 +149,11 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5
+  },
+  passwordStrength: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10
   }
 });
 
