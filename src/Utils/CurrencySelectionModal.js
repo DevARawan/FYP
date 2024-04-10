@@ -10,13 +10,17 @@ import {
 import currencyList from "./CurrenciesList"; // assuming you have the currency list object
 import { useDispatch } from "react-redux";
 import { setCurrency } from "../Store/reducers/currenncyReducer";
+import { updateUserCurrency } from "./currencyFirebaseHandler";
+import firestore from "@react-native-firebase/firestore";
+import { useAuthContext } from "../Hooks/UseAuth";
 const CurrencySelectionModal = ({ visible, onClose }) => {
+  const { currentUser } = useAuthContext();
   const dispatch = useDispatch();
   const handleSetCurrency = async (currencyCode) => {
     dispatch(setCurrency(currencyCode)); // Update Redux state
-
-    // Firebase Integration (Firestore)
-
+    await firestore().collection("users").doc(currentUser.uid).update({
+      currency: currencyCode
+    });
     onClose();
   };
 

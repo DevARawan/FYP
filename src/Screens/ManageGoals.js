@@ -61,7 +61,7 @@ const ManageGoals = () => {
       let goals = [];
       const goalsData = goalsSnapshot.docs.map((doc) => {
         const goalData = doc.data();
-        console.log("now what i ", goalData);
+
         if (goalData.user_id == myuser.user.uid) {
           goals.push({
             id: doc.id,
@@ -90,7 +90,7 @@ const ManageGoals = () => {
       const userDocRef = doc(usersCollection, userId);
       const goalsCollection = collection(userDocRef, "goals");
       const goalsDocRef = doc(goalsCollection, goal_id);
-      console.log("what i have send now", newGoal);
+
       setDoc(goalsDocRef, {
         newGoal,
         user_id: userId,
@@ -128,7 +128,6 @@ const ManageGoals = () => {
   //   }
   // }
 
-  console.log("date", newGoal.dueDate);
   return (
     <ScrollView style={styles.container}>
       <View style={styles.allGoals}>

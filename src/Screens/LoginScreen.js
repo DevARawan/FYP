@@ -26,7 +26,7 @@ import myColor from "../Components/Color";
 
 import { useAuthContext } from "../Hooks/UseAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 
 const UserIcon = () => {
   return (
@@ -64,25 +64,23 @@ export default function LoginScreen() {
 
           if (userInfo.user.emailVerified) {
             try {
-              await AsyncStorage.setItem("user", JSON.stringify(userInfo));
+              const usersCollection = firestore().collection("users");
+              const userDocRef = usersCollection.doc(userInfo.user.uid);
 
-              const usersCollection = firestore().collection("Users");
-              const userDocRef = doc(usersCollection, userInfo.user.uid);
+              const userDocSnapshot = await userDocRef.get();
+              // const userDocSnapshot = await getDocs(userDocRef);
 
-              const userDocSnapshot = await getDoc(userDocRef);
-
-              if (userDocSnapshot.exists()) {
+              if (userDocSnapshot.exists) {
                 navigation.replace("main");
               } else {
                 try {
-                  // Define the data to be stored in the document
                   const userData = {
                     email: userInfo.user.email,
                     user_id: userInfo.user.uid
                     // Add any additional user information you want to store
                   };
                   // Set the document data in Firestore
-                  await setDoc(userDocRef, userData);
+                  await userDocRef.set(userData);
                   navigation.replace("main");
                 } catch (error) {
                   console.error("Error storing user information:", error);
@@ -152,7 +150,6 @@ export default function LoginScreen() {
     //       setLoad(false);
     //     }
     //   } catch (error) {
-    //     console.log('error is', error)
     //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
     //       // user cancelled the login flow
     //     } else if (error.code === statusCodes.IN_PROGRESS) {

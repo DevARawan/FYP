@@ -1,6 +1,7 @@
 import { collection, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../firebaseConfig";
 import * as firebaseAuth from "firebase/auth";
+import { ToastAndroid } from "react-native";
 
 export async function fetchAllUsers() {
   try {
@@ -30,7 +31,7 @@ export const changePassword = async (oldPassword, newPassword) => {
 
     // Update the user's password
     await user.updatePassword(newPassword);
-    console.log("Password changed successfully!");
+    ToastAndroid.show("Password changed successfully!");
   } catch (error) {
     console.error("Error changing password:", error);
     // Handle errors (e.g., invalid password, network issues)

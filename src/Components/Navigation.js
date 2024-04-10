@@ -1,19 +1,14 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet } from "react-native";
-import { CommonActions } from "@react-navigation/native";
+import firestore from "@react-native-firebase/firestore";
+import messaging from "@react-native-firebase/messaging";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text, BottomNavigation } from "react-native-paper";
+import { CommonActions } from "@react-navigation/native";
+import React, { useEffect } from "react";
+import { PermissionsAndroid, StyleSheet } from "react-native";
+import { BottomNavigation } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useAuthContext } from "../Hooks/UseAuth";
 import HomeScreen from "../Screens/HomeScreen";
 import Settings from "../Screens/Settings";
-import AdminScreen from "../Screens/Admin/ViewController";
-import messaging from "@react-native-firebase/messaging";
-import { PermissionsAndroid } from "react-native";
-import { useAuthContext } from "../Hooks/UseAuth";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { FIREBASE_DB } from "../../firebaseConfig";
-import firestore from "@react-native-firebase/firestore";
-import { getUserCurrency } from "../Utils/fetchCurrencyFromFirebase";
 
 const Tab = createBottomTabNavigator();
 
@@ -36,9 +31,6 @@ export default function Home() {
             email: currentUser.email,
             user_id: currentUser.uid
           });
-          console.log("Document updated:", currentUser.uid);
-        } else {
-          console.log("Token is unchanged, no update needed.");
         }
       } else {
         // If the document doesn't exist, create it with the new data
@@ -47,7 +39,6 @@ export default function Home() {
           email: currentUser.email,
           user_id: currentUser.uid
         });
-        console.log("Document added:", currentUser.uid);
       }
     } catch (error) {
       console.error("Error adding or updating document:", error);
@@ -61,7 +52,6 @@ export default function Home() {
     await messaging().registerDeviceForRemoteMessages();
     const token = await messaging().getToken();
     handleSaveToken(token);
-    getUserCurrency(currentUser.uid);
   };
   useEffect(() => {
     getDeviceToken();

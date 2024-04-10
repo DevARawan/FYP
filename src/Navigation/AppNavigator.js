@@ -118,16 +118,6 @@ const AppNavigator = () => {
           component={LoginScreen}
           options={({ navigation }) => ({
             title: "Login",
-            headerLeft: () => (
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <View style={{ marginLeft: 10 }}>
-                  <FontAwesome5
-                    name="arrow-left"
-                    style={{ fontSize: 24, color: "black" }}
-                  />
-                </View>
-              </TouchableOpacity>
-            ),
             headerRight: () => <Logo />
           })}
         />

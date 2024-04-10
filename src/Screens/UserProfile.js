@@ -83,7 +83,6 @@ const UserProfile = () => {
   const handleLogout = () => {
     AsyncStorage.removeItem("user");
     navigation.navigate("FrontScreen");
-    // console.log("hi");
   };
 
   const handleSaveProfile = async () => {

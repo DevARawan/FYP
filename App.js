@@ -45,7 +45,6 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState("");
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      console.log("push is", remoteMessage);
       setShowNotification(true);
       setNotificationMessage(remoteMessage.notification.body);
 
