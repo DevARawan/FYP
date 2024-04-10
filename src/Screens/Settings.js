@@ -1,25 +1,23 @@
-import React, { useState, useRef, useEffect } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Animated
-} from "react-native";
-import {
-  MaterialIcons,
-  FontAwesome5,
   FontAwesome,
-  MaterialCommunityIcons
+  FontAwesome5,
+  MaterialCommunityIcons,
+  MaterialIcons
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 // import { LinearGradient } from 'expo-linear-gradient';
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import LottieView from "lottie-react-native";
-import { useAuthContext } from "../Hooks/UseAuth";
 import { Button, TextInput } from "react-native-paper";
-import { BottomSheet } from "react-native-elements";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -27,27 +25,7 @@ const Settings = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [selectedRow, setSelectedRow] = useState("");
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
-  const handleSubmit = async () => {
-    if (newPassword !== confirmPassword) {
-      alert("New passwords do not match!");
-      return;
-    }
 
-    try {
-      const user = auth.currentUser;
-      // ... (placeholder logic for reauthenticateWithCredential)
-      const credential = await reauthenticateWithCredential(user /* ... */);
-      await updatePassword(user, newPassword);
-      // Show success message
-    } catch (error) {
-      console.error(error);
-      // Show error message based on error code
-    }
-  };
   const { signOut } = useAuthContext();
   const [blinkAnimation] = useState(new Animated.Value(0));
 
@@ -95,73 +73,6 @@ const Settings = () => {
     navigation.navigate("CurrencyPreferences");
   };
 
-  const ChangePasswordBottomSheet = () => {
-    return (
-      <View style={styles.resetContainer}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text style={styles.title}>Change Password</Text>
-          <MaterialIcons
-            onPress={() => {
-              setIsBottomSheetVisible(false);
-            }}
-            name="close"
-            size={30}
-          />
-        </View>
-        <View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="lock-outline"
-              size={24}
-              color="black"
-              style={styles.icon}
-            />
-            <TextInput
-              value={oldPassword}
-              onChangeText={(value) => setOldPassword(value)}
-              placeholder="Current Password"
-              style={styles.textInput}
-              secureTextEntry
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="lock-plus"
-              size={24}
-              color="black"
-              style={styles.icon}
-            />
-            <TextInput
-              value={newPassword}
-              onChangeText={setNewPassword}
-              mask="..."
-              placeholder="New Password"
-              style={styles.textInput}
-              secureTextEntry
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <MaterialCommunityIcons
-              name="lock-check"
-              size={24}
-              color="black"
-              style={styles.icon}
-            />
-            <TextInput
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              mask="..."
-              placeholder="Re-enter New Password"
-              style={styles.textInput}
-              secureTextEntry
-            />
-          </View>
-          <Button title="Submit" onPress={handleSubmit} />
-          <Button title="Cancel" color="grey" />
-        </View>
-      </View>
-    );
-  };
   const startBlinkingAnimation = () => {
     Animated.loop(
       Animated.sequence([
@@ -244,16 +155,6 @@ const Settings = () => {
         />
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.row}
-        onPress={() => setIsBottomSheetVisible(true)}
-      >
-        <Text style={styles.link}>Change Password</Text>
-        <MaterialIcons
-          name={showGenerateOptions ? "keyboard-arrow-up" : "chevron-right"}
-          style={[styles.rowIcon, { color: "black" }]}
-        />
-      </TouchableOpacity>
       {showGenerateOptions && (
         <View style={styles.dropdown}>
           <TouchableOpacity
@@ -320,9 +221,6 @@ const Settings = () => {
       {/* <Button icon="logout" mode="contained" style={styles.logoutButton} onPress={handleLogout}>
       Logout
     </Button> */}
-      <BottomSheet isVisible={isBottomSheetVisible}>
-        <ChangePasswordBottomSheet />
-      </BottomSheet>
     </ScrollView>
   );
 };

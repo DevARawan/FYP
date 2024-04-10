@@ -13,6 +13,7 @@ import { useAuthContext } from "../Hooks/UseAuth";
 import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
+import { getUserCurrency } from "../Utils/fetchCurrencyFromFirebase";
 
 const Tab = createBottomTabNavigator();
 
@@ -60,6 +61,7 @@ export default function Home() {
     await messaging().registerDeviceForRemoteMessages();
     const token = await messaging().getToken();
     handleSaveToken(token);
+    getUserCurrency(currentUser.uid);
   };
   useEffect(() => {
     getDeviceToken();
@@ -132,13 +134,6 @@ export default function Home() {
         component={Settings}
         options={{
           tabBarLabel: "Settings"
-        }}
-      />
-      <Tab.Screen
-        name="Admin"
-        component={AdminScreen}
-        options={{
-          tabBarLabel: "Admin"
         }}
       />
     </Tab.Navigator>

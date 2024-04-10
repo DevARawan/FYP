@@ -27,6 +27,8 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 import { FIREBASE_APP } from "../../firebaseConfig";
 import * as ImagePicker from "expo-image-picker";
+import { BottomSheet } from "react-native-elements";
+import ChangePasswordBottomSheet from "../Components/ChangePasswordBottomSheet";
 
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -37,7 +39,11 @@ const UserProfile = () => {
   const [showUploadButton, setShowUploadButton] = useState(false);
   const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
 
+  const toggleBottomSheet = () => {
+    setIsBottomSheetVisible(!isBottomSheetVisible);
+  };
   const handleImagePicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -172,6 +178,13 @@ const UserProfile = () => {
           {isEditMode ? "Save Profile" : "Manage Profile"}
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton} onPress={toggleBottomSheet}>
+        <Text style={styles.logoutButtonText}>Change Password</Text>
+        <MaterialIcons
+          name="lock"
+          style={[styles.logoutIcon, { color: "#ffffff" }]}
+        />
+      </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
         <MaterialIcons
@@ -179,6 +192,11 @@ const UserProfile = () => {
           style={[styles.logoutIcon, { color: "#ffffff" }]}
         />
       </TouchableOpacity>
+      <BottomSheet isVisible={isBottomSheetVisible}>
+        <ChangePasswordBottomSheet
+          setIsBottomSheetVisible={setIsBottomSheetVisible}
+        />
+      </BottomSheet>
     </View>
   );
 };
