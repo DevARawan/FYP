@@ -23,6 +23,7 @@ import {
   getDocs,
   deleteDoc
 } from "firebase/firestore";
+import firestore from "@react-native-firebase/firestore";
 import CircularProgressBar from "../Components/Progressbar";
 import { useAuthContext } from "../Hooks/UseAuth";
 import uuid from "react-native-uuid";
@@ -36,7 +37,7 @@ const HomeScreen = () => {
   const [showCelebration, setshowCelebration] = useState(false);
   const [achieveStatus, setAchieveStatus] = useState("silver");
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
-
+  const { currentUser } = useAuthContext();
   const navigation = useNavigation();
   const db = getFirestore(app);
 
@@ -48,10 +49,24 @@ const HomeScreen = () => {
   };
 
   const getAllExpenseDetail = async () => {
-    const user = await AsyncStorage.getItem("user");
-    const userId = JSON.parse(user)?.user?.uid;
+    // const user = await AsyncStorage.getItem("user");
+    // const userId = JSON.parse(user)?.user?.uid;
+    const userId = currentUser.uid;
+    console.log("userId", userId);
     const what = collection(FIREBASE_DB, `users`, userId, "expenses");
+    console.log("userId", userId);
     const snapshot = await getDocs(what);
+
+    const expensesCollection = firestore()
+      .collection("users")
+      .doc(userId)
+      .collection("expenses")
+      .doc();
+
+    console.log("expensesCollection", expensesCollection);
+    const expenseDocRef = expensesCollection.doc();
+
+    const userDocSnapshot = await expenseDocRef.get();
     let payload = [];
     snapshot.forEach((doc) => {
       try {

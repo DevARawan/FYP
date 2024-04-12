@@ -106,7 +106,7 @@ const DataEntry = () => {
       const user = await AsyncStorage.getItem("user");
 
       const userId = currentUser.uid;
-      console.log("userId", userId);
+
       if (!userId) {
         setIsButtonDistable(false);
         throw new Error("User ID not found");
@@ -118,7 +118,7 @@ const DataEntry = () => {
         .collection("users")
         .doc(userId)
         .get();
-      console.log("serDocRef.exists", userDocRef);
+
       if (userDocRef.exists) {
         const expensesCollection = firestore()
           .collection("users")
@@ -178,7 +178,7 @@ const DataEntry = () => {
       </View>
 
       <TouchableOpacity
-        disabled={isButtonDistable}
+        // disabled={isButtonDistable}
         style={styles.submitButton}
         onPress={handleSubmit}
       >
