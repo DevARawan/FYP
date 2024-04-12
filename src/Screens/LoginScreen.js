@@ -2,6 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import firestore from "@react-native-firebase/firestore";
+import { useDispatch } from "react-redux";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -27,6 +28,7 @@ import myColor from "../Components/Color";
 import { useAuthContext } from "../Hooks/UseAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
+import { setCurrency } from "../Store/reducers/currenncyReducer";
 
 const UserIcon = () => {
   return (
@@ -50,6 +52,7 @@ export default function LoginScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigation = useNavigation();
   const { signOut } = useAuthContext();
+  const dispatch = useDispatch();
   const handleLogin = async () => {
     setValidationError(true);
     if (email.length > 0 && password.length > 0) {
@@ -72,6 +75,13 @@ export default function LoginScreen() {
 
               if (userDocSnapshot.exists) {
                 navigation.replace("main");
+                if (userDocSnapshot.data().currency) {
+                  dispatch(setCurrency(userDocSnapshot.data().currency));
+                } else {
+                  Alert.alert(
+                    "No Currency is currenctly selected by User. Go to general settings and select current currency"
+                  );
+                }
               } else {
                 try {
                   const userData = {

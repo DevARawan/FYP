@@ -1,27 +1,22 @@
+import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import firestore from "@react-native-firebase/firestore";
 import React, { useState } from "react";
 import {
-  View,
+  Alert,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert
+  View
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
-import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  doc,
-  getDoc,
-  getFirestore,
-  collection,
-  setDoc,
-  getDocs
-} from "firebase/firestore";
+
 import { useNavigation } from "@react-navigation/native";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const DataEntry = () => {
+  const { currentUser } = useAuthContext();
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [incomeAmount, setIncomeAmount] = useState(null);
   const [expenseAmounts, setExpenseAmounts] = useState({
@@ -109,32 +104,37 @@ const DataEntry = () => {
 
     try {
       const user = await AsyncStorage.getItem("user");
-      const userId = JSON.parse(user)?.user?.uid;
+
+      const userId = currentUser.uid;
+      console.log("userId", userId);
       if (!userId) {
         setIsButtonDistable(false);
         throw new Error("User ID not found");
       }
 
-      const usersCollection = collection(FIREBASE_DB, "users");
+      // const userDocRef = firestore().collection("users").doc(userId);
 
-      const userDocRef = doc(usersCollection, userId);
-      // const userDocRef = doc(collection(FIREBASE_DB, "users"), userId);
-      const userDocSnapshot = await getDoc(userDocRef);
+      const userDocRef = await firestore()
+        .collection("users")
+        .doc(userId)
+        .get();
+      console.log("serDocRef.exists", userDocRef);
+      if (userDocRef.exists) {
+        const expensesCollection = firestore()
+          .collection("users")
+          .doc(userId)
+          .collection("expenses");
+        const expenseDocRef = expensesCollection.doc();
 
-      if (userDocSnapshot.exists()) {
-        const expensesCollection = collection(userDocRef, "expenses");
-        const expenseDocRef = doc(expensesCollection);
-
-        await setDoc(expenseDocRef, {
-          expenseAmounts,
+        await expenseDocRef.set({
+          expenseAmounts: expenseAmounts,
           income: incomeAmount,
           user_id: userId
         });
 
+        // Navigation and state update code
         navigation.navigate("main");
-        setIsButtonDistable(false);
       } else {
-        setIsButtonDistable(false);
         throw new Error("User document not found");
       }
     } catch (error) {
