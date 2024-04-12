@@ -28,7 +28,7 @@ const DataEntry = () => {
     Other: ""
   });
   const [plusIcon, setPlusIcon] = useState(true);
-  const [isButtonDistable, setIsButtonDistable] = useState(false);
+  const [isButtonDistable, setIsButtonDisabled] = useState(false);
   const navigation = useNavigation();
 
   const renderAddIncome = () => {
@@ -81,64 +81,45 @@ const DataEntry = () => {
   };
 
   const handleSubmit = async () => {
-    setIsButtonDistable(true);
-    if (!incomeAmount) {
-      Alert.alert("Please provide income details");
-      setIsButtonDistable(false);
-      return;
-    }
-
-    let totalExpense = 0;
-    for (const key in expenseAmounts) {
-      const value = expenseAmounts[key];
-      if (!isNaN(value) && value !== "") {
-        totalExpense += parseFloat(value);
-      }
-    }
-
-    if (incomeAmount < totalExpense) {
-      Alert.alert("Your expenses exceed your income");
-      setIsButtonDistable(false);
-      return;
-    }
+    setIsButtonDisabled(true);
 
     try {
-      const user = await AsyncStorage.getItem("user");
-
       const userId = currentUser.uid;
 
       if (!userId) {
-        setIsButtonDistable(false);
+        setIsButtonDisabled(false);
         throw new Error("User ID not found");
       }
 
-      // const userDocRef = firestore().collection("users").doc(userId);
-
-      const userDocRef = await firestore()
+      const expensesCollection = firestore()
         .collection("users")
         .doc(userId)
-        .get();
+        .collection("expenses");
 
-      if (userDocRef.exists) {
-        const expensesCollection = firestore()
-          .collection("users")
-          .doc(userId)
-          .collection("expenses");
-        const expenseDocRef = expensesCollection.doc();
+      // Check if there is an existing expense document for the user
+      const userExpenseDoc = await expensesCollection.doc(userId).get();
 
-        await expenseDocRef.set({
+      if (userExpenseDoc.exists) {
+        // If an expense document exists, update it with new expense details
+        await userExpenseDoc.ref.update({
           expenseAmounts: expenseAmounts,
           income: incomeAmount,
           user_id: userId
         });
-
-        // Navigation and state update code
-        navigation.navigate("main");
       } else {
-        throw new Error("User document not found");
+        // If no expense document exists, create a new one
+        const newExpenseDocRef = expensesCollection.doc(userId);
+        await newExpenseDocRef.set({
+          expenseAmounts: expenseAmounts,
+          income: incomeAmount,
+          user_id: userId
+        });
       }
+
+      // Navigation and state update code
+      navigation.navigate("main");
     } catch (error) {
-      setIsButtonDistable(false);
+      setIsButtonDisabled(false);
       console.error("Error occurred:", error);
       Alert.alert("Error occurred while processing the request");
     }
@@ -178,7 +159,7 @@ const DataEntry = () => {
       </View>
 
       <TouchableOpacity
-        // disabled={isButtonDistable}
+        disabled={isButtonDistable}
         style={styles.submitButton}
         onPress={handleSubmit}
       >

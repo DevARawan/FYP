@@ -25,7 +25,6 @@ const ManageGoals = () => {
   const [allGoals, setAllGoals] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigation = useNavigation();
   const [date, setDate] = useState(null);
   const [open, setOpen] = useState(false);
 
@@ -45,24 +44,34 @@ const ManageGoals = () => {
       // Get user document from Firestore
       const userCollection = firestore().collection("users");
       const userDoc = userCollection.doc(userId);
+
       // Get goals collection from user document
       const goalsRef = userDoc.collection("goals");
+
       // Fetch documents from goals collection
       const goalsSnapshot = await goalsRef.get();
+
       // Store goals data in an array
       let goals = [];
-      goalsSnapshot.forEach((doc) => {
-        const goalData = doc.data();
-        if (goalData.user_id === myuser.user.uid) {
-          goals.push({
-            id: doc.id,
-            goalName: goalData.newGoal.goalName,
-            goalDescription: goalData.newGoal.description,
-            totalAmount: goalData.newGoal.totalAmount,
-            dueDate: goalData.newGoal.dueDate || null
-          });
-        }
-      });
+
+      // Check if there are any documents in the snapshot
+      if (!goalsSnapshot.empty) {
+        goalsSnapshot.forEach((doc) => {
+          const goalData = doc.data();
+          if (goalData.user_id === currentUser.uid) {
+            goals.push({
+              id: doc.id,
+              goalName: goalData.newGoal.goalName,
+              goalDescription: goalData.newGoal.description,
+              totalAmount: goalData.newGoal.totalAmount,
+              dueDate: goalData.newGoal.dueDate || null
+            });
+          }
+        });
+      } else {
+        console.log("No goals found in the snapshot");
+      }
+
       setAllGoals(goals);
       setIsLoading(false);
       // Do whatever you need with goalsData here
@@ -102,19 +111,6 @@ const ManageGoals = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const showMessage = (message) => {
-    // Show message in a modal
-    setModalVisible(true);
-    // Set message to display
-    setMessage(message);
-  };
-  // if (date != null) {
-  //   if (controlRender) {
-  //     setNewGoal({ ...newGoal, dueDate: date });
-  //     controlRender = false;
-  //   }
-  // }
 
   return (
     <ScrollView style={styles.container}>
