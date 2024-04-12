@@ -1,12 +1,11 @@
-import { collection, getDocs } from "firebase/firestore";
-import { FIREBASE_DB } from "../../firebaseConfig";
-import * as firebaseAuth from "firebase/auth";
+import firestore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
 import { ToastAndroid } from "react-native";
 
 export async function fetchAllUsers() {
   try {
-    const usersCollection = collection(FIREBASE_DB, "users"); // Replace 'users' with your collection name
-    const querySnapshot = await getDocs(usersCollection);
+    const usersCollection = firestore().collection("users");
+    const querySnapshot = await usersCollection.get();
     const users = [];
     querySnapshot.forEach((doc) => {
       users.push(doc.data());
@@ -20,10 +19,10 @@ export async function fetchAllUsers() {
 
 export const changePassword = async (oldPassword, newPassword) => {
   try {
-    const user = firebaseAuth.currentUser;
+    const user = auth().currentUser;
 
     // Reauthenticate the user with their current password for security
-    const credential = firebaseAuth.EmailAuthProvider.credential(
+    const credential = auth.EmailAuthProvider.credential(
       user.email,
       oldPassword
     );
@@ -31,7 +30,7 @@ export const changePassword = async (oldPassword, newPassword) => {
 
     // Update the user's password
     await user.updatePassword(newPassword);
-    ToastAndroid.show("Password changed successfully!");
+    ToastAndroid.show("Password changed successfully!", ToastAndroid.SHORT);
   } catch (error) {
     console.error("Error changing password:", error);
     // Handle errors (e.g., invalid password, network issues)

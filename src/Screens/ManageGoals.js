@@ -1,13 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import firestore from "@react-native-firebase/firestore"; // Import the firestore module from react-native-firebase
 import { useNavigation } from "@react-navigation/native";
-import {
-  collection,
-  doc,
-  getDocs,
-  getFirestore,
-  setDoc
-} from "firebase/firestore";
+
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
@@ -21,12 +15,12 @@ import {
 } from "react-native";
 import DatePicker from "react-native-date-picker";
 import uuid from "react-native-uuid";
-import { FIREBASE_APP } from "../../firebaseConfig";
+import { useAuthContext } from "../Hooks/UseAuth";
+import Loader from "../Utils/Loader";
 
 let controlRender = true;
 
 const ManageGoals = () => {
-  const app = FIREBASE_APP;
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [allGoals, setAllGoals] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -34,7 +28,9 @@ const ManageGoals = () => {
   const navigation = useNavigation();
   const [date, setDate] = useState(null);
   const [open, setOpen] = useState(false);
-  const db = getFirestore(app);
+
+  const { currentUser } = useAuthContext();
+  const userId = currentUser.uid;
   let goals = [];
   const [newGoal, setNewGoal] = useState({
     goalName: "",
@@ -46,21 +42,18 @@ const ManageGoals = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const myuser1 = await AsyncStorage.getItem("user");
-      const myuser = JSON.parse(myuser1);
       // Get user document from Firestore
-      const userCollection = collection(db, "users");
-      const userDoc = doc(userCollection, myuser.user.uid);
+      const userCollection = firestore().collection("users");
+      const userDoc = userCollection.doc(userId);
       // Get goals collection from user document
-      const goalsRef = collection(userDoc, "goals");
+      const goalsRef = userDoc.collection("goals");
       // Fetch documents from goals collection
-      const goalsSnapshot = await getDocs(goalsRef);
+      const goalsSnapshot = await goalsRef.get();
       // Store goals data in an array
       let goals = [];
-      const goalsData = goalsSnapshot.docs.map((doc) => {
+      goalsSnapshot.forEach((doc) => {
         const goalData = doc.data();
-
-        if (goalData.user_id == myuser.user.uid) {
+        if (goalData.user_id === myuser.user.uid) {
           goals.push({
             id: doc.id,
             goalName: goalData.newGoal.goalName,
@@ -74,22 +67,19 @@ const ManageGoals = () => {
       setIsLoading(false);
       // Do whatever you need with goalsData here
     } catch (error) {
-      console.error("Error fetching user data 3:", error);
+      console.error("Error fetching user data:", error);
     }
   };
 
   const handleAddGoal = async () => {
     try {
       const goal_id = uuid.v4();
-      const user = await AsyncStorage.getItem("user");
-      const userId = JSON.parse(user)?.user?.uid;
-      const db = getFirestore(app);
-      const usersCollection = collection(db, "users");
-      const userDocRef = doc(usersCollection, userId);
-      const goalsCollection = collection(userDocRef, "goals");
-      const goalsDocRef = doc(goalsCollection, goal_id);
+      const usersCollection = firestore().collection("users");
+      const userDocRef = usersCollection.doc(userId);
+      const goalsCollection = userDocRef.collection("goals");
+      const goalsDocRef = goalsCollection.doc(goal_id);
 
-      setDoc(goalsDocRef, {
+      await goalsDocRef.set({
         newGoal,
         user_id: userId,
         goal_id
@@ -196,6 +186,7 @@ const ManageGoals = () => {
           <TextInput
             style={styles.input}
             placeholder="Total Amount"
+            keyboardType="number-pad"
             onChangeText={(text) =>
               setNewGoal({ ...newGoal, totalAmount: text })
             }

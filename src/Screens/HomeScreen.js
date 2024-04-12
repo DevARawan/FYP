@@ -1,33 +1,31 @@
-import React, { useState, useEffect } from "react";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
+  ScrollView,
   StatusBar,
-  ScrollView
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 // import Toast from 'react-native-toast-message';
-import { FIREBASE_APP as app, FIREBASE_DB } from "../../firebaseConfig";
-import messaging from "@react-native-firebase/messaging";
-import {
-  doc,
-  getDoc,
-  getFirestore,
-  collection,
-  setDoc,
-  getDocs,
-  deleteDoc
-} from "firebase/firestore";
 import firestore from "@react-native-firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  getFirestore,
+  setDoc
+} from "firebase/firestore";
+import ConfettiCannon from "react-native-confetti-cannon";
+import uuid from "react-native-uuid";
+import { FIREBASE_APP as app } from "../../firebaseConfig";
 import CircularProgressBar from "../Components/Progressbar";
 import { useAuthContext } from "../Hooks/UseAuth";
-import uuid from "react-native-uuid";
-import ConfettiCannon from "react-native-confetti-cannon";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 
 const HomeScreen = () => {
@@ -49,51 +47,46 @@ const HomeScreen = () => {
   };
 
   const getAllExpenseDetail = async () => {
-    // const user = await AsyncStorage.getItem("user");
-    // const userId = JSON.parse(user)?.user?.uid;
-    const userId = currentUser.uid;
-    console.log("userId", userId);
-    const what = collection(FIREBASE_DB, `users`, userId, "expenses");
-    console.log("userId", userId);
-    const snapshot = await getDocs(what);
-
-    const expensesCollection = firestore()
+    const userId = currentUser.uid; // Assuming currentUser is accessible
+    const expensesCollectionRef = firestore()
       .collection("users")
       .doc(userId)
-      .collection("expenses")
-      .doc();
+      .collection("expenses");
 
-    console.log("expensesCollection", expensesCollection);
-    const expenseDocRef = expensesCollection.doc();
+    try {
+      const snapshot = await expensesCollectionRef.get();
+      let payload = [];
 
-    const userDocSnapshot = await expenseDocRef.get();
-    let payload = [];
-    snapshot.forEach((doc) => {
-      try {
-        const userData = doc.data();
-        if (userData[`user_id`] == userId) {
-          payload.push(userData);
+      snapshot.forEach((doc) => {
+        try {
+          const userData = doc.data();
+          if (userData[`user_id`] === userId) {
+            payload.push(userData);
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
-      }
-      // Process each document as needed
-    });
-    const totalIncome = payload.reduce(
-      (acc, data) => Number(acc) + Number(data.income),
-      0
-    );
+      });
 
-    const totalExpense = payload.reduce((accumulator, currentValue) => {
-      const expenses = currentValue.expenseAmounts;
-      const expenseValues = Object.values(expenses);
-      const expenseSum = expenseValues.reduce(
-        (sum, value) => sum + Number(value),
+      const totalIncome = payload.reduce(
+        (acc, data) => acc + Number(data.income || 0),
         0
       );
-      return accumulator + expenseSum;
-    }, 0);
-    setSavingsAmount(totalIncome - totalExpense);
+
+      const totalExpense = payload.reduce((accumulator, currentValue) => {
+        const expenses = currentValue.expenseAmounts || {};
+        const expenseValues = Object.values(expenses);
+        const expenseSum = expenseValues.reduce(
+          (sum, value) => sum + Number(value),
+          0
+        );
+        return accumulator + expenseSum;
+      }, 0);
+
+      setSavingsAmount(totalIncome - totalExpense);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    }
   };
 
   const fetchData = async () => {

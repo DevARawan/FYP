@@ -2,15 +2,9 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification
 } from "firebase/auth";
-import { collection, doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { Alert, ToastAndroid } from "react-native";
-import {
-  FIREBASE_AUTH,
-  FIREBASE_APP,
-  FIREBASE_DB
-} from "../../../firebaseConfig";
-import { firebase } from "@react-native-firebase/firestore";
+import { FIREBASE_AUTH } from "../../../firebaseConfig";
 import { useAuthContext } from "../../Hooks/UseAuth";
 
 const SignUpBusinessLogic = ({ children, navigation }) => {
