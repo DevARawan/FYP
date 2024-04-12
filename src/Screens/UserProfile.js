@@ -35,6 +35,7 @@ import { FIREBASE_APP } from "../../firebaseConfig";
 import * as ImagePicker from "expo-image-picker";
 import { BottomSheet } from "react-native-elements";
 import ChangePasswordBottomSheet from "../Components/ChangePasswordBottomSheet";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -46,7 +47,7 @@ const UserProfile = () => {
   const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState(null);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
-
+  const { signOut } = useAuthContext();
   const toggleBottomSheet = () => {
     setIsBottomSheetVisible(!isBottomSheetVisible);
   };
@@ -86,6 +87,7 @@ const UserProfile = () => {
   };
 
   const handleLogout = () => {
+    signOut();
     AsyncStorage.removeItem("user");
     navigation.navigate("FrontScreen");
   };

@@ -99,6 +99,7 @@ export default function LoginScreen() {
             }
           } else {
             Alert.alert("please verify you email");
+
             signOut();
           }
           setLoad(false);
