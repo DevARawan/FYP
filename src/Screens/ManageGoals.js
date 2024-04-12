@@ -1,29 +1,27 @@
-import React, { useState, useEffect } from "react";
+import { FontAwesome } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import {
-  View,
+  collection,
+  doc,
+  getDocs,
+  getFirestore,
+  setDoc
+} from "firebase/firestore";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Modal,
-  ActivityIndicator
+  View
 } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  doc,
-  getDoc,
-  getFirestore,
-  collection,
-  setDoc,
-  getDocs
-} from "firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
 import DatePicker from "react-native-date-picker";
-import moment from "moment";
 import uuid from "react-native-uuid";
+import { FIREBASE_APP } from "../../firebaseConfig";
 
 let controlRender = true;
 
