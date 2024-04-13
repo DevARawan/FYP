@@ -1,29 +1,34 @@
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
+  Modal,
   ScrollView,
   StatusBar,
   StyleSheet,
-  View,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  View,
+  Image
 } from "react-native";
 import { useSelector } from "react-redux";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // import Toast from 'react-native-toast-message';
 import firestore from "@react-native-firebase/firestore";
 import { useAuthContext } from "../Hooks/UseAuth";
-import CircularProgressBar from "../Components/Progressbar";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
+import CelebrationComponent from "../Components/CelebrationComponent";
 
 const HomeScreen = () => {
-  const [savingsAmount, setSavingsAmount] = useState("");
+  const [savingsAmount, setSavingsAmount] = useState(0);
   const [allGoals, setAllGoals] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showCelebration, setshowCelebration] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [achieveStatus, setAchieveStatus] = useState("silver");
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { currentUser } = useAuthContext();
+  const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(true);
+
   const navigation = useNavigation();
   const userId = currentUser.uid;
   const fetchExpenses = async () => {
@@ -59,7 +64,7 @@ const HomeScreen = () => {
         0
       );
 
-      setSavingsAmount(totalIncome - totalOverallExpenses);
+      fetchAchievements(totalIncome, totalOverallExpenses);
     } catch (error) {
       console.error("Error fetching and logging expenses:", error);
     }
@@ -91,11 +96,134 @@ const HomeScreen = () => {
       });
 
       // Do whatever you need with the fetched goals (e.g., set state)
-      console.log("Fetched goals:", goals);
+
       setAllGoals(goals);
       // You can set the fetched goals to state or perform any other actions here
     } catch (error) {
       console.error("Error fetching goals:", error);
+    }
+  };
+  const sumAchievemntsAmount = (achievements) => {
+    // Use reduce to calculate the sum of totalAmount
+    const total = achievements.reduce((sum, achievement) => {
+      // Convert totalAmount to a number and add it to the sum
+      return sum + Number(achievement.totalAmount);
+    }, 0); // Start with an initial sum of 0
+    return total;
+  };
+  const fetchAchievements = async (totalIncome, totalOverallExpenses) => {
+    try {
+      // Get a reference to the Firestore collection of achievements under the user's collection
+      const achievementsCollectionRef = firestore().collection(
+        `users/${userId}/achievements`
+      );
+
+      // Fetch documents from the achievements collection
+      const achievementsSnapshot = await achievementsCollectionRef.get();
+      let achievements = [];
+
+      // Log each document in the achievements collection
+      achievementsSnapshot.forEach((doc) => {
+        console.log("Achievements data", doc.data());
+        const achievementData = doc.data();
+        const achievement = {
+          id: achievementData.id,
+          dueDate: achievementData.dueDate,
+          goalName: achievementData.goalName,
+          goalDescription: achievementData.goalDescription,
+          totalAmount: achievementData.totalAmount
+          // Add other fields as needed
+        };
+
+        achievements.push(achievement);
+      });
+
+      // Do whatever you need with the fetched achievements (e.g., set state)
+
+      if (achievements.length > 0) {
+        const sumAchievemnts = sumAchievemntsAmount(achievements);
+        const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
+        setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
+        console.log("savingsWithoutAchievements:", savingsWithoutAchievements);
+        console.log("sumAchievemnts:", sumAchievemnts);
+        console.log("here:", savingsWithoutAchievements - sumAchievemnts);
+      } else {
+        console.log("usama is here in else");
+        setSavingsAmount(totalIncome - totalOverallExpenses);
+      }
+      // You can set the fetched achievements to state or perform any other actions here
+    } catch (error) {
+      console.error("Error fetching achievements:", error);
+    }
+  };
+  const handleAchievement = () => {};
+
+  const handleCelebrationEnd = () => {
+    // setShowCelebration(false);
+    // Perform any cleanup or navigate to another screen after celebration ends
+  };
+  const CelebrationBottomSheet = ({ visible, onClose }) => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={visible}
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.bottomSheet}>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <MaterialCommunityIcons name="close" size={24} color="black" />
+            </TouchableOpacity>
+            <Image
+              source={require("../Images/celebrations.gif")} // Replace with your GIF
+              style={styles.gif}
+            />
+            <Text style={styles.text}>Next</Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const checkAndUpdateGoals = async (savingsAmount, goals) => {
+    try {
+      // Check if there are any goals
+      if (goals.length > 0) {
+        const selectedGoal = goals[0]; // Selecting the first goal for now
+        // Check if savings amount is greater than or equal to the total amount of the selected goal
+        if (savingsAmount >= selectedGoal.totalAmount) {
+          // Make a Firebase call to delete the selected goal from the goals collection
+          const goalsCollectionRef = firestore().collection(
+            `users/${userId}/goals`
+          );
+          await goalsCollectionRef.doc(selectedGoal.id).delete();
+
+          // Add the selected goal to the achievements collection under the user's collection
+          const achievementsCollectionRef = firestore().collection(
+            `users/${userId}/achievements`
+          );
+          await achievementsCollectionRef.add(selectedGoal);
+
+          console.log(
+            "Selected goal achieved and moved to achievements:",
+            selectedGoal
+          );
+
+          // setShowCelebration(true);
+          fetchExpenses();
+          fetchGoals();
+        } else {
+          console.log(
+            "Savings amount is not enough to achieve the selected goal."
+          );
+          setIsCelebrationsVisible(true);
+        }
+      } else {
+        console.log("No goals found.");
+      }
+    } catch (error) {
+      console.error("Error checking and updating goals:", error);
     }
   };
 
@@ -109,7 +237,11 @@ const HomeScreen = () => {
   useEffect(() => {
     fetchExpenses();
     fetchGoals();
-  }, []);
+  }, [useIsFocused()]);
+
+  useEffect(() => {
+    checkAndUpdateGoals(savingsAmount, allGoals);
+  }, [savingsAmount, allGoals]);
 
   const selectedCurrency = useSelector((state) => state.currency.currency);
 
@@ -202,12 +334,16 @@ const HomeScreen = () => {
           WE ARE LOADING YOUR GOALS.
         </Text>
       )}
-      {showCelebration && (
-        <ConfettiCannon fadeOut={true} count={1000} origin={{ x: 10, y: 0 }} />
-      )}
+
       <CurrencySelectionModal
         visible={showCurrencyModal}
         onClose={() => setShowCurrencyModal(false)}
+      />
+      <CelebrationBottomSheet
+        visible={isCelebrationsVisible}
+        onClose={() => {
+          setIsCelebrationsVisible(false);
+        }}
       />
     </ScrollView>
   );
@@ -313,6 +449,33 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     alignItems: "center",
     marginTop: 10
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)"
+  },
+  bottomSheet: {
+    backgroundColor: "white",
+    alignItems: "center",
+    paddingBottom: 40,
+    width: "100%",
+    paddingTop: 20
+  },
+  gif: {
+    width: 150,
+    height: 150
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10
   }
 });
 

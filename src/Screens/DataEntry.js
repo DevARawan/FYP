@@ -1,7 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -13,8 +11,8 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { FIREBASE_DB } from "../../firebaseConfig";
 import firestore from "@react-native-firebase/firestore";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
@@ -28,6 +26,7 @@ const DataEntry = () => {
     Clothes: "",
     Other: ""
   });
+  const { currentUser } = useAuthContext();
   const [plusIcon, setPlusIcon] = useState(true);
   const [isButtonDistable, setIsButtonDistable] = useState(false);
   const navigation = useNavigation();
@@ -105,8 +104,7 @@ const DataEntry = () => {
     }
 
     try {
-      const user = await AsyncStorage.getItem("user");
-      const userId = JSON.parse(user)?.user?.uid;
+      const userId = currentUser.uid;
       if (!userId) {
         setIsButtonDistable(false);
         throw new Error("User ID not found");
