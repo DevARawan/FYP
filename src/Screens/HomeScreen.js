@@ -1,10 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StatusBar, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity
+} from "react-native";
+import { useSelector } from "react-redux";
 
 // import Toast from 'react-native-toast-message';
 import firestore from "@react-native-firebase/firestore";
 import { useAuthContext } from "../Hooks/UseAuth";
+import CircularProgressBar from "../Components/Progressbar";
+import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState("");
@@ -26,29 +36,87 @@ const HomeScreen = () => {
       // Fetch documents from the expenses collection
       const expensesSnapshot = await expensesCollectionRef.get();
       let totalIncome = 0;
+      let totalExpenses = {
+        Clothes: 0,
+        Electricity: 0,
+        Fuel: 0,
+        Gas: 0,
+        Grocery: 0,
+        Other: 0
+      };
       // Log each document in the expenses collection
       expensesSnapshot.forEach((doc) => {
-        console.log(doc.data().income);
         const income = Number(doc.data().income);
-
-        // Add income to totalIncome
         totalIncome += income;
+        Object.keys(doc.data().expenseAmounts).forEach((category) => {
+          const expenseAmount = Number(doc.data().expenseAmounts[category]);
+          totalExpenses[category] += expenseAmount;
+        });
       });
-      console.log("total income => ", totalIncome);
-      setSavingsAmount(totalIncome);
 
-      console.log("Expenses fetched and logged successfully");
+      const totalOverallExpenses = Object.values(totalExpenses).reduce(
+        (total, expense) => total + expense,
+        0
+      );
+
+      setSavingsAmount(totalIncome - totalOverallExpenses);
     } catch (error) {
       console.error("Error fetching and logging expenses:", error);
     }
   };
+  const fetchGoals = async () => {
+    try {
+      // Get a reference to the Firestore collection of goals under the user's collection
+      const goalsCollectionRef = firestore().collection(
+        `users/${userId}/goals`
+      );
+
+      // Fetch documents from the goals collection
+      const goalsSnapshot = await goalsCollectionRef.get();
+      let goals = [];
+
+      // Log each document in the goals collection
+      goalsSnapshot.forEach((doc) => {
+        const goalData = doc.data();
+        const goal = {
+          id: doc.id,
+          goalName: goalData.newGoal.goalName,
+          goalDescription: goalData.newGoal.description,
+          totalAmount: goalData.newGoal.totalAmount,
+          dueDate: goalData.newGoal.dueDate || null,
+          user_id: goalData.user_id,
+          goal_id: goalData.goal_id
+        };
+        goals.push(goal);
+      });
+
+      // Do whatever you need with the fetched goals (e.g., set state)
+      console.log("Fetched goals:", goals);
+      setAllGoals(goals);
+      // You can set the fetched goals to state or perform any other actions here
+    } catch (error) {
+      console.error("Error fetching goals:", error);
+    }
+  };
+
+  const handleDataEntry = () => {
+    navigation.navigate("dataEntry");
+  };
+  const handleManageGoals = () => {
+    navigation.navigate("manageGoals");
+  };
+
   useEffect(() => {
     fetchExpenses();
+    fetchGoals();
   }, []);
+
+  const selectedCurrency = useSelector((state) => state.currency.currency);
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
-      {/* <View style={{ alignItems: "flex-end", paddingHorizontal: 10 }}>
+      <View style={{ alignItems: "flex-end", paddingHorizontal: 10 }}>
         <Text style={{ color: "red" }}>
           {achieveStatus == "silver"
             ? "🥈"
@@ -70,13 +138,13 @@ const HomeScreen = () => {
 
       <Text style={styles.heading}>Dashboard</Text>
       <View style={{ alignSelf: "center" }}>
-        <CircularProgressBar
+        {/* <CircularProgressBar
           currentGoal={allGoals[0]}
           savingIncome={savingsAmount}
           nextGoal={NextGoalHandler}
           ForwardToAchieveHandler={ForwardToAchieveHandler}
           celebrationHandler={setshowCelebration}
-        />
+        /> */}
       </View>
 
       <View style={styles.savingsContainer}>
@@ -140,7 +208,7 @@ const HomeScreen = () => {
       <CurrencySelectionModal
         visible={showCurrencyModal}
         onClose={() => setShowCurrencyModal(false)}
-      /> */}
+      />
     </ScrollView>
   );
 };
