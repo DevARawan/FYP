@@ -1,42 +1,35 @@
-import React, { useState, useEffect } from "react";
+import { FontAwesome } from "@expo/vector-icons";
+import firestore from "@react-native-firebase/firestore"; // Import the firestore module from react-native-firebase
+import { useNavigation } from "@react-navigation/native";
+
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Modal,
-  ActivityIndicator
+  View
 } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { FIREBASE_APP, FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  doc,
-  getDoc,
-  getFirestore,
-  collection,
-  setDoc,
-  getDocs
-} from "firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
 import DatePicker from "react-native-date-picker";
-import moment from "moment";
 import uuid from "react-native-uuid";
+import { useAuthContext } from "../Hooks/UseAuth";
+import Loader from "../Utils/Loader";
 
 let controlRender = true;
 
 const ManageGoals = () => {
-  const app = FIREBASE_APP;
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [allGoals, setAllGoals] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const navigation = useNavigation();
   const [date, setDate] = useState(null);
   const [open, setOpen] = useState(false);
-  const db = getFirestore(app);
+
+  const { currentUser } = useAuthContext();
+  const userId = currentUser.uid;
   let goals = [];
   const [newGoal, setNewGoal] = useState({
     goalName: "",
@@ -48,50 +41,54 @@ const ManageGoals = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const myuser1 = await AsyncStorage.getItem("user");
-      const myuser = JSON.parse(myuser1);
       // Get user document from Firestore
-      const userCollection = collection(db, "users");
-      const userDoc = doc(userCollection, myuser.user.uid);
+      const userCollection = firestore().collection("users");
+      const userDoc = userCollection.doc(userId);
+
       // Get goals collection from user document
-      const goalsRef = collection(userDoc, "goals");
+      const goalsRef = userDoc.collection("goals");
+
       // Fetch documents from goals collection
-      const goalsSnapshot = await getDocs(goalsRef);
+      const goalsSnapshot = await goalsRef.get();
+
       // Store goals data in an array
       let goals = [];
-      const goalsData = goalsSnapshot.docs.map((doc) => {
-        const goalData = doc.data();
 
-        if (goalData.user_id == myuser.user.uid) {
-          goals.push({
-            id: doc.id,
-            goalName: goalData.newGoal.goalName,
-            goalDescription: goalData.newGoal.description,
-            totalAmount: goalData.newGoal.totalAmount,
-            dueDate: goalData.newGoal.dueDate || null
-          });
-        }
-      });
+      // Check if there are any documents in the snapshot
+      if (!goalsSnapshot.empty) {
+        goalsSnapshot.forEach((doc) => {
+          const goalData = doc.data();
+          if (goalData.user_id === currentUser.uid) {
+            goals.push({
+              id: doc.id,
+              goalName: goalData.newGoal.goalName,
+              goalDescription: goalData.newGoal.description,
+              totalAmount: goalData.newGoal.totalAmount,
+              dueDate: goalData.newGoal.dueDate || null
+            });
+          }
+        });
+      } else {
+        console.log("No goals found in the snapshot");
+      }
+
       setAllGoals(goals);
       setIsLoading(false);
       // Do whatever you need with goalsData here
     } catch (error) {
-      console.error("Error fetching user data 3:", error);
+      console.error("Error fetching user data:", error);
     }
   };
 
   const handleAddGoal = async () => {
     try {
       const goal_id = uuid.v4();
-      const user = await AsyncStorage.getItem("user");
-      const userId = JSON.parse(user)?.user?.uid;
-      const db = getFirestore(app);
-      const usersCollection = collection(db, "users");
-      const userDocRef = doc(usersCollection, userId);
-      const goalsCollection = collection(userDocRef, "goals");
-      const goalsDocRef = doc(goalsCollection, goal_id);
+      const usersCollection = firestore().collection("users");
+      const userDocRef = usersCollection.doc(userId);
+      const goalsCollection = userDocRef.collection("goals");
+      const goalsDocRef = goalsCollection.doc(goal_id);
 
-      setDoc(goalsDocRef, {
+      await goalsDocRef.set({
         newGoal,
         user_id: userId,
         goal_id
@@ -114,19 +111,6 @@ const ManageGoals = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const showMessage = (message) => {
-    // Show message in a modal
-    setModalVisible(true);
-    // Set message to display
-    setMessage(message);
-  };
-  // if (date != null) {
-  //   if (controlRender) {
-  //     setNewGoal({ ...newGoal, dueDate: date });
-  //     controlRender = false;
-  //   }
-  // }
 
   return (
     <ScrollView style={styles.container}>
@@ -198,6 +182,7 @@ const ManageGoals = () => {
           <TextInput
             style={styles.input}
             placeholder="Total Amount"
+            keyboardType="number-pad"
             onChangeText={(text) =>
               setNewGoal({ ...newGoal, totalAmount: text })
             }

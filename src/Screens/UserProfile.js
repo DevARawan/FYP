@@ -8,27 +8,34 @@ import {
   StyleSheet
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-
 import { FontAwesome5 } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import {
   getAuth,
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential
-} from "firebase/auth";
-import { getFirestore, doc, updateDoc, collection } from "firebase/firestore";
+} from "@firebase/auth";
+import {
+  getFirestore,
+  doc,
+  updateDoc,
+  collection
+} from "@react-native-firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-// import { getStorage, ref, uploadBytes } from 'firebase/storage';
 import { ActionSheet } from "@expo/react-native-action-sheet";
-import firebase from "@firebase/app";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "@firebase/storage";
 
 import { FIREBASE_APP } from "../../firebaseConfig";
 import * as ImagePicker from "expo-image-picker";
 import { BottomSheet } from "react-native-elements";
 import ChangePasswordBottomSheet from "../Components/ChangePasswordBottomSheet";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -40,7 +47,7 @@ const UserProfile = () => {
   const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState(null);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
-
+  const { signOut } = useAuthContext();
   const toggleBottomSheet = () => {
     setIsBottomSheetVisible(!isBottomSheetVisible);
   };
@@ -52,7 +59,7 @@ const UserProfile = () => {
       quality: 1
     });
 
-    if (!result.canceled) {
+    if (!result.cancelled) {
       setSelectedImage(result.assets[0].uri);
     }
   };
@@ -63,7 +70,6 @@ const UserProfile = () => {
         let storedUserData = await AsyncStorage.getItem("user");
         storedUserData = JSON.parse(storedUserData);
         if (storedUserData) {
-          // const userData = JSON.parse(storedUserData);
           setUserData(storedUserData);
           setEmail(storedUserData.email);
           setPassword(storedUserData.password);
@@ -81,6 +87,7 @@ const UserProfile = () => {
   };
 
   const handleLogout = () => {
+    signOut();
     AsyncStorage.removeItem("user");
     navigation.navigate("FrontScreen");
   };
@@ -106,11 +113,13 @@ const UserProfile = () => {
       });
       const updated_local_storage = { ...userData, profile_url: downloadURL };
       const updated_userData = JSON.stringify(updated_local_storage);
-      localStorage.setItem("user", updated_userData);
+      AsyncStorage.setItem("user", updated_userData);
 
       setIsEditMode(false);
       setShowUploadButton(false);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
   };
 
   return (
@@ -225,7 +234,6 @@ const styles = StyleSheet.create({
     borderColor: "black",
     justifyContent: "center",
     alignItems: "center"
-    // marginBottom: 12,
   },
   userImage: {
     width: "100%",

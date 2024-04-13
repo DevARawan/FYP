@@ -1,8 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import firestore from "@react-native-firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -11,13 +13,12 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-
-import { useNavigation } from "@react-navigation/native";
-import { useAuthContext } from "../Hooks/UseAuth";
+import { FIREBASE_DB } from "../../firebaseConfig";
+import firestore from "@react-native-firebase/firestore";
 
 const DataEntry = () => {
-  const { currentUser } = useAuthContext();
   const [showAddIncome, setShowAddIncome] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [incomeAmount, setIncomeAmount] = useState(null);
   const [expenseAmounts, setExpenseAmounts] = useState({
     Electricity: "",
@@ -81,6 +82,7 @@ const DataEntry = () => {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     setIsButtonDistable(true);
     if (!incomeAmount) {
       Alert.alert("Please provide income details");
@@ -104,44 +106,42 @@ const DataEntry = () => {
 
     try {
       const user = await AsyncStorage.getItem("user");
-
-      const userId = currentUser.uid;
-      console.log("userId", userId);
+      const userId = JSON.parse(user)?.user?.uid;
       if (!userId) {
         setIsButtonDistable(false);
         throw new Error("User ID not found");
       }
 
-      // const userDocRef = firestore().collection("users").doc(userId);
+      const usersCollection = firestore().collection("users");
 
-      const userDocRef = await firestore()
-        .collection("users")
-        .doc(userId)
-        .get();
-      console.log("serDocRef.exists", userDocRef);
-      if (userDocRef.exists) {
-        const expensesCollection = firestore()
-          .collection("users")
-          .doc(userId)
-          .collection("expenses");
+      const userDocRef = usersCollection.doc(userId);
+
+      const userDocSnapshot = await userDocRef.get();
+
+      if (userDocSnapshot.exists) {
+        const expensesCollection = userDocRef.collection("expenses");
         const expenseDocRef = expensesCollection.doc();
 
         await expenseDocRef.set({
-          expenseAmounts: expenseAmounts,
+          expenseAmounts,
           income: incomeAmount,
           user_id: userId
         });
 
-        // Navigation and state update code
         navigation.navigate("main");
+        setIsButtonDistable(false);
       } else {
+        setIsButtonDistable(false);
         throw new Error("User document not found");
       }
+      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       setIsButtonDistable(false);
       console.error("Error occurred:", error);
       Alert.alert("Error occurred while processing the request");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -182,7 +182,11 @@ const DataEntry = () => {
         style={styles.submitButton}
         onPress={handleSubmit}
       >
-        <Text style={styles.submitButtonText}>Submit</Text>
+        {isLoading ? (
+          <ActivityIndicator />
+        ) : (
+          <Text style={styles.submitButtonText}>Submit</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );

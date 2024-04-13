@@ -1,10 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  sendSignInLinkToEmail
-} from "firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -16,10 +11,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
-import { collection, doc, setDoc } from "firebase/firestore";
-import { firebase } from "@react-native-firebase/auth";
-import * as firebaseAuth from "firebase/auth";
+import { FIREBASE_AUTH } from "../../firebaseConfig";
 
 const UserIcon = () => {
   return (

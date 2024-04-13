@@ -1,8 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+import firestore from "@react-native-firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import firestore from "@react-native-firebase/firestore";
-import { useDispatch } from "react-redux";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -16,18 +15,17 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { useDispatch } from "react-redux";
 
 import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword
 } from "firebase/auth";
 
-import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebaseConfig";
+import { FIREBASE_AUTH } from "../../firebaseConfig";
 import myColor from "../Components/Color";
 
 import { useAuthContext } from "../Hooks/UseAuth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { setCurrency } from "../Store/reducers/currenncyReducer";
 
 const UserIcon = () => {
@@ -101,6 +99,7 @@ export default function LoginScreen() {
             }
           } else {
             Alert.alert("please verify you email");
+
             signOut();
           }
           setLoad(false);

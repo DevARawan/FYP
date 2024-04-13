@@ -1,6 +1,5 @@
-import { deleteDoc, doc } from "firebase/firestore";
-import React, { useState } from "react";
-import { FIREBASE_DB } from "../../../firebaseConfig";
+import firestore from "@react-native-firebase/firestore";
+import React, { useState, useEffect } from "react";
 import { fetchAllUsers } from "../../Utils/FirebaseFunctions";
 
 const AdminService = ({ children, navigation }) => {
@@ -12,21 +11,20 @@ const AdminService = ({ children, navigation }) => {
     setSelectedUser(user);
     setShowOptionsModal(true);
   };
+
   const handleDeleteUser = async () => {
-    // Check if selectedUser has an ID
     if (!selectedUser?.user_id) {
       console.error("Selected user is missing an ID");
       return;
     }
 
     try {
-      // Create a reference to the user document
-      const userDocRef = doc(FIREBASE_DB, "users", selectedUser.user_id);
+      const userDocRef = firestore()
+        .collection("users")
+        .doc(selectedUser.user_id);
 
-      // Delete the document
-      await deleteDoc(userDocRef);
+      await userDocRef.delete();
 
-      // Update local state (optional, data might already be outdated)
       const updatedUsers = users.filter(
         (u) => u.user_id !== selectedUser.user_id
       );
@@ -34,16 +32,18 @@ const AdminService = ({ children, navigation }) => {
     } catch (error) {
       console.error("Error deleting user:", error);
     } finally {
-      setShowOptionsModal(false); // Close the modal regardless of success or failure
+      setShowOptionsModal(false);
     }
   };
-  React.useEffect(() => {
+
+  useEffect(() => {
     const fetchData = async () => {
       const allUsers = await fetchAllUsers();
       setUsers(allUsers);
     };
     fetchData();
   }, []);
+
   return children({
     navigation,
     selectedUser,
@@ -56,4 +56,5 @@ const AdminService = ({ children, navigation }) => {
     handleDeleteUser
   });
 };
+
 export default AdminService;
