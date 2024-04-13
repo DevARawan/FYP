@@ -1,21 +1,32 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import Loader from "../Utils/Loader";
+import React, { useState, useEffect } from "react";
 import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
+  View,
   Text,
+  StyleSheet,
   TouchableOpacity,
-  View
+  StatusBar,
+  ScrollView
 } from "react-native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
-import firestore from "@react-native-firebase/firestore"; // Import firestore from react-native-firebase
-import ConfettiCannon from "react-native-confetti-cannon";
-import uuid from "react-native-uuid";
+// import Toast from 'react-native-toast-message';
+import { FIREBASE_APP as app, FIREBASE_DB } from "../../firebaseConfig";
+import firestore from "@react-native-firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  collection,
+  setDoc,
+  getDocs,
+  deleteDoc
+} from "firebase/firestore";
 import CircularProgressBar from "../Components/Progressbar";
 import { useAuthContext } from "../Hooks/UseAuth";
+import uuid from "react-native-uuid";
+import ConfettiCannon from "react-native-confetti-cannon";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 
 const HomeScreen = () => {
@@ -27,96 +38,108 @@ const HomeScreen = () => {
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { currentUser } = useAuthContext();
   const navigation = useNavigation();
+  const db = getFirestore(app);
 
   const handleDataEntry = () => {
     navigation.navigate("dataEntry");
   };
-
   const handleManageGoals = () => {
     navigation.navigate("manageGoals");
   };
 
   const getAllExpenseDetail = async () => {
-    const userId = currentUser.uid;
-
     try {
-      const expenseDocRef = firestore()
+      const userId = currentUser.uid;
+
+      const expensesCollection = firestore()
         .collection("users")
         .doc(userId)
-        .collection("expenses")
-        .doc(userId); // Assuming there's only one document in the collection
+        .collection("expenses");
 
-      const expenseDoc = await expenseDocRef.get();
+      const snapshot = await expensesCollection.get();
 
-      if (expenseDoc.exists) {
-        const userData = expenseDoc.data();
-        if (userData.user_id === userId) {
-          const totalIncome = Number(userData.income || 0);
-          const expenseAmounts = userData.expenseAmounts || {};
-          const expenseValues = Object.values(expenseAmounts);
-          const totalExpense = expenseValues.reduce(
-            (sum, value) => sum + Number(value),
-            0
-          );
-
-          setSavingsAmount(totalIncome - totalExpense);
-        } else {
+      let payload = [];
+      snapshot.forEach((doc) => {
+        try {
+          const userData = doc.data();
+          if (userData.user_id === userId) {
+            payload.push(userData);
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } else {
-      }
+        // Process each document as needed
+      });
+
+      const totalIncome = payload.reduce(
+        (acc, data) => Number(acc) + Number(data.income),
+        0
+      );
+
+      const totalExpense = payload.reduce((accumulator, currentValue) => {
+        const expenses = currentValue.expenseAmounts;
+        const expenseValues = Object.values(expenses);
+        const expenseSum = expenseValues.reduce(
+          (sum, value) => sum + Number(value),
+          0
+        );
+        return accumulator + expenseSum;
+      }, 0);
+
+      setSavingsAmount(totalIncome - totalExpense);
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
   };
-
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const userDocRef = firestore().collection("users").doc(currentUser.uid);
-      const goalsRef = userDocRef.collection("goals");
-      const goalsSnapshot = await goalsRef.get();
+      const userid = currentUser.uid;
 
+      // Get user document from Firestore
+      const userDocRef = firestore().collection("users").doc(userid);
+
+      // Get goals collection from user document
+      const goalsCollectionRef = userDocRef.collection("goals");
+
+      // Fetch documents from goals collection
+      const goalsSnapshot = await goalsCollectionRef.get();
+
+      // Store goals data in an array
       let goals = [];
       goalsSnapshot.forEach((doc) => {
         const goalData = doc.data();
-        if (goalData.user_id === currentUser.uid) {
+        if (goalData.user_id === userid) {
           goals.push({
             id: doc.id,
             goalName: goalData.newGoal.goalName,
             goalDescription: goalData.newGoal.description,
             totalAmount: goalData.newGoal.totalAmount,
             dueDate: goalData.newGoal.dueDate || null,
-            user_id: goalData.user_id,
-            goal_id: goalData.goal_id
+            user_id: goalData?.user_id,
+            goal_id: goalData?.goal_id
           });
         }
       });
 
       setAllGoals(goals);
       setIsLoading(false);
+      // Do whatever you need with goalsData here
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching user data 2:", error);
     }
   };
-
-  // useEffect(() => {
-  //   getAllExpenseDetail();
-  // fetchData();
-  // }, [useIsFocused()]);
   useEffect(() => {
-    fetchData();
     getAllExpenseDetail();
-  });
-
+    fetchData();
+  }, []);
   let count = 0;
-
   const ForwardToAchieveHandler = async (goal) => {
     ++count;
-    if (count === 2) {
+    if (count == 2) {
       count = 0;
       return;
     }
-
     const achievementId = uuid.v4();
     let achieve = {
       ...goal,
@@ -124,11 +147,16 @@ const HomeScreen = () => {
     };
 
     try {
-      const userDocRef = firestore().collection("users").doc(currentUser.uid);
-      const goalsCollection = userDocRef.collection("achieve");
-      const goalsDocRef = goalsCollection.doc(achievementId);
-
-      await goalsDocRef.set({ achieve });
+      const user = await AsyncStorage.getItem("user");
+      const userId = JSON.parse(user)?.user?.uid;
+      const db = getFirestore(app);
+      const usersCollection = collection(db, "users");
+      const userDocRef = doc(usersCollection, userId);
+      const goalsCollection = collection(userDocRef, "achieve");
+      const goalsDocRef = doc(goalsCollection, achievementId);
+      setDoc(goalsDocRef, {
+        achieve
+      });
 
       fetchData();
       Reward();
@@ -139,14 +167,18 @@ const HomeScreen = () => {
 
   const NextGoalHandler = async (goal, progressHandler) => {
     setshowCelebration(false);
-    setAllGoals(allGoals.filter((data) => data.goalName !== goal.goalName));
+    setAllGoals(allGoals.filter((data) => data.goalName != goal.goalName));
 
     try {
-      const userDocRef = firestore().collection("users").doc(currentUser.uid);
-      const goalsCollection = userDocRef.collection("goals");
-      const goalDocRef = goalsCollection.doc(goal.goal_id);
+      const user = await AsyncStorage.getItem("user");
+      const userId = JSON.parse(user)?.user?.uid;
+      const db = getFirestore(app);
+      const usersCollection = collection(db, "users");
+      const userDocRef = doc(usersCollection, userId);
+      const goalsCollection = collection(userDocRef, "goals");
 
-      // await goalDocRef.delete();
+      const goalDocRef = doc(goalsCollection, goal?.goal_id); // Assuming goalId is the ID of the goal you want to delete
+      await deleteDoc(goalDocRef);
       ForwardToAchieveHandler(goal);
 
       progressHandler(0);
@@ -154,14 +186,16 @@ const HomeScreen = () => {
       console.error("Error deleting goal:", error);
     }
   };
-
   const selectedCurrency = useSelector((state) => state.currency.currency);
-
   const Reward = async () => {
     try {
-      const userDocRef = firestore().collection("users").doc(currentUser.uid);
-      const goalsCollection = userDocRef.collection("achieve");
-      const achieveSnapshot = await goalsCollection.get();
+      const user = await AsyncStorage.getItem("user");
+      const userId = JSON.parse(user)?.user?.uid;
+      const db = getFirestore(app);
+      const usersCollection = collection(db, "users");
+      const userDocRef = doc(usersCollection, userId);
+      const goalsCollection = collection(userDocRef, "achieve");
+      const achieveSnapshot = await getDocs(goalsCollection);
 
       if (achieveSnapshot.size >= 3 && achieveSnapshot.size <= 5) {
         setAchieveStatus("matel");
@@ -174,7 +208,6 @@ const HomeScreen = () => {
   };
 
   const fetchUserCurrency = () => {};
-
   useEffect(() => {
     Reward();
     fetchUserCurrency();
@@ -185,9 +218,9 @@ const HomeScreen = () => {
       <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
       <View style={{ alignItems: "flex-end", paddingHorizontal: 10 }}>
         <Text style={{ color: "red" }}>
-          {achieveStatus === "silver"
+          {achieveStatus == "silver"
             ? "🥈"
-            : achieveStatus === "matel"
+            : achieveStatus == "matel"
             ? "🥉"
             : "🏅"}
         </Text>
@@ -265,11 +298,9 @@ const HomeScreen = () => {
           </View>
         ))
       ) : (
-        <>
-          <Text style={{ textAlign: "center", marginTop: 20 }}>
-            WE ARE LOADING YOUR GOALS.
-          </Text>
-        </>
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          WE ARE LOADING YOUR GOALS.
+        </Text>
       )}
       {showCelebration && (
         <ConfettiCannon fadeOut={true} count={1000} origin={{ x: 10, y: 0 }} />
@@ -287,6 +318,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f4f4f4",
     padding: 12
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   navbar: {
     flexDirection: "row",
