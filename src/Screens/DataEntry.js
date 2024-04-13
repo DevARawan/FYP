@@ -1,8 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import firestore from "@react-native-firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
+import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -11,13 +13,12 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-
-import { useNavigation } from "@react-navigation/native";
-import { useAuthContext } from "../Hooks/UseAuth";
+import { FIREBASE_DB } from "../../firebaseConfig";
+import firestore from "@react-native-firebase/firestore";
 
 const DataEntry = () => {
-  const { currentUser } = useAuthContext();
   const [showAddIncome, setShowAddIncome] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [incomeAmount, setIncomeAmount] = useState(null);
   const [expenseAmounts, setExpenseAmounts] = useState({
     Electricity: "",
@@ -28,7 +29,7 @@ const DataEntry = () => {
     Other: ""
   });
   const [plusIcon, setPlusIcon] = useState(true);
-  const [isButtonDistable, setIsButtonDisabled] = useState(false);
+  const [isButtonDistable, setIsButtonDistable] = useState(false);
   const navigation = useNavigation();
 
   const renderAddIncome = () => {
@@ -81,48 +82,66 @@ const DataEntry = () => {
   };
 
   const handleSubmit = async () => {
-    setIsButtonDisabled(true);
+    setIsLoading(true);
+    setIsButtonDistable(true);
+    if (!incomeAmount) {
+      Alert.alert("Please provide income details");
+      setIsButtonDistable(false);
+      return;
+    }
+
+    let totalExpense = 0;
+    for (const key in expenseAmounts) {
+      const value = expenseAmounts[key];
+      if (!isNaN(value) && value !== "") {
+        totalExpense += parseFloat(value);
+      }
+    }
+
+    if (incomeAmount < totalExpense) {
+      Alert.alert("Your expenses exceed your income");
+      setIsButtonDistable(false);
+      return;
+    }
 
     try {
-      const userId = currentUser.uid;
-
+      const user = await AsyncStorage.getItem("user");
+      const userId = JSON.parse(user)?.user?.uid;
       if (!userId) {
-        setIsButtonDisabled(false);
+        setIsButtonDistable(false);
         throw new Error("User ID not found");
       }
 
-      const expensesCollection = firestore()
-        .collection("users")
-        .doc(userId)
-        .collection("expenses");
+      const usersCollection = firestore().collection("users");
 
-      // Check if there is an existing expense document for the user
-      const userExpenseDoc = await expensesCollection.doc(userId).get();
+      const userDocRef = usersCollection.doc(userId);
 
-      if (userExpenseDoc.exists) {
-        // If an expense document exists, update it with new expense details
-        await userExpenseDoc.ref.update({
-          expenseAmounts: expenseAmounts,
+      const userDocSnapshot = await userDocRef.get();
+
+      if (userDocSnapshot.exists) {
+        const expensesCollection = userDocRef.collection("expenses");
+        const expenseDocRef = expensesCollection.doc();
+
+        await expenseDocRef.set({
+          expenseAmounts,
           income: incomeAmount,
           user_id: userId
         });
+
+        navigation.navigate("main");
+        setIsButtonDistable(false);
       } else {
-        // If no expense document exists, create a new one
-        const newExpenseDocRef = expensesCollection.doc(userId);
-        await newExpenseDocRef.set({
-          expenseAmounts: expenseAmounts,
-          income: incomeAmount,
-          user_id: userId
-        });
+        setIsButtonDistable(false);
+        throw new Error("User document not found");
       }
-
-      // Navigation and state update code
-      navigation.navigate("main");
+      setIsLoading(false);
     } catch (error) {
-      setIsButtonDisabled(false);
+      setIsLoading(false);
+      setIsButtonDistable(false);
       console.error("Error occurred:", error);
       Alert.alert("Error occurred while processing the request");
     }
+    setIsLoading(false);
   };
 
   return (
@@ -163,7 +182,11 @@ const DataEntry = () => {
         style={styles.submitButton}
         onPress={handleSubmit}
       >
-        <Text style={styles.submitButtonText}>Submit</Text>
+        {isLoading ? (
+          <ActivityIndicator />
+        ) : (
+          <Text style={styles.submitButtonText}>Submit</Text>
+        )}
       </TouchableOpacity>
     </ScrollView>
   );
