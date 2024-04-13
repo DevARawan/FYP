@@ -2,6 +2,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import firestore from "@react-native-firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import auth from "@react-native-firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -124,7 +125,7 @@ export default function LoginScreen() {
     if (forgotPasswordEmail.length > 0 && isForgotPasswordEmailValid) {
       try {
         setLoad(true);
-        await sendPasswordResetEmail(FIREBASE_AUTH, email);
+        await auth().sendPasswordResetEmail(forgotPasswordEmail);
         Alert.alert(
           "Password Reset Email Sent",
           "Check your email to reset your password."

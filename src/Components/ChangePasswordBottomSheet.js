@@ -55,13 +55,11 @@ const ChangePasswordBottomSheet = ({ setIsBottomSheetVisible }) => {
   // Password complexity validation function
   const validatePassword = (password) => {
     const minLength = 8; // Adjust minimum length as needed
-    const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
     const hasSpecialChar = /[!@#$%^&*()]/.test(password);
     return (
       password.length >= minLength &&
-      hasUpperCase &&
       hasLowerCase &&
       hasNumber &&
       hasSpecialChar
