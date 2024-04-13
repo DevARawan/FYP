@@ -28,6 +28,7 @@ const HomeScreen = () => {
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { currentUser } = useAuthContext();
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(true);
+  const [userLevel, setUserLevel] = useState();
 
   const navigation = useNavigation();
   const userId = currentUser.uid;
@@ -111,6 +112,21 @@ const HomeScreen = () => {
     }, 0); // Start with an initial sum of 0
     return total;
   };
+  const calculateLevel = (numberOfAchievements) => {
+    if (numberOfAchievements >= 1 && numberOfAchievements <= 5) {
+      return 5;
+    } else if (numberOfAchievements >= 6 && numberOfAchievements <= 10) {
+      return 4;
+    } else if (numberOfAchievements >= 11 && numberOfAchievements <= 15) {
+      return 3;
+    } else if (numberOfAchievements >= 16 && numberOfAchievements <= 20) {
+      return 2;
+    } else if (numberOfAchievements >= 21) {
+      return 1;
+    }
+    return 0; // No badge assigned
+  };
+
   const fetchAchievements = async (totalIncome, totalOverallExpenses) => {
     try {
       // Get a reference to the Firestore collection of achievements under the user's collection
@@ -144,6 +160,8 @@ const HomeScreen = () => {
         const sumAchievemnts = sumAchievemntsAmount(achievements);
         const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
+        const userLevel = calculateLevel(achievements.length);
+        setUserLevel(userLevel);
         console.log("savingsWithoutAchievements:", savingsWithoutAchievements);
         console.log("sumAchievemnts:", sumAchievemnts);
         console.log("here:", savingsWithoutAchievements - sumAchievemnts);
@@ -249,13 +267,7 @@ const HomeScreen = () => {
     <ScrollView style={styles.container}>
       <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
       <View style={{ alignItems: "flex-end", paddingHorizontal: 10 }}>
-        <Text style={{ color: "red" }}>
-          {achieveStatus == "silver"
-            ? "🥈"
-            : achieveStatus == "matel"
-            ? "🥉"
-            : "🏅"}
-        </Text>
+        <Text style={{ color: "red" }}>{userLevel}</Text>
       </View>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={handleDataEntry}>
