@@ -14,6 +14,7 @@ import ManageGoals from "../Screens/ManageGoals";
 import FrontScreen from "../Screens/IntroScreen";
 import SignUpScreen from "../Screens/SignUpScreen/ViewController";
 import UserProfile from "../Screens/UserProfile";
+import LeaderboardScreen from "../Screens/Leaderboard";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -194,6 +195,7 @@ const AppNavigator = () => {
             headerRight: () => <Logo />
           })}
         />
+        <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

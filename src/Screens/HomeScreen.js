@@ -18,6 +18,7 @@ import firestore from "@react-native-firebase/firestore";
 import { useAuthContext } from "../Hooks/UseAuth";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 import CelebrationComponent from "../Components/CelebrationComponent";
+import { getMedal } from "../Utils/MedalUtils";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -160,8 +161,8 @@ const HomeScreen = () => {
         const sumAchievemnts = sumAchievemntsAmount(achievements);
         const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
-        const userLevel = calculateLevel(achievements.length);
-        setUserLevel(userLevel);
+        const medal = getMedal(achievements.length);
+        setUserLevel(medal);
         console.log("savingsWithoutAchievements:", savingsWithoutAchievements);
         console.log("sumAchievemnts:", sumAchievemnts);
         console.log("here:", savingsWithoutAchievements - sumAchievemnts);
@@ -266,9 +267,14 @@ const HomeScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
-      <View style={{ alignItems: "flex-end", paddingHorizontal: 10 }}>
-        <Text style={{ color: "red" }}>{userLevel}</Text>
-      </View>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Leaderboard");
+        }}
+        style={{ alignItems: "flex-end", paddingHorizontal: 10 }}
+      >
+        <Text style={styles.medal}>{userLevel}</Text>
+      </TouchableOpacity>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={handleDataEntry}>
           <Text style={styles.navButtonText}>Manage Data Entry</Text>
@@ -488,7 +494,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10
-  }
+  },
+  medal: { color: "red", fontSize: 40 }
 });
 
 export default HomeScreen;
