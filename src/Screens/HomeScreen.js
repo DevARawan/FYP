@@ -19,6 +19,7 @@ import { useAuthContext } from "../Hooks/UseAuth";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 import CelebrationComponent from "../Components/CelebrationComponent";
 import { getMedal } from "../Utils/MedalUtils";
+import { CircularProgressBar } from "../Components/CircularProgressBar";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -28,7 +29,7 @@ const HomeScreen = () => {
   const [achieveStatus, setAchieveStatus] = useState("silver");
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { currentUser } = useAuthContext();
-  const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(true);
+  const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
   const [userLevel, setUserLevel] = useState();
 
   const navigation = useNavigation();
@@ -288,13 +289,13 @@ const HomeScreen = () => {
 
       <Text style={styles.heading}>Dashboard</Text>
       <View style={{ alignSelf: "center" }}>
-        {/* <CircularProgressBar
-          currentGoal={allGoals[0]}
-          savingIncome={savingsAmount}
-          nextGoal={NextGoalHandler}
-          ForwardToAchieveHandler={ForwardToAchieveHandler}
-          celebrationHandler={setshowCelebration}
-        /> */}
+        <CircularProgressBar
+          currentAmount={savingsAmount} // Assuming savingsAmount represents the current amount saved
+          totalAmount={allGoals.length > 0 ? allGoals[0].totalAmount : 0} // Assuming allGoals is an array of goals and you want to show progress for the first goal
+          // nextGoal={NextGoalHandler}
+          // ForwardToAchieveHandler={ForwardToAchieveHandler}
+          // celebrationHandler={setshowCelebration}
+        />
       </View>
 
       <View style={styles.savingsContainer}>
