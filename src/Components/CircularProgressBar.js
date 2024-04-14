@@ -1,7 +1,7 @@
 import { Circle, G, Svg, Text as SvgText } from "react-native-svg";
 
 export const CircularProgressBar = ({ currentAmount, totalAmount }) => {
-  const strokeWidth = 20;
+  const strokeWidth = 27;
   const radius = 100;
   const circumference = 2 * Math.PI * radius;
   const progress = (currentAmount / totalAmount) * circumference;

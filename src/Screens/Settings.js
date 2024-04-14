@@ -66,7 +66,7 @@ const Settings = () => {
   };
 
   const handlePolicy = () => {
-    navigation.navigate("privacy policy");
+    navigation.navigate("PrivacyPolicy");
   };
 
   const handleGeneral = () => {
