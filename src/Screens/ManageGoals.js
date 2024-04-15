@@ -27,6 +27,7 @@ const ManageGoals = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState(null);
   const [open, setOpen] = useState(false);
+  const [priority, setPriority] = useState("");
 
   const { currentUser } = useAuthContext();
   const userId = currentUser.uid;
@@ -64,7 +65,8 @@ const ManageGoals = () => {
               goalName: goalData.newGoal.goalName,
               goalDescription: goalData.newGoal.description,
               totalAmount: goalData.newGoal.totalAmount,
-              dueDate: goalData.newGoal.dueDate || null
+              dueDate: goalData.newGoal.dueDate || null,
+              priority: goalData.newGoal.priority || ""
             });
           }
         });
@@ -88,7 +90,11 @@ const ManageGoals = () => {
       const goalsDocRef = goalsCollection.doc(goal_id);
 
       await goalsDocRef.set({
-        newGoal,
+        // newGoal,
+        newGoal: {
+          ...newGoal,
+          priority: priority // Including priority in newGoal object
+        },
         user_id: userId,
         goal_id
       });
@@ -98,12 +104,23 @@ const ManageGoals = () => {
         totalAmount: "",
         dueDate: ""
       });
+      setPriority(""); // Reset priority after adding goal
       fetchData();
       controlRender = true;
       setShowAddGoal(false);
     } catch (error) {
       setShowAddGoal(false);
       console.error(error);
+    }
+  };
+  const handlePriorityChange = (text) => {
+    // Validate input to ensure it's within the range of 1 to 10
+    const priorityValue = parseInt(text);
+    if (!isNaN(priorityValue) && priorityValue >= 1 && priorityValue <= 10) {
+      setPriority(priorityValue.toString());
+    } else {
+      // If input is invalid, clear the input field
+      setPriority("");
     }
   };
 
@@ -125,40 +142,6 @@ const ManageGoals = () => {
 
       {/* Existing Goals Section */}
       <ScrollView style={styles.goalsContainer}>
-        {showAddGoal && (
-          <View style={styles.goalBox}>
-            <View style={styles.goalDetailContainer}>
-              <Text style={styles.goalDetailLabel}>Goal Name:</Text>
-              <View style={styles.textbox}>
-                <Text style={styles.goalDetailValue}>{newGoal.goalName}</Text>
-              </View>
-            </View>
-            <View style={styles.goalDetailContainer}>
-              <Text style={styles.goalDetailLabel}>Description:</Text>
-              <View style={styles.textbox}>
-                <Text style={styles.goalDetailValue}>
-                  {newGoal.description}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.goalDetailContainer}>
-              <Text style={styles.goalDetailLabel}>Total Amount:</Text>
-              <View style={styles.textbox}>
-                <Text style={styles.goalDetailValue}>
-                  {newGoal.totalAmount}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.goalDetailContainer}>
-              <Text style={styles.goalDetailLabel}>Due Date:</Text>
-              <View style={styles.textbox}>
-                <Text style={styles.goalDetailValue}>
-                  {newGoal.dueDate == "" ? "No Due Date" : newGoal.dueDate}
-                </Text>
-              </View>
-            </View>
-          </View>
-        )}
       </ScrollView>
 
       {/* Add Goal Section */}
@@ -186,6 +169,14 @@ const ManageGoals = () => {
               setNewGoal({ ...newGoal, totalAmount: text })
             }
           />
+          <TextInput
+            style={styles.input}
+            placeholder="Priority (1-10)"
+            keyboardType="number-pad"
+            onChangeText={handlePriorityChange} // Step 3
+            value={priority}
+          />
+
           {/* <TextInput
             style={styles.input}
             placeholder="Due Date (Optional)"
@@ -242,6 +233,13 @@ const ManageGoals = () => {
                   <Text style={styles.goalDetailValue}>{goal.goalName}</Text>
                 </View>
               </View>
+
+              <View style={styles.goalDetailContainer}>
+          <Text style={styles.goalDetailLabel}>Priority:</Text>
+          <View style={styles.textbox}>
+        <Text style={styles.goalDetailValue}>{goal.priority}</Text>
+        </View>
+        </View>
 
               <View style={styles.goalDetailContainer}>
                 <Text style={styles.goalDetailLabel}>Description:</Text>

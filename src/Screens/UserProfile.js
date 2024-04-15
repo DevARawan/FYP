@@ -149,7 +149,7 @@ const UserProfile = () => {
           <MaterialIcons
             name="email"
             size={24}
-            color="black"
+            color="blue"
             style={styles.icon}
           />
           <TextInput
@@ -160,7 +160,35 @@ const UserProfile = () => {
             editable={false}
           />
         </View>
-        <View style={styles.inputContainer}>
+        {isEditMode ? (
+          <TouchableOpacity style={styles.logoutButton} onPress={toggleBottomSheet}>
+          <Text style={styles.logoutButtonText}>Change Password</Text>
+          <MaterialIcons
+            name="lock"
+            style={[styles.logoutIcon, { color: "#ffffff" }]}
+          />
+        </TouchableOpacity>
+        ) : (
+          <View style={styles.inputContainer}>
+            <FontAwesome5
+              name="key"
+              size={24}
+              color="black"
+              style={styles.icon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="change your password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!isEditMode}
+              editable={isEditMode}
+            />
+          </View>
+        )}
+      </View>
+
+        {/* <View style={styles.inputContainer}>
           <FontAwesome5
             name="key"
             size={24}
@@ -175,8 +203,8 @@ const UserProfile = () => {
             secureTextEntry={!isEditMode}
             editable={isEditMode}
           />
-        </View>
-      </View>
+        </View> 
+      </View> */}
 
       <TouchableOpacity
         style={styles.manageProfileButton}
@@ -186,13 +214,7 @@ const UserProfile = () => {
           {isEditMode ? "Save Profile" : "Manage Profile"}
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.logoutButton} onPress={toggleBottomSheet}>
-        <Text style={styles.logoutButtonText}>Change Password</Text>
-        <MaterialIcons
-          name="lock"
-          style={[styles.logoutIcon, { color: "#ffffff" }]}
-        />
-      </TouchableOpacity>
+      
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
         <MaterialIcons
@@ -280,7 +302,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
-    marginBottom: 20
+    marginBottom: 20, marginTop: 20,
   },
   manageProfileButtonText: {
     color: "white",
@@ -295,7 +317,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 40
+    marginTop: 17, marginBottom: 12,
   },
   logoutButtonText: {
     color: "white",

@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginHorizontal: 10,
+    marginBottom:15,
   },
   contactText: {
     marginLeft: 10,
