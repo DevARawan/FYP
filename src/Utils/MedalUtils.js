@@ -1,5 +1,4 @@
 export const getMedal = (numberOfAchievements) => {
-  console.log("numberOfAchievements", numberOfAchievements);
   if (numberOfAchievements >= 1 && numberOfAchievements <= 5) {
     return "🥇";
   } else if (numberOfAchievements >= 6 && numberOfAchievements <= 10) {

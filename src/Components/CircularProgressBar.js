@@ -39,7 +39,13 @@ export const CircularProgressBar = ({ currentAmount, totalAmount }) => {
         fill="#3498db"
         dy=".3em"
       >
-        {`${((currentAmount / totalAmount) * 100).toFixed(2)}%`}
+        {currentAmount > 0 && totalAmount > 0
+          ? `${
+              ((currentAmount / totalAmount) * 100).toFixed(2) > 100
+                ? "100.00%"
+                : ((currentAmount / totalAmount) * 100).toFixed(2)
+            }%`
+          : 0}
       </SvgText>
     </Svg>
   );
