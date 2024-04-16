@@ -71,6 +71,7 @@ const ManageGoals = () => {
           }
         });
       } else {
+        console.log("No goals found in the snapshot");
       }
 
       setAllGoals(goals);

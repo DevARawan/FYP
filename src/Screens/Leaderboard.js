@@ -26,7 +26,7 @@ const LeaderboardScreen = () => {
             const achievements = achievementsSnapshot.docs.map((doc) =>
               doc.data()
             );
-
+            console.log("achievements", achievements);
             const achievementCount = achievements.length;
             return { ...user, achievementCount };
           })

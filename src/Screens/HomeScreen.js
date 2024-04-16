@@ -1,36 +1,34 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Image,
   Modal,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Image
 } from "react-native";
 import { useSelector } from "react-redux";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // import Toast from 'react-native-toast-message';
 import firestore from "@react-native-firebase/firestore";
-import { CircularProgressBar } from "../Components/CircularProgressBar";
 import { useAuthContext } from "../Hooks/UseAuth";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
+import CelebrationComponent from "../Components/CelebrationComponent";
 import { getMedal } from "../Utils/MedalUtils";
-import AnimatedLottieView from "lottie-react-native";
-import LottieView from "lottie-react-native";
+import { CircularProgressBar } from "../Components/CircularProgressBar";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
   const [allGoals, setAllGoals] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [achieveStatus, setAchieveStatus] = useState("silver");
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { currentUser } = useAuthContext();
-  const [isCelebrationsDialogVisible, setIsCelebrationsDialogVisible] =
-    useState(false);
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
   const [userLevel, setUserLevel] = useState();
 
@@ -116,6 +114,20 @@ const HomeScreen = () => {
     }, 0); // Start with an initial sum of 0
     return total;
   };
+  const calculateLevel = (numberOfAchievements) => {
+    if (numberOfAchievements >= 1 && numberOfAchievements <= 5) {
+      return 5;
+    } else if (numberOfAchievements >= 6 && numberOfAchievements <= 10) {
+      return 4;
+    } else if (numberOfAchievements >= 11 && numberOfAchievements <= 15) {
+      return 3;
+    } else if (numberOfAchievements >= 16 && numberOfAchievements <= 20) {
+      return 2;
+    } else if (numberOfAchievements >= 21) {
+      return 1;
+    }
+    return 0; // No badge assigned
+  };
 
   const fetchAchievements = async (totalIncome, totalOverallExpenses) => {
     try {
@@ -130,6 +142,7 @@ const HomeScreen = () => {
 
       // Log each document in the achievements collection
       achievementsSnapshot.forEach((doc) => {
+        console.log("Achievements data", doc.data());
         const achievementData = doc.data();
         const achievement = {
           id: achievementData.id,
@@ -151,7 +164,11 @@ const HomeScreen = () => {
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
         const medal = getMedal(achievements.length);
         setUserLevel(medal);
+        console.log("savingsWithoutAchievements:", savingsWithoutAchievements);
+        console.log("sumAchievemnts:", sumAchievemnts);
+        console.log("here:", savingsWithoutAchievements - sumAchievemnts);
       } else {
+        console.log("usama is here in else");
         setSavingsAmount(totalIncome - totalOverallExpenses);
       }
       // You can set the fetched achievements to state or perform any other actions here
@@ -159,7 +176,12 @@ const HomeScreen = () => {
       console.error("Error fetching achievements:", error);
     }
   };
+  const handleAchievement = () => {};
 
+  const handleCelebrationEnd = () => {
+    // setShowCelebration(false);
+    // Perform any cleanup or navigate to another screen after celebration ends
+  };
   const CelebrationBottomSheet = ({ visible, onClose }) => {
     return (
       <Modal
@@ -178,43 +200,10 @@ const HomeScreen = () => {
               style={styles.gif}
             />
             <Text style={styles.text}>Next</Text>
-            <View
-              style={{ position: "absolute", height: "100%", width: "100%" }}
-            >
-              <LottieView
-                style={{
-                  width: 200,
-                  height: 150,
-                  alignSelf: "center"
-                }}
-                source={require("../../Animations/fireworks.json")}
-                autoPlay
-                loop
-              />
-            </View>
           </View>
         </View>
       </Modal>
     );
-  };
-
-  const moveGoalToAchievemnt = async (selectedGoal) => {
-    // Make a Firebase call to delete the selected goal from the goals collection
-    const goalsCollectionRef = firestore().collection(`users/${userId}/goals`);
-    await goalsCollectionRef.doc(selectedGoal.id).delete();
-    // Add the selected goal to the achievements collection under the user's collection
-    const achievementsCollectionRef = firestore().collection(
-      `users/${userId}/achievements`
-    );
-    await achievementsCollectionRef.add(selectedGoal);
-    fetchExpenses();
-    fetchGoals();
-    setIsCelebrationsDialogVisible(true);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    setIsCelebrationsDialogVisible(false);
-    setIsCelebrationsVisible(true);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    setIsCelebrationsVisible(false);
   };
 
   const checkAndUpdateGoals = async (savingsAmount, goals) => {
@@ -222,60 +211,39 @@ const HomeScreen = () => {
       // Check if there are any goals
       if (goals.length > 0) {
         const selectedGoal = goals[0]; // Selecting the first goal for now
-
-        // Check if the goal has already been moved to achievements
-        const isGoalAchieved = await isGoalMovedToAchievements(
-          selectedGoal.goal_id
-        );
-
-        if (isGoalAchieved) {
-          return;
-        }
-
         // Check if savings amount is greater than or equal to the total amount of the selected goal
         if (savingsAmount >= selectedGoal.totalAmount) {
-          Alert.alert(
-            "Congratulations",
-            `Goal ${selectedGoal.goalName} can now be achieved. Do you want to proceed?`,
-            [
-              {
-                text: "Cancel",
-                onPress: () => {
-                  // Handle cancel action
-                },
-                style: "cancel"
-              },
-              {
-                text: "OK",
-                onPress: () => {
-                  moveGoalToAchievemnt(selectedGoal);
-                }
-              }
-            ],
-            { cancelable: false }
+          // Make a Firebase call to delete the selected goal from the goals collection
+          const goalsCollectionRef = firestore().collection(
+            `users/${userId}/goals`
           );
+          await goalsCollectionRef.doc(selectedGoal.id).delete();
+
+          // Add the selected goal to the achievements collection under the user's collection
+          const achievementsCollectionRef = firestore().collection(
+            `users/${userId}/achievements`
+          );
+          await achievementsCollectionRef.add(selectedGoal);
+
+          console.log(
+            "Selected goal achieved and moved to achievements:",
+            selectedGoal
+          );
+
+          // setShowCelebration(true);
+          fetchExpenses();
+          fetchGoals();
         } else {
+          console.log(
+            "Savings amount is not enough to achieve the selected goal."
+          );
+          setIsCelebrationsVisible(true);
         }
       } else {
+        console.log("No goals found.");
       }
     } catch (error) {
       console.error("Error checking and updating goals:", error);
-    }
-  };
-
-  const isGoalMovedToAchievements = async (goalId) => {
-    try {
-      // Query the achievements collection to check if a document with the given goalId exists
-      const achievementsSnapshot = await firestore()
-        .collection(`users/${userId}/achievements`)
-        .where("goal_id", "==", goalId)
-        .get();
-
-      // Check if any documents were found
-      return !achievementsSnapshot.empty;
-    } catch (error) {
-      console.error("Error checking if goal is moved to achievements:", error);
-      return false; // Return false in case of error
     }
   };
 
@@ -390,69 +358,12 @@ const HomeScreen = () => {
         visible={showCurrencyModal}
         onClose={() => setShowCurrencyModal(false)}
       />
-
-      {isCelebrationsVisible && (
-        <View
-          style={{
-            flex: 1,
-            height: "100%",
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            position: "absolute"
-          }}
-        >
-          <LottieView
-            style={{
-              width: 200,
-              height: 150,
-              alignSelf: "center",
-              marginBottom: 50
-            }}
-            source={require("../../Animations/Stars.json")}
-            autoPlay
-            loop
-          />
-          <LottieView
-            style={{
-              width: 200,
-              height: 150,
-              alignSelf: "center",
-              position: "absolute"
-            }}
-            source={require("../../Animations/fireworks.json")}
-            autoPlay
-            loop
-          />
-        </View>
-      )}
-      {isCelebrationsDialogVisible && (
-        <View
-          style={{
-            flex: 1,
-            height: "100%",
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-            position: "absolute"
-          }}
-        >
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={true}
-            onRequestClose={() => console.log("Modal has been closed.")}
-          >
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <Text style={styles.modalText}>
-                  Congratulations you have achieved your goal
-                </Text>
-              </View>
-            </View>
-          </Modal>
-        </View>
-      )}
+      <CelebrationBottomSheet
+        visible={isCelebrationsVisible}
+        onClose={() => {
+          setIsCelebrationsVisible(false);
+        }}
+      />
     </ScrollView>
   );
 };
@@ -585,32 +496,7 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10
   },
-  medal: { color: "red", fontSize: 40 },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22
-  },
-  modalView: {
-    width: "90%", // Make the modal view 90% of the screen width
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center"
-  }
+  medal: { color: "red", fontSize: 40 }
 });
 
 export default HomeScreen;
