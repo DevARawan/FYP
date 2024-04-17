@@ -109,7 +109,7 @@ export default function LoginScreen() {
           setLoad(false);
         } catch (error) {
           console.error(error);
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
+          ToastAndroid.show(error, ToastAndroid.SHORT);
           setLoad(false);
         }
       } else {

@@ -16,6 +16,8 @@ import SignUpScreen from "../Screens/SignUpScreen/ViewController";
 import UserProfile from "../Screens/UserProfile";
 import PrivacyPolicy from "../Screens/PrivacyPolicy";
 import LeaderboardScreen from "../Screens/Leaderboard";
+import FinancialReport from "../Screens/FinancialReports";
+import ExpenseReportScreen from "../Screens/ExpenseReports";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -159,8 +161,43 @@ const AppNavigator = () => {
             headerRight: () => <Logo />
           })}
         />
-
-          <Stack.Screen
+        <Stack.Screen
+          name="FinancialReport"
+          component={FinancialReport}
+          options={({ navigation }) => ({
+            title: "FinancialReport",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <View style={{ marginLeft: 10 }}>
+                  <FontAwesome5
+                    name="arrow-left"
+                    style={{ fontSize: 24, color: "black" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ),
+            headerRight: () => <Logo />
+          })}
+        />
+        <Stack.Screen
+          name="ExpensesReport"
+          component={ExpenseReportScreen}
+          options={({ navigation }) => ({
+            title: "ExpensesReport",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <View style={{ marginLeft: 10 }}>
+                  <FontAwesome5
+                    name="arrow-left"
+                    style={{ fontSize: 24, color: "black" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ),
+            headerRight: () => <Logo />
+          })}
+        />
+        <Stack.Screen
           name="PrivacyPolicy"
           component={PrivacyPolicy}
           options={({ navigation }) => ({

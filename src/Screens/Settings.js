@@ -164,7 +164,7 @@ const Settings = () => {
                 ? styles.selectedOption
                 : null
             ]}
-            onPress={() => handleOption("Generate Financial Report")}
+            onPress={() => navigation.navigate("FinancialReport")}
           >
             <Text>Generate Financial Report</Text>
           </TouchableOpacity>
@@ -175,7 +175,7 @@ const Settings = () => {
                 ? styles.selectedOption
                 : null
             ]}
-            onPress={() => handleOption("Generate Expense Report")}
+            onPress={() => navigation.navigate("ExpensesReport")}
           >
             <Text>Generate Expense Report</Text>
           </TouchableOpacity>
