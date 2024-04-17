@@ -184,7 +184,7 @@ const HomeScreen = () => {
               <LottieView
                 style={{
                   width: 200,
-                  height: 150,
+                  height: 200,
                   alignSelf: "center"
                 }}
                 source={require("../../Animations/fireworks.json")}
@@ -405,7 +405,7 @@ const HomeScreen = () => {
           <LottieView
             style={{
               width: 200,
-              height: 150,
+              height: 200,
               alignSelf: "center",
               marginBottom: 50
             }}
@@ -416,7 +416,7 @@ const HomeScreen = () => {
           <LottieView
             style={{
               width: 200,
-              height: 150,
+              height: 170,
               alignSelf: "center",
               position: "absolute"
             }}
@@ -446,7 +446,7 @@ const HomeScreen = () => {
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
                 <Text style={styles.modalText}>
-                  Congratulations you have achieved your goal
+                  Congratulations! you have achieved your goal
                 </Text>
               </View>
             </View>
@@ -593,11 +593,11 @@ const styles = StyleSheet.create({
     marginTop: 22
   },
   modalView: {
-    width: "90%", // Make the modal view 90% of the screen width
+    width: "92%", // Make the modal view 90% of the screen width
     backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
-    alignItems: "center",
+    alignItems: "center", justifyContent:'center',
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   modalText: {
-    marginBottom: 15,
+    marginBottom: 15, 
     textAlign: "center"
   }
 });
