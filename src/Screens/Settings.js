@@ -197,6 +197,7 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "#FFD700" }]}
         />
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.row}>
         <Text style={styles.link}>About us</Text>
         <MaterialIcons
@@ -204,6 +205,7 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "#607D8B" }]}
         />
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.row} onPress={handlePolicy}>
         <Text style={styles.link}>Privacy Policy</Text>
         <FontAwesome5
@@ -211,6 +213,20 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "#8E44AD" }]}
         />
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => {
+          navigation.navigate("Admin");
+        }}
+      >
+        <Text style={styles.link}>Admin</Text>
+        <FontAwesome5
+          name="user-shield"
+          style={[styles.rowIcon, { color: "#8E44AD" }]}
+        />
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
         <MaterialIcons
