@@ -18,6 +18,7 @@ import PrivacyPolicy from "../Screens/PrivacyPolicy";
 import LeaderboardScreen from "../Screens/Leaderboard";
 import FinancialReport from "../Screens/FinancialReports";
 import ExpenseReportScreen from "../Screens/ExpenseReports";
+import AdminScreen from "../Screens/Admin/ViewController";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -254,6 +255,7 @@ const AppNavigator = () => {
           })}
         />
         <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
+        <Stack.Screen name="Admin" component={AdminScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
