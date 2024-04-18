@@ -7,9 +7,9 @@ const CelebrationComponent = ({ onCelebrationEnd }) => {
 
   useEffect(() => {
     startBalloonAnimation();
-    // Add any cleanup logic or other effects here
+    // Add  other effects here
     return () => {
-      // Cleanup logic
+      //  gic
     };
   }, []);
 
