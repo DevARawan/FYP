@@ -32,7 +32,7 @@ const HomeScreen = () => {
   const [isCelebrationsDialogVisible, setIsCelebrationsDialogVisible] =
     useState(false);
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
-  const [userLevel, setUserLevel] = useState();
+  const [userLevel, setUserLevel] = useState('🏅');
 
   const navigation = useNavigation();
   const userId = currentUser.uid;

@@ -154,7 +154,7 @@ const UserProfile = () => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Enter Email"
+            placeholder="Your Email"
             value={email}
             onChangeText={setEmail}
             editable={false}
