@@ -19,6 +19,7 @@ import LeaderboardScreen from "../Screens/Leaderboard";
 import FinancialReport from "../Screens/FinancialReports";
 import ExpenseReportScreen from "../Screens/ExpenseReports";
 import AdminScreen from "../Screens/Admin/ViewController";
+import GoalsChartScreen from "../Screens/Admin/GoalCompletionsReport";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -26,10 +27,8 @@ const AppNavigator = () => {
   const RenderInitialScreen = () => {
     if (currentUser === null) {
       return <FrontScreen />;
-    } else if (currentUser) {
-      return <Home />;
     } else {
-      return <FrontScreen />;
+      return <Home />;
     }
   };
   return (
@@ -181,6 +180,25 @@ const AppNavigator = () => {
           })}
         />
         <Stack.Screen
+          name="AdminReport"
+          component={GoalsChartScreen}
+          options={({ navigation }) => ({
+            title: "FinancialReport",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <View style={{ marginLeft: 10 }}>
+                  <FontAwesome5
+                    name="arrow-left"
+                    style={{ fontSize: 24, color: "black" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ),
+            headerRight: () => <Logo />
+          })}
+        />
+
+        <Stack.Screen
           name="ExpensesReport"
           component={ExpenseReportScreen}
           options={({ navigation }) => ({
@@ -216,7 +234,6 @@ const AppNavigator = () => {
             headerRight: () => <Logo />
           })}
         />
-
         <Stack.Screen
           name="CurrencyPreferences"
           component={General}

@@ -5,10 +5,12 @@ import { ToastAndroid } from "react-native";
 export async function fetchAllUsers() {
   try {
     const usersCollection = firestore().collection("users");
-    const querySnapshot = await usersCollection.get();
+    const querySnapshot = await usersCollection
+      .where("isDisabled", "==", false)
+      .get();
     const users = [];
     querySnapshot.forEach((doc) => {
-      users.push(doc.data());
+      users.push({ id: doc.id, ...doc.data() });
     });
     return users;
   } catch (error) {

@@ -18,6 +18,7 @@ import {
 import LottieView from "lottie-react-native";
 import { Button, TextInput } from "react-native-paper";
 import { useAuthContext } from "../Hooks/UseAuth";
+import { useSelector } from "react-redux";
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -28,7 +29,8 @@ const Settings = () => {
 
   const { signOut } = useAuthContext();
   const [blinkAnimation] = useState(new Animated.Value(0));
-
+  const user = useSelector((state) => state.user.user);
+  console.log("user is:", user);
   const handleProfile = () => {
     navigation.navigate("profile");
   };
@@ -213,19 +215,22 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "#8E44AD" }]}
         />
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.row}
-        onPress={() => {
-          navigation.navigate("Admin");
-        }}
-      >
-        <Text style={styles.link}>Admin</Text>
-        <FontAwesome5
-          name="user-shield"
-          style={[styles.rowIcon, { color: "#8E44AD" }]}
-        />
-      </TouchableOpacity>
+      {user && user.isAdmin ? (
+        <TouchableOpacity
+          style={styles.row}
+          onPress={() => {
+            navigation.navigate("Admin");
+          }}
+        >
+          <Text style={styles.link}>Admin</Text>
+          <FontAwesome5
+            name="user-shield"
+            style={[styles.rowIcon, { color: "#8E44AD" }]}
+          />
+        </TouchableOpacity>
+      ) : (
+        <></>
+      )}
 
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>

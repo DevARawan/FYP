@@ -7,7 +7,7 @@ import rootReducer from "./reducers"; // Your root reducer
 const persistConfig = {
   key: "root", // key is required, it is used to define where in your persistence layer you'd like to store the data.
   storage: AsyncStorage, // AsyncStorage for React Native
-  whitelist: ["currency"] // Add any additional configuration here...
+  whitelist: [] // Add any additional configuration here...
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

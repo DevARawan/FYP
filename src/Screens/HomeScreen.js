@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // import Toast from 'react-native-toast-message';
 import firestore from "@react-native-firebase/firestore";
@@ -22,6 +22,7 @@ import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 import { getMedal } from "../Utils/MedalUtils";
 import AnimatedLottieView from "lottie-react-native";
 import LottieView from "lottie-react-native";
+import { setUser } from "../Store/reducers/UserSlice";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -32,7 +33,8 @@ const HomeScreen = () => {
   const [isCelebrationsDialogVisible, setIsCelebrationsDialogVisible] =
     useState(false);
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
-  const [userLevel, setUserLevel] = useState('🏅');
+  const [userLevel, setUserLevel] = useState("🏅");
+  const dispatch = useDispatch();
 
   const navigation = useNavigation();
   const userId = currentUser.uid;
@@ -159,6 +161,24 @@ const HomeScreen = () => {
       console.error("Error fetching achievements:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const usersCollection = firestore().collection("users");
+        const userDocRef = usersCollection.doc(currentUser.uid);
+        const userDocSnapshot = await userDocRef.get();
+        if (userDocSnapshot.exists) {
+          const userData = userDocSnapshot.data();
+          console.log("userData:", userData);
+          if (userData) {
+            dispatch(setUser(userData));
+          }
+        }
+      } catch (error) {}
+    };
+    fetchUserData();
+  }, []);
 
   const CelebrationBottomSheet = ({ visible, onClose }) => {
     return (
@@ -597,7 +617,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
-    alignItems: "center", justifyContent:'center',
+    alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -608,7 +629,7 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   modalText: {
-    marginBottom: 15, 
+    marginBottom: 15,
     textAlign: "center"
   }
 });

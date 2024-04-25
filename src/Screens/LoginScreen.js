@@ -1,8 +1,8 @@
 import { FontAwesome5 } from "@expo/vector-icons";
+import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import auth from "@react-native-firebase/auth";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -17,17 +17,10 @@ import {
   View
 } from "react-native";
 import { useDispatch } from "react-redux";
-
-import {
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword
-} from "firebase/auth";
-
-import { FIREBASE_AUTH } from "../../firebaseConfig";
 import myColor from "../Components/Color";
-
 import { useAuthContext } from "../Hooks/UseAuth";
 import { setCurrency } from "../Store/reducers/currenncyReducer";
+import { setUser } from "../Store/reducers/UserSlice";
 
 const UserIcon = () => {
   return (
@@ -58,8 +51,7 @@ export default function LoginScreen() {
       if (isEmailValid) {
         setLoad(true);
         try {
-          const userInfo = await signInWithEmailAndPassword(
-            FIREBASE_AUTH,
+          const userInfo = await auth().signInWithEmailAndPassword(
             email,
             password
           );
@@ -68,26 +60,38 @@ export default function LoginScreen() {
             try {
               const usersCollection = firestore().collection("users");
               const userDocRef = usersCollection.doc(userInfo.user.uid);
-
               const userDocSnapshot = await userDocRef.get();
-              // const userDocSnapshot = await getDocs(userDocRef);
-
               if (userDocSnapshot.exists) {
-                navigation.replace("main");
-                if (userDocSnapshot.data().currency) {
-                  dispatch(setCurrency(userDocSnapshot.data().currency));
-                } else {
+                const userData = userDocSnapshot.data();
+                if (userData.isDisabled) {
                   Alert.alert(
-                    "No Currency is currenctly selected by User. Go to general settings and select current currency"
+                    "Account Disabled",
+                    "Your account has been disabled. Please contact support for assistance."
                   );
+                  auth().signOut();
+                } else {
+                  navigation.replace("main");
+
+                  if (userData.currency) {
+                    dispatch(setCurrency(userData.currency));
+                  } else {
+                    Alert.alert(
+                      "No Currency is currently selected by User",
+                      "Go to general settings and select current currency"
+                    );
+                  }
                 }
               } else {
                 try {
                   const userData = {
                     email: userInfo.user.email,
-                    user_id: userInfo.user.uid
+                    user_id: userInfo.user.uid,
+                    isSuperAdmin: false,
+                    isAdmin: false,
+                    isDisabled: false
                     // Add any additional user information you want to store
                   };
+                  dispatch(setUser(userData));
                   // Set the document data in Firestore
                   await userDocRef.set(userData);
                   navigation.replace("main");
@@ -103,13 +107,12 @@ export default function LoginScreen() {
               "Email Not Verified",
               "Check your email and verify to proceed logging in "
             );
-
-            signOut();
+            auth().signOut();
           }
           setLoad(false);
         } catch (error) {
           console.error(error);
-          ToastAndroid.show(error, ToastAndroid.SHORT);
+          ToastAndroid.show(error.message, ToastAndroid.SHORT);
           setLoad(false);
         }
       } else {
