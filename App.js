@@ -9,6 +9,7 @@ import { initializeApp } from "firebase/app";
 import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
 import { Text, View } from "react-native";
+import { ToastProvider } from "react-native-toast-notifications";
 const Stack = createNativeStackNavigator();
 function Notification({ message }) {
   return (
@@ -68,7 +69,9 @@ const App = () => {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <AuthProvider>
-            <AppNavigator />
+            <ToastProvider>
+              <AppNavigator />
+            </ToastProvider>
           </AuthProvider>
         </PersistGate>
       </Provider>

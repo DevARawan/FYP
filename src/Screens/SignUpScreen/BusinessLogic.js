@@ -50,7 +50,7 @@ const SignUpBusinessLogic = ({ children, navigation }) => {
 
     // Validate email, password, and confirm password
     if (email.length > 0 && password.length > 0 && confirmPassword.length > 0) {
-      if (isEmailValid) {
+      if (isEmailValid && isPasswordValid) {
         const auth = FIREBASE_AUTH;
         setLoad(true); // Set loading state
 

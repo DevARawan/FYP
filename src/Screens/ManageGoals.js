@@ -85,9 +85,10 @@ const ManageGoals = () => {
 
     const totalAmountValid = /^[0-9]+(\.[0-9]+)?$/.test(newGoal.totalAmount);
     const priorityValid =
-      !isNaN(parseInt(priority)) &&
-      parseInt(priority) >= 1 &&
-      parseInt(priority) <= 10;
+      priority === "" || // Allow empty string as the default value
+      (!isNaN(parseInt(priority)) &&
+        parseInt(priority) >= 1 &&
+        parseInt(priority) <= 10);
 
     if (!totalAmountValid) {
       alert("Please enter a valid total amount.");
@@ -160,14 +161,28 @@ const ManageGoals = () => {
               setNewGoal({ ...newGoal, description: text })
             }
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Total Amount"
-            keyboardType="number-pad"
-            onChangeText={(text) =>
-              setNewGoal({ ...newGoal, totalAmount: text })
-            }
-          />
+          <View>
+            <Text
+              style={{
+                position: "absolute",
+                zIndex: 2,
+                left: 15,
+                height: "80%",
+                textAlignVertical: "center"
+              }}
+            >
+              {selectedCurrency.symbol}
+            </Text>
+            <TextInput
+              style={[styles.input, { paddingLeft: 40 }]}
+              placeholder="Total Amount"
+              keyboardType="number-pad"
+              onChangeText={(text) =>
+                setNewGoal({ ...newGoal, totalAmount: text })
+              }
+            />
+          </View>
+
           <TextInput
             style={styles.input}
             placeholder="Priority (1-10)"
