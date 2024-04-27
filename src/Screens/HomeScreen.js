@@ -97,14 +97,17 @@ const HomeScreen = () => {
           totalAmount: goalData.newGoal.totalAmount,
           dueDate: goalData.newGoal.dueDate || null,
           user_id: goalData.user_id,
-          goal_id: goalData.goal_id
+          goal_id: goalData.goal_id,
+          priority: goalData.newGoal.priority || 11
         };
         goals.push(goal);
       });
 
       // Do whatever you need with the fetched goals (e.g., set state)
-
-      setAllGoals(goals);
+      const sortedData = goals.sort(
+        (a, b) => parseInt(a.priority) - parseInt(b.priority)
+      );
+      setAllGoals(sortedData);
       // You can set the fetched goals to state or perform any other actions here
     } catch (error) {
       console.error("Error fetching goals:", error);
@@ -170,7 +173,7 @@ const HomeScreen = () => {
         const userDocSnapshot = await userDocRef.get();
         if (userDocSnapshot.exists) {
           const userData = userDocSnapshot.data();
-          console.log("userData:", userData);
+
           if (userData) {
             dispatch(setUser(userData));
           }
@@ -179,6 +182,10 @@ const HomeScreen = () => {
     };
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    console.log("all goals are", allGoals);
+  }, [allGoals]);
 
   const CelebrationBottomSheet = ({ visible, onClose }) => {
     return (
@@ -361,46 +368,54 @@ const HomeScreen = () => {
       </View>
 
       {allGoals.length > 0 ? (
-        allGoals.map((goal) => (
-          <View style={styles.currentGoalContainer} key={goal.id}>
-            <Text style={styles.currentGoalText}>Current Goal</Text>
-            <View style={styles.goalBox}>
-              <View style={styles.goalDetailContainer}>
-                <Text style={styles.goalDetailLabel}>Goal Name:</Text>
-                <View style={styles.textbox}>
-                  <Text style={styles.goalDetailValue}>{goal.goalName}</Text>
+        allGoals.map((goal) => {
+          return (
+            <View style={styles.currentGoalContainer} key={goal.id}>
+              <Text style={styles.currentGoalText}>Current Goal</Text>
+              <View style={styles.goalBox}>
+                <View style={styles.goalDetailContainer}>
+                  <Text style={styles.goalDetailLabel}>Goal Name:</Text>
+                  <View style={styles.textbox}>
+                    <Text style={styles.goalDetailValue}>{goal.goalName}</Text>
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.goalDetailContainer}>
-                <Text style={styles.goalDetailLabel}>Description:</Text>
-                <View style={styles.textbox}>
-                  <Text style={styles.goalDetailValue}>
-                    {goal.goalDescription}
-                  </Text>
+                <View style={styles.goalDetailContainer}>
+                  <Text style={styles.goalDetailLabel}>Description:</Text>
+                  <View style={styles.textbox}>
+                    <Text style={styles.goalDetailValue}>
+                      {goal.goalDescription}
+                    </Text>
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.goalDetailContainer}>
-                <Text style={styles.goalDetailLabel}>Total Amount:</Text>
-                <View style={styles.textbox}>
-                  <Text style={styles.goalDetailValue}>
-                    {selectedCurrency.symbol}
-                    {goal.totalAmount}
-                  </Text>
+                <View style={styles.goalDetailContainer}>
+                  <Text style={styles.goalDetailLabel}>Total Amount:</Text>
+                  <View style={styles.textbox}>
+                    <Text style={styles.goalDetailValue}>
+                      {selectedCurrency.symbol}
+                      {goal.totalAmount}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-              <View style={styles.goalDetailContainer}>
-                <Text style={styles.goalDetailLabel}>Due Date:</Text>
-                <View style={styles.textbox}>
-                  <Text style={styles.goalDetailValue}>
-                    {goal.dueDate || "No Due Date"}
-                  </Text>
+                <View style={styles.goalDetailContainer}>
+                  <Text style={styles.goalDetailLabel}>Priority:</Text>
+                  <View style={styles.textbox}>
+                    <Text style={styles.goalDetailValue}>{goal.priority}</Text>
+                  </View>
+                </View>
+                <View style={styles.goalDetailContainer}>
+                  <Text style={styles.goalDetailLabel}>Due Date:</Text>
+                  <View style={styles.textbox}>
+                    <Text style={styles.goalDetailValue}>
+                      {goal.dueDate || "No Due Date"}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        ))
+          );
+        })
       ) : (
         <Text style={{ textAlign: "center", marginTop: 20 }}>
           WE ARE LOADING YOUR GOALS.
