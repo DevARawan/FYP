@@ -36,6 +36,7 @@ import * as ImagePicker from "expo-image-picker";
 import { BottomSheet } from "react-native-elements";
 import ChangePasswordBottomSheet from "../Components/ChangePasswordBottomSheet";
 import { useAuthContext } from "../Hooks/UseAuth";
+import { useSelector } from "react-redux";
 
 const UserProfile = () => {
   const [userData, setUserData] = useState(null);
@@ -48,6 +49,7 @@ const UserProfile = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const { signOut } = useAuthContext();
+  const user = useSelector((state) => state.user.user);
   const toggleBottomSheet = () => {
     setIsBottomSheetVisible(!isBottomSheetVisible);
   };
@@ -67,8 +69,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let storedUserData = await AsyncStorage.getItem("user");
-        storedUserData = JSON.parse(storedUserData);
+        let storedUserData = user;
         if (storedUserData) {
           setUserData(storedUserData);
           setEmail(storedUserData.email);
@@ -161,13 +162,16 @@ const UserProfile = () => {
           />
         </View>
         {isEditMode ? (
-          <TouchableOpacity style={styles.logoutButton} onPress={toggleBottomSheet}>
-          <Text style={styles.logoutButtonText}>Change Password</Text>
-          <MaterialIcons
-            name="lock"
-            style={[styles.logoutIcon, { color: "#ffffff" }]}
-          />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={toggleBottomSheet}
+          >
+            <Text style={styles.logoutButtonText}>Change Password</Text>
+            <MaterialIcons
+              name="lock"
+              style={[styles.logoutIcon, { color: "#ffffff" }]}
+            />
+          </TouchableOpacity>
         ) : (
           <View style={styles.inputContainer}>
             <FontAwesome5
@@ -188,7 +192,7 @@ const UserProfile = () => {
         )}
       </View>
 
-        {/* <View style={styles.inputContainer}>
+      {/* <View style={styles.inputContainer}>
           <FontAwesome5
             name="key"
             size={24}
@@ -214,7 +218,7 @@ const UserProfile = () => {
           {isEditMode ? "Save Profile" : "Manage Profile"}
         </Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
         <MaterialIcons
@@ -302,7 +306,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",
-    marginBottom: 20, marginTop: 20,
+    marginBottom: 20,
+    marginTop: 20
   },
   manageProfileButtonText: {
     color: "white",
@@ -317,7 +322,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 17, marginBottom: 12,
+    marginTop: 17,
+    marginBottom: 12
   },
   logoutButtonText: {
     color: "white",
