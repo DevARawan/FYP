@@ -83,6 +83,9 @@ const DataEntry = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     setIsButtonDistable(true);
+    // Get the current date
+    const currentDate = new Date();
+
     if (!incomeAmount) {
       Alert.alert("Please provide income details");
       setIsButtonDistable(false);
@@ -111,19 +114,19 @@ const DataEntry = () => {
       }
 
       const usersCollection = firestore().collection("users");
-
       const userDocRef = usersCollection.doc(userId);
-
       const userDocSnapshot = await userDocRef.get();
 
       if (userDocSnapshot.exists) {
         const expensesCollection = userDocRef.collection("expenses");
         const expenseDocRef = expensesCollection.doc();
 
+        // Include the date in the expense document
         await expenseDocRef.set({
           expenseAmounts,
           income: incomeAmount,
-          user_id: userId
+          user_id: userId,
+          date: currentDate // Add the current date
         });
 
         navigation.navigate("main");
@@ -139,7 +142,6 @@ const DataEntry = () => {
       console.error("Error occurred:", error);
       Alert.alert("Error occurred while processing the request");
     }
-    setIsLoading(false);
   };
 
   return (

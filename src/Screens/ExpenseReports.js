@@ -13,6 +13,7 @@ const ExpenseReportScreen = () => {
   const [expensesData, setExpensesData] = useState([]);
   const [incomeData, setIncomeData] = useState([]);
   const [savingsData, setSavingsData] = useState([]);
+  const [datesData, setDatesData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { currentUser } = useAuthContext();
   const userId = currentUser.uid;
@@ -37,17 +38,25 @@ const ExpenseReportScreen = () => {
           console.log("income is:", income);
           const savings =
             income !== null ? (income - totalExpense).toFixed(2) : null;
-          return { totalExpense: totalExpense.toFixed(2), income, savings };
+          const date = doc.data().date.toDate(); // Convert timestamp to JavaScript Date object
+          return {
+            totalExpense: totalExpense.toFixed(2),
+            income,
+            savings,
+            date
+          };
         });
 
         // Extract savings, income, and expenses data into separate arrays
         const savings = userData.map((data) => parseFloat(data.savings)); // Convert to float
         const income = userData.map((data) => parseFloat(data.income)); // Convert to float
         const expenses = userData.map((data) => parseFloat(data.totalExpense)); // Convert to float
+        const dates = userData.map((data) => data.date); // Extract dates
 
         setSavingsData(savings);
         setIncomeData(income);
         setExpensesData(expenses);
+        setDatesData(dates); // Set dates data
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -64,6 +73,13 @@ const ExpenseReportScreen = () => {
     savings: "#4682B4", // SteelBlue
     income: "#32CD32" // LimeGreen
   };
+  const formatDate = (date) => {
+    // Example formatting: "MM/DD/YYYY"
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // Month indexes are 0-based
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -78,16 +94,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: Array.from(
-                    {
-                      length: Math.max(
-                        expensesData.length,
-                        incomeData.length,
-                        savingsData.length
-                      )
-                    },
-                    (_, i) => String(i + 1)
-                  ),
+                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
                   datasets: [
                     {
                       data: expensesData,
@@ -131,9 +138,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: Array.from({ length: expensesData.length }, (_, i) =>
-                    String(i + 1)
-                  ),
+                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
                   datasets: [{ data: expensesData }]
                 }}
                 width={screenWidth}
@@ -165,9 +170,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: Array.from({ length: savingsData.length }, (_, i) =>
-                    String(i + 1)
-                  ),
+                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
                   datasets: [{ data: savingsData }]
                 }}
                 width={screenWidth}
@@ -199,9 +202,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: Array.from({ length: incomeData.length }, (_, i) =>
-                    String(i + 1)
-                  ),
+                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
                   datasets: [{ data: incomeData }]
                 }}
                 width={screenWidth}
