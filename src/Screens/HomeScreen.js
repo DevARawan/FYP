@@ -183,48 +183,6 @@ const HomeScreen = () => {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    console.log("all goals are", allGoals);
-  }, [allGoals]);
-
-  const CelebrationBottomSheet = ({ visible, onClose }) => {
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={visible}
-        onRequestClose={onClose}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.bottomSheet}>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <MaterialCommunityIcons name="close" size={24} color="black" />
-            </TouchableOpacity>
-            <Image
-              source={require("../Images/celebrations.gif")} // Replace with your GIF
-              style={styles.gif}
-            />
-            <Text style={styles.text}>Next</Text>
-            <View
-              style={{ position: "absolute", height: "100%", width: "100%" }}
-            >
-              <LottieView
-                style={{
-                  width: 200,
-                  height: 200,
-                  alignSelf: "center"
-                }}
-                source={require("../../Animations/fireworks.json")}
-                autoPlay
-                loop
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
   const moveGoalToAchievemnt = async (selectedGoal) => {
     // Make a Firebase call to delete the selected goal from the goals collection
     const goalsCollectionRef = firestore().collection(`users/${userId}/goals`);
@@ -396,12 +354,6 @@ const HomeScreen = () => {
                       {selectedCurrency.symbol}
                       {goal.totalAmount}
                     </Text>
-                  </View>
-                </View>
-                <View style={styles.goalDetailContainer}>
-                  <Text style={styles.goalDetailLabel}>Priority:</Text>
-                  <View style={styles.textbox}>
-                    <Text style={styles.goalDetailValue}>{goal.priority}</Text>
                   </View>
                 </View>
                 <View style={styles.goalDetailContainer}>
