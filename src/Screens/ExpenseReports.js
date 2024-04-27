@@ -17,6 +17,7 @@ const ExpenseReportScreen = () => {
   const { currentUser } = useAuthContext();
   const userId = currentUser.uid;
 
+  // Modify the useEffect hook to format the data before setting the state
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -33,15 +34,16 @@ const ExpenseReportScreen = () => {
             .reduce((acc, curr) => acc + parseFloat(curr), 0);
           const incomeValue = parseFloat(doc.data().income);
           const income = isNaN(incomeValue) ? null : incomeValue.toFixed(2);
+          console.log("income is:", income);
           const savings =
             income !== null ? (income - totalExpense).toFixed(2) : null;
           return { totalExpense: totalExpense.toFixed(2), income, savings };
         });
 
         // Extract savings, income, and expenses data into separate arrays
-        const savings = userData.map((data) => data.savings);
-        const income = userData.map((data) => data.income);
-        const expenses = userData.map((data) => data.totalExpense);
+        const savings = userData.map((data) => parseFloat(data.savings)); // Convert to float
+        const income = userData.map((data) => parseFloat(data.income)); // Convert to float
+        const expenses = userData.map((data) => parseFloat(data.totalExpense)); // Convert to float
 
         setSavingsData(savings);
         setIncomeData(income);
