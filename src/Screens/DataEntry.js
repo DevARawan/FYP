@@ -159,7 +159,22 @@ const DataEntry = () => {
     }
 
     if (totalIncome < totalExpense) {
-      Alert.alert("Your expenses exceed your income");
+      Alert.alert(
+        "Your expenses exceed your income",
+        "Consider exploring loan options to cover your expenses.",
+        [
+          {
+            text: "See Loan Section",
+            onPress: () => {
+              navigation.navigate("Loans");
+            }
+          },
+          {
+            text: "Cancel",
+            style: "cancel"
+          }
+        ]
+      );
       setIsButtonDisabled(false);
       return;
     }

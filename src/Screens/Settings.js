@@ -215,7 +215,12 @@ const Settings = () => {
           style={[styles.rowIcon, { color: "#8E44AD" }]}
         />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.row} onPress={handlePolicy}>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => {
+          navigation.navigate("Loans");
+        }}
+      >
         <Text style={styles.link}>Loan</Text>
 
         <Ionicons
