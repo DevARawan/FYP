@@ -47,16 +47,68 @@ const ExpenseReportScreen = () => {
           };
         });
 
-        // Extract savings, income, and expenses data into separate arrays
-        const savings = userData.map((data) => parseFloat(data.savings)); // Convert to float
-        const income = userData.map((data) => parseFloat(data.income)); // Convert to float
-        const expenses = userData.map((data) => parseFloat(data.totalExpense)); // Convert to float
-        const dates = userData.map((data) => data.date); // Extract dates
+        // Grouping and summing income by month
+        const monthlyIncome = userData.reduce((acc, data) => {
+          const date = new Date(data.date);
+          const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
+          if (!acc[monthYear]) {
+            acc[monthYear] = 0;
+          }
+          acc[monthYear] += parseFloat(data.income || 0);
+          return acc;
+        }, {});
+
+        // Grouping and summing expenses by month
+        const monthlyExpenses = userData.reduce((acc, data) => {
+          const date = new Date(data.date);
+          const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
+          if (!acc[monthYear]) {
+            acc[monthYear] = 0;
+          }
+          acc[monthYear] += parseFloat(data.totalExpense || 0);
+          return acc;
+        }, {});
+
+        // Grouping and summing savings by month
+        const monthlySavings = userData.reduce((acc, data) => {
+          const date = new Date(data.date);
+          const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
+          if (!acc[monthYear]) {
+            acc[monthYear] = 0;
+          }
+          acc[monthYear] += parseFloat(data.savings || 0);
+          return acc;
+        }, {});
+
+        // Extracting unique months and sorting them
+        const uniqueMonths = Object.keys(monthlyIncome).sort();
+
+        // Creating arrays for income, expenses, savings, and dates
+        const income = uniqueMonths.map(
+          (monthYear) => monthlyIncome[monthYear]
+        );
+        const expenses = uniqueMonths.map(
+          (monthYear) => monthlyExpenses[monthYear]
+        );
+        const savings = uniqueMonths.map(
+          (monthYear) => monthlySavings[monthYear]
+        );
+        const dates = uniqueMonths.map((monthYear) => new Date(monthYear));
+        const monthNamesWithYear = uniqueMonths.map((monthYear) => {
+          const [month, year] = monthYear.split("-");
+          return `${new Date(year, month - 1, 1).toLocaleString("default", {
+            month: "long"
+          })} ${year}`;
+        });
+        console.log("Income by month:", income);
+        console.log("Expenses by month:", expenses);
+        console.log("Savings by month:", savings);
+        console.log("Months:", monthNamesWithYear);
 
         setSavingsData(savings);
         setIncomeData(income);
         setExpensesData(expenses);
-        setDatesData(dates); // Set dates data
+        setDatesData(monthNamesWithYear); // Set dates data
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
@@ -94,7 +146,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
+                  labels: datesData, // Format dates for display
                   datasets: [
                     {
                       data: expensesData,
@@ -138,7 +190,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
+                  labels: datesData, // Format dates for display
                   datasets: [{ data: expensesData }]
                 }}
                 width={screenWidth}
@@ -170,7 +222,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
+                  labels: datesData, // Format dates for display
                   datasets: [{ data: savingsData }]
                 }}
                 width={screenWidth}
@@ -202,7 +254,7 @@ const ExpenseReportScreen = () => {
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
-                  labels: datesData.map((date) => formatDate(date)), // Format dates for display
+                  labels: datesData, // Format dates for display
                   datasets: [{ data: incomeData }]
                 }}
                 width={screenWidth}
