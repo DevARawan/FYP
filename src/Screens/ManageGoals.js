@@ -1,8 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
-import firestore from "@react-native-firebase/firestore"; // Import the firestore module from react-native-firebase
+import firestore from "@react-native-firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 
-import moment from "moment";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -18,20 +17,12 @@ import uuid from "react-native-uuid";
 import { useAuthContext } from "../Hooks/UseAuth";
 import Loader from "../Utils/Loader";
 
-let controlRender = true;
-
 const ManageGoals = () => {
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [allGoals, setAllGoals] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [date, setDate] = useState(null);
   const [open, setOpen] = useState(false);
   const [priority, setPriority] = useState("");
-
-  const { currentUser } = useAuthContext();
-  const userId = currentUser.uid;
-  let goals = [];
   const [newGoal, setNewGoal] = useState({
     goalName: "",
     description: "",
@@ -39,23 +30,18 @@ const ManageGoals = () => {
     dueDate: ""
   });
 
+  const { currentUser } = useAuthContext();
+  const userId = currentUser.uid;
+
   const fetchData = async () => {
-    setIsLoading(true);
+    setIsLoading(true); // Set loading to true before fetching data
     try {
-      // Get user document from Firestore
       const userCollection = firestore().collection("users");
       const userDoc = userCollection.doc(userId);
-
-      // Get goals collection from user document
       const goalsRef = userDoc.collection("goals");
-
-      // Fetch documents from goals collection
       const goalsSnapshot = await goalsRef.get();
 
-      // Store goals data in an array
       let goals = [];
-
-      // Check if there are any documents in the snapshot
       if (!goalsSnapshot.empty) {
         goalsSnapshot.forEach((doc) => {
           const goalData = doc.data();
@@ -70,18 +56,47 @@ const ManageGoals = () => {
             });
           }
         });
-      } else {
       }
 
       setAllGoals(goals);
-      setIsLoading(false);
-      // Do whatever you need with goalsData here
+      setIsLoading(false); // Set loading to false after data is fetched
     } catch (error) {
+      setIsLoading(false); // Set loading to false if there's an error
       console.error("Error fetching user data:", error);
     }
   };
 
+  const handlePriorityChange = (text) => {
+    const priorityValue = parseInt(text);
+    if (!isNaN(priorityValue) && priorityValue >= 1 && priorityValue <= 10) {
+      setPriority(priorityValue.toString());
+    } else {
+      setPriority("");
+    }
+  };
+
   const handleAddGoal = async () => {
+    if (!newGoal.goalName) {
+      alert("Please enter a goal name.");
+      return;
+    }
+
+    const totalAmountValid = /^[0-9]+(\.[0-9]+)?$/.test(newGoal.totalAmount);
+    const priorityValid =
+      !isNaN(parseInt(priority)) &&
+      parseInt(priority) >= 1 &&
+      parseInt(priority) <= 10;
+
+    if (!totalAmountValid) {
+      alert("Please enter a valid total amount.");
+      return;
+    }
+
+    if (!priorityValid) {
+      alert("Priority must be a number between 1 and 10.");
+      return;
+    }
+
     try {
       const goal_id = uuid.v4();
       const usersCollection = firestore().collection("users");
@@ -90,37 +105,26 @@ const ManageGoals = () => {
       const goalsDocRef = goalsCollection.doc(goal_id);
 
       await goalsDocRef.set({
-        // newGoal,
         newGoal: {
           ...newGoal,
-          priority: priority // Including priority in newGoal object
+          priority: priority
         },
         user_id: userId,
         goal_id
       });
+
       setNewGoal({
         goalName: "",
         description: "",
         totalAmount: "",
         dueDate: ""
       });
-      setPriority(""); // Reset priority after adding goal
+      setPriority("");
       fetchData();
-      controlRender = true;
       setShowAddGoal(false);
     } catch (error) {
       setShowAddGoal(false);
       console.error(error);
-    }
-  };
-  const handlePriorityChange = (text) => {
-    // Validate input to ensure it's within the range of 1 to 10
-    const priorityValue = parseInt(text);
-    if (!isNaN(priorityValue) && priorityValue >= 1 && priorityValue <= 10) {
-      setPriority(priorityValue.toString());
-    } else {
-      // If input is invalid, clear the input field
-      setPriority("");
     }
   };
 
@@ -140,13 +144,6 @@ const ManageGoals = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Existing Goals Section */}
-      <ScrollView style={styles.goalsContainer}>
-      </ScrollView>
-
-      {/* Add Goal Section */}
-
-      {/* Add Goal Form (Conditional Rendering) */}
       {showAddGoal && (
         <View style={styles.addGoalForm}>
           <TextInput
@@ -173,22 +170,13 @@ const ManageGoals = () => {
             style={styles.input}
             placeholder="Priority (1-10)"
             keyboardType="number-pad"
-            onChangeText={handlePriorityChange} // Step 3
+            onChangeText={handlePriorityChange}
             value={priority}
           />
-
-          {/* <TextInput
-            style={styles.input}
-            placeholder="Due Date (Optional)"
-            onChangeText={(text) => setNewGoal({ ...newGoal, dueDate: text })}
-          /> */}
           <TouchableOpacity
             style={styles.input}
             placeholder="Due Date (Optional)"
-            onPress={() => {
-              setOpen(true);
-            }}
-            onChangeText={(text) => setNewGoal({ ...newGoal, dueDate: text })}
+            onPress={() => setOpen(true)}
           >
             <Text>
               {newGoal.dueDate == "" ? "Due Date (Optional)" : newGoal.dueDate}
@@ -206,7 +194,7 @@ const ManageGoals = () => {
               setOpen(false);
               setNewGoal({
                 ...newGoal,
-                dueDate: JSON.stringify(moment(date).format("l"))
+                dueDate: date.toISOString().split("T")[0]
               });
             }}
             onCancel={() => {
@@ -219,13 +207,12 @@ const ManageGoals = () => {
       {isLoading ? (
         <ActivityIndicator
           style={{ marginTop: 20 }}
-          size="extraLarge"
+          size="large"
           color="#0000ff"
         />
       ) : allGoals.length > 0 ? (
         allGoals.map((goal) => (
           <View style={styles.goalsContainer} key={goal.id}>
-            {/* <Text style={styles.currentGoalText}>Current Goal</Text> */}
             <View style={styles.goalBox}>
               <View style={styles.goalDetailContainer}>
                 <Text style={styles.goalDetailLabel}>Goal Name:</Text>
@@ -235,11 +222,11 @@ const ManageGoals = () => {
               </View>
 
               <View style={styles.goalDetailContainer}>
-          <Text style={styles.goalDetailLabel}>Priority:</Text>
-          <View style={styles.textbox}>
-        <Text style={styles.goalDetailValue}>{goal.priority}</Text>
-        </View>
-        </View>
+                <Text style={styles.goalDetailLabel}>Priority:</Text>
+                <View style={styles.textbox}>
+                  <Text style={styles.goalDetailValue}>{goal.priority}</Text>
+                </View>
+              </View>
 
               <View style={styles.goalDetailContainer}>
                 <Text style={styles.goalDetailLabel}>Description:</Text>
@@ -293,6 +280,7 @@ const ManageGoals = () => {
           No goals found.
         </Text>
       )}
+      <Loader isLoading={isLoading} />
     </ScrollView>
   );
 };
