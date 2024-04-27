@@ -263,7 +263,7 @@ const AppNavigator = () => {
                 <View>
                   <FontAwesome5
                     name="arrow-left"
-                    style={{ fontSize: 24, color: "black", paddingright: 10 }}
+                    style={{ fontSize: 24, color: "black" }}
                   />
                 </View>
               </TouchableOpacity>
