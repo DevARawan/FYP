@@ -5,8 +5,17 @@ const initialState = {
   currency: {
     id: "PKR",
     name: "Pakistani Rupee",
-    symbol: "Rs"
-  } // Initial currency
+    symbol: "Rs",
+    websites: [
+      { name: "EasyPaisa", url: "https://www.easypaisa.com.pk/" },
+      { name: "JazzCash", url: "https://www.jazzcash.com.pk/" },
+      { name: "Rizq", url: "https://www.rizq.com/" },
+      { name: "Meezan Bank", url: "https://www.meezanbank.com/" },
+      { name: "UBL", url: "https://www.ubldigital.com/" },
+      { name: "Bank Alfalah", url: "https://www.bankalfalah.com/" },
+      { name: "Askari Bank", url: "https://askaribank.com/" }
+    ]
+  }
 };
 
 const currencySlice = createSlice({

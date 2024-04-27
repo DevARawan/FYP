@@ -20,6 +20,7 @@ import FinancialReport from "../Screens/FinancialReports";
 import ExpenseReportScreen from "../Screens/ExpenseReports";
 import AdminScreen from "../Screens/Admin/ViewController";
 import GoalsChartScreen from "../Screens/Admin/GoalCompletionsReport";
+import { Loans } from "../Screens/Loans";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -271,8 +272,27 @@ const AppNavigator = () => {
             headerRight: () => <Logo />
           })}
         />
+
         <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
         <Stack.Screen name="Admin" component={AdminScreen} />
+        <Stack.Screen
+          name="Loans"
+          component={Loans}
+          options={({ navigation }) => ({
+            title: "Loans",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <View style={{ marginHorizontal: 10 }}>
+                  <FontAwesome5
+                    name="arrow-left"
+                    style={{ fontSize: 24, color: "black" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ),
+            headerRight: () => <Logo />
+          })}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

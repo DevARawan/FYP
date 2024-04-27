@@ -4,6 +4,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons
 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
@@ -30,7 +31,6 @@ const Settings = () => {
   const { signOut } = useAuthContext();
   const [blinkAnimation] = useState(new Animated.Value(0));
   const user = useSelector((state) => state.user.user);
-  console.log("user is:", user);
   const handleProfile = () => {
     navigation.navigate("profile");
   };
@@ -213,6 +213,16 @@ const Settings = () => {
         <FontAwesome5
           name="user-secret"
           style={[styles.rowIcon, { color: "#8E44AD" }]}
+        />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.row} onPress={handlePolicy}>
+        <Text style={styles.link}>Loan</Text>
+
+        <Ionicons
+          name="md-cash"
+          size={24}
+          color="black"
+          style={styles.rowIcon}
         />
       </TouchableOpacity>
       {user && user.isAdmin ? (
