@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import firestore from "@react-native-firebase/firestore";
 import { useAuthContext } from "../Hooks/UseAuth";
+import { useSelector } from "react-redux";
 
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
@@ -32,6 +33,8 @@ const DataEntry = () => {
   const [plusIcon, setPlusIcon] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const navigation = useNavigation();
+  const selectedCurrency = useSelector((state) => state.currency.currency);
+  const currencySymbol = selectedCurrency.symbol;
 
   const renderAddIncome = () => {
     if (showAddIncome) {
@@ -40,6 +43,7 @@ const DataEntry = () => {
           <View style={styles.row}>
             <Text style={styles.label}>Income 1:</Text>
             <View style={styles.inputContainer}>
+              <Text style={styles.dollarSign}>{currencySymbol}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter income"
@@ -57,6 +61,7 @@ const DataEntry = () => {
           <View style={styles.row}>
             <Text style={styles.label}>Income 2:</Text>
             <View style={styles.inputContainer}>
+              <Text style={styles.dollarSign}>{currencySymbol}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter income"
@@ -74,6 +79,7 @@ const DataEntry = () => {
           <View style={styles.row}>
             <Text style={styles.label}>Income 3:</Text>
             <View style={styles.inputContainer}>
+              <Text style={styles.dollarSign}>{currencySymbol}</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Enter income"
@@ -100,6 +106,7 @@ const DataEntry = () => {
         <View key={category} style={styles.row}>
           <Text style={styles.category}>{category}</Text>
           <View style={styles.inputContainer}>
+            <Text style={styles.dollarSign}>{currencySymbol}</Text>
             <TextInput
               style={styles.input}
               placeholder="Enter amount"
@@ -309,7 +316,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
-    width: "100%" // Ensure the input takes the full width
+    width: "100%", // Ensure the input takes the full width
+    paddingLeft: 40
   },
   submitButton: {
     backgroundColor: "#007AFF",
@@ -323,6 +331,13 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold"
+  },
+  dollarSign: {
+    position: "absolute",
+    height: "100%",
+    left: 10,
+    alignSelf: "center",
+    textAlignVertical: "center"
   }
 });
 

@@ -385,7 +385,8 @@ const HomeScreen = () => {
                 <Text style={styles.goalDetailLabel}>Total Amount:</Text>
                 <View style={styles.textbox}>
                   <Text style={styles.goalDetailValue}>
-                    ${goal.totalAmount}
+                    {selectedCurrency.symbol}
+                    {goal.totalAmount}
                   </Text>
                 </View>
               </View>

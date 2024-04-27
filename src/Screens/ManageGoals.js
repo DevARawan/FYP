@@ -16,6 +16,7 @@ import DatePicker from "react-native-date-picker";
 import uuid from "react-native-uuid";
 import { useAuthContext } from "../Hooks/UseAuth";
 import Loader from "../Utils/Loader";
+import { useSelector } from "react-redux";
 
 const ManageGoals = () => {
   const [showAddGoal, setShowAddGoal] = useState(false);
@@ -30,6 +31,7 @@ const ManageGoals = () => {
     dueDate: ""
   });
 
+  const selectedCurrency = useSelector((state) => state.currency.currency);
   const { currentUser } = useAuthContext();
   const userId = currentUser.uid;
 
@@ -241,7 +243,7 @@ const ManageGoals = () => {
                 <Text style={styles.goalDetailLabel}>Total Amount:</Text>
                 <View style={styles.textbox}>
                   <Text style={styles.goalDetailValue}>
-                    ${goal.totalAmount}
+                    {selectedCurrency.symbol} {goal.totalAmount}
                   </Text>
                 </View>
               </View>
