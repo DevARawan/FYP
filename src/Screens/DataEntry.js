@@ -17,7 +17,9 @@ import { useAuthContext } from "../Hooks/UseAuth";
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [incomeAmount, setIncomeAmount] = useState(null);
+  const [incomeAmount1, setIncomeAmount1] = useState(null);
+  const [incomeAmount2, setIncomeAmount2] = useState(null);
+  const [incomeAmount3, setIncomeAmount3] = useState(null);
   const [expenseAmounts, setExpenseAmounts] = useState({
     Electricity: "",
     Gas: "",
@@ -28,22 +30,63 @@ const DataEntry = () => {
   });
   const { currentUser } = useAuthContext();
   const [plusIcon, setPlusIcon] = useState(true);
-  const [isButtonDistable, setIsButtonDistable] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const navigation = useNavigation();
 
   const renderAddIncome = () => {
     if (showAddIncome) {
       return (
-        <View style={styles.row}>
-          <Text style={styles.label}>Add Income:</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter income"
-              keyboardType="numeric"
-              value={incomeAmount}
-              onChangeText={(text) => setIncomeAmount(text)}
-            />
+        <View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Income 1:</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter income"
+                keyboardType="numeric"
+                value={incomeAmount1}
+                onChangeText={(text) => {
+                  // Validate input to allow only numbers (integers or floats)
+                  if (/^\d*\.?\d*$/.test(text)) {
+                    setIncomeAmount1(text);
+                  }
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Income 2:</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter income"
+                keyboardType="numeric"
+                value={incomeAmount2}
+                onChangeText={(text) => {
+                  // Validate input to allow only numbers (integers or floats)
+                  if (/^\d*\.?\d*$/.test(text)) {
+                    setIncomeAmount2(text);
+                  }
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Income 3:</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter income"
+                keyboardType="numeric"
+                value={incomeAmount3}
+                onChangeText={(text) => {
+                  // Validate input to allow only numbers (integers or floats)
+                  if (/^\d*\.?\d*$/.test(text)) {
+                    setIncomeAmount3(text);
+                  }
+                }}
+              />
+            </View>
           </View>
         </View>
       );
@@ -62,12 +105,15 @@ const DataEntry = () => {
               placeholder="Enter amount"
               keyboardType="numeric"
               value={expenseAmounts[category]}
-              onChangeText={(text) =>
-                setExpenseAmounts((prevAmounts) => ({
-                  ...prevAmounts,
-                  [category]: text
-                }))
-              }
+              onChangeText={(text) => {
+                // Validate input to allow only numbers (integers or floats)
+                if (/^\d*\.?\d*$/.test(text)) {
+                  setExpenseAmounts((prevAmounts) => ({
+                    ...prevAmounts,
+                    [category]: text
+                  }));
+                }
+              }}
             />
           </View>
         </View>
@@ -82,13 +128,18 @@ const DataEntry = () => {
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    setIsButtonDistable(true);
+    setIsButtonDisabled(true);
     // Get the current date
     const currentDate = new Date();
 
-    if (!incomeAmount) {
+    const incomes = [incomeAmount1, incomeAmount2, incomeAmount3]
+      .filter(Boolean)
+      .map(parseFloat);
+    const totalIncome = incomes.reduce((acc, curr) => acc + curr, 0);
+
+    if (totalIncome === 0) {
       Alert.alert("Please provide income details");
-      setIsButtonDistable(false);
+      setIsButtonDisabled(false);
       return;
     }
 
@@ -100,16 +151,16 @@ const DataEntry = () => {
       }
     }
 
-    if (incomeAmount < totalExpense) {
+    if (totalIncome < totalExpense) {
       Alert.alert("Your expenses exceed your income");
-      setIsButtonDistable(false);
+      setIsButtonDisabled(false);
       return;
     }
 
     try {
       const userId = currentUser.uid;
       if (!userId) {
-        setIsButtonDistable(false);
+        setIsButtonDisabled(false);
         throw new Error("User ID not found");
       }
 
@@ -124,21 +175,21 @@ const DataEntry = () => {
         // Include the date in the expense document
         await expenseDocRef.set({
           expenseAmounts,
-          income: incomeAmount,
+          income: totalIncome,
           user_id: userId,
           date: currentDate // Add the current date
         });
 
         navigation.navigate("main");
-        setIsButtonDistable(false);
+        setIsButtonDisabled(false);
       } else {
-        setIsButtonDistable(false);
+        setIsButtonDisabled(false);
         throw new Error("User document not found");
       }
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      setIsButtonDistable(false);
+      setIsButtonDisabled(false);
       console.error("Error occurred:", error);
       Alert.alert("Error occurred while processing the request");
     }
@@ -151,7 +202,9 @@ const DataEntry = () => {
       <TouchableOpacity style={styles.row} onPress={handleToggleIcon}>
         <View style={styles.categoryContainer}>
           <Text style={styles.category}>My Income:</Text>
-          <Text style={styles.value}>{incomeAmount}</Text>
+          <Text style={styles.value}>{incomeAmount1}</Text>
+          <Text style={styles.value}>{incomeAmount2}</Text>
+          <Text style={styles.value}>{incomeAmount3}</Text>
 
           <Feather
             name={plusIcon ? "plus" : "minus"}
@@ -178,7 +231,7 @@ const DataEntry = () => {
       </View>
 
       <TouchableOpacity
-        disabled={isButtonDistable}
+        disabled={isButtonDisabled}
         style={styles.submitButton}
         onPress={handleSubmit}
       >
@@ -246,7 +299,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 9,
-    width: "52%" // Adjust the width as needed
+    width: "17%" // Adjust the width as needed
   },
   inputContainer: {
     width: "59.5%", // Adjust the width as needed
