@@ -17,7 +17,6 @@ const AdminService = ({ children, navigation }) => {
     } else {
       setSelectedUserAction("Promote To Admin");
     }
-    console.log("user is", user);
     setSelectedUser(user);
     setShowOptionsModal(true);
   };

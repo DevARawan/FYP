@@ -19,10 +19,10 @@ import DatePicker from "react-native-date-picker";
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [incomeAmount1, setIncomeAmount1] = useState(null);
+  const [incomeAmount1, setIncomeAmount1] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [incomeAmount2, setIncomeAmount2] = useState(null);
-  const [incomeAmount3, setIncomeAmount3] = useState(null);
+  const [incomeAmount2, setIncomeAmount2] = useState("");
+  const [incomeAmount3, setIncomeAmount3] = useState("");
   const [expenseAmounts, setExpenseAmounts] = useState({
     Electricity: "",
     Gas: "",
@@ -38,6 +38,21 @@ const DataEntry = () => {
   const selectedCurrency = useSelector((state) => state.currency.currency);
   const currencySymbol = selectedCurrency.symbol;
   const [isOpen, setOpen] = useState(false);
+
+  const clearData = () => {
+    setIncomeAmount1("");
+    setIncomeAmount2("");
+    setIncomeAmount3("");
+    setDate(new Date().toISOString().split("T")[0]);
+    setExpenseAmounts({
+      Electricity: "",
+      Gas: "",
+      Grocery: "",
+      Fuel: "",
+      Clothes: "",
+      Other: ""
+    });
+  };
 
   const renderAddIncome = () => {
     if (showAddIncome) {
@@ -160,6 +175,8 @@ const DataEntry = () => {
     }
 
     if (totalIncome < totalExpense) {
+      setIsLoading(false);
+      clearData();
       Alert.alert(
         "Your expenses exceed your income",
         "Consider exploring loan options to cover your expenses.",
@@ -204,13 +221,17 @@ const DataEntry = () => {
         });
 
         navigation.navigate("main");
+        clearData();
         setIsButtonDisabled(false);
       } else {
         setIsButtonDisabled(false);
+        clearData();
         throw new Error("User document not found");
       }
       setIsLoading(false);
+      clearData();
     } catch (error) {
+      clearData();
       setIsLoading(false);
       setIsButtonDisabled(false);
       console.error("Error occurred:", error);

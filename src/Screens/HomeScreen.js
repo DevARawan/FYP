@@ -370,7 +370,7 @@ const HomeScreen = () => {
         })
       ) : (
         <Text style={{ textAlign: "center", marginTop: 20 }}>
-          WE ARE LOADING YOUR GOALS.
+          NO GOALS FOUND
         </Text>
       )}
 

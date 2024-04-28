@@ -100,7 +100,6 @@ const ManageGoals = () => {
           }
         });
       }
-      console.log("All goals are", goals);
       setAllGoals(goals);
       setIsLoading(false); // Set loading to false after data is fetched
     } catch (error) {

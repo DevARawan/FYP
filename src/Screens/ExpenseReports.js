@@ -35,7 +35,6 @@ const ExpenseReportScreen = () => {
             .reduce((acc, curr) => acc + parseFloat(curr), 0);
           const incomeValue = parseFloat(doc.data().income);
           const income = isNaN(incomeValue) ? null : incomeValue.toFixed(2);
-          console.log("income is:", income);
           const savings =
             income !== null ? (income - totalExpense).toFixed(2) : null;
           const date = doc.data().date.toDate(); // Convert timestamp to JavaScript Date object
@@ -100,10 +99,6 @@ const ExpenseReportScreen = () => {
             month: "long"
           })} ${year}`;
         });
-        console.log("Income by month:", income);
-        console.log("Expenses by month:", expenses);
-        console.log("Savings by month:", savings);
-        console.log("Months:", monthNamesWithYear);
 
         setSavingsData(savings);
         setIncomeData(income);
