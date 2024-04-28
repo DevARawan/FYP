@@ -14,11 +14,13 @@ import {
 import firestore from "@react-native-firebase/firestore";
 import { useAuthContext } from "../Hooks/UseAuth";
 import { useSelector } from "react-redux";
+import DatePicker from "react-native-date-picker";
 
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [incomeAmount1, setIncomeAmount1] = useState(null);
+  const [date, setDate] = useState(new Date());
   const [incomeAmount2, setIncomeAmount2] = useState(null);
   const [incomeAmount3, setIncomeAmount3] = useState(null);
   const [expenseAmounts, setExpenseAmounts] = useState({
@@ -35,6 +37,7 @@ const DataEntry = () => {
   const navigation = useNavigation();
   const selectedCurrency = useSelector((state) => state.currency.currency);
   const currencySymbol = selectedCurrency.symbol;
+  const [isOpen, setOpen] = useState(false);
 
   const renderAddIncome = () => {
     if (showAddIncome) {
@@ -136,8 +139,6 @@ const DataEntry = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     setIsButtonDisabled(true);
-    // Get the current date
-    const currentDate = new Date();
 
     const incomes = [incomeAmount1, incomeAmount2, incomeAmount3]
       .filter(Boolean)
@@ -199,7 +200,7 @@ const DataEntry = () => {
           expenseAmounts,
           income: totalIncome,
           user_id: userId,
-          date: currentDate // Add the current date
+          date: date // Add the current date
         });
 
         navigation.navigate("main");
@@ -220,7 +221,20 @@ const DataEntry = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.heading}>Add Income and Expenses</Text>
-
+      <TouchableOpacity
+        style={{
+          borderWidth: 1,
+          borderRadius: 10,
+          padding: 10,
+          width: "80%", // Ensure the input takes the full width
+          paddingLeft: 40,
+          alignSelf: "center",
+          marginBottom: 20
+        }}
+        onPress={() => setOpen(true)}
+      >
+        <Text>Date:{date}</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.row} onPress={handleToggleIcon}>
         <View style={styles.categoryContainer}>
           <Text style={styles.category}>My Income:</Text>
@@ -263,6 +277,20 @@ const DataEntry = () => {
           <Text style={styles.submitButtonText}>Submit</Text>
         )}
       </TouchableOpacity>
+      <DatePicker
+        modal
+        open={isOpen}
+        maximumDate={new Date()} // Prevent selecting future dates
+        date={new Date()}
+        mode="date"
+        onConfirm={(date) => {
+          setOpen(false);
+          setDate(date.toISOString().split("T")[0]);
+        }}
+        onCancel={() => {
+          setOpen(false);
+        }}
+      />
     </ScrollView>
   );
 };

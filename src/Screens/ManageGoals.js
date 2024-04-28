@@ -271,6 +271,8 @@ const ManageGoals = () => {
             modal
             open={open}
             date={new Date()}
+            minimumDate={new Date()}
+            mode="date"
             onConfirm={(date) => {
               setOpen(false);
               setNewGoal({
