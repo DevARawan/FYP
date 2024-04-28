@@ -37,7 +37,7 @@ const ExpenseReportScreen = () => {
           const income = isNaN(incomeValue) ? null : incomeValue.toFixed(2);
           const savings =
             income !== null ? (income - totalExpense).toFixed(2) : null;
-          const date = doc.data().date.toDate(); // Convert timestamp to JavaScript Date object
+          const date = doc.data().date; // Convert timestamp to JavaScript Date object
           return {
             totalExpense: totalExpense.toFixed(2),
             income,

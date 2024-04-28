@@ -3,6 +3,7 @@ import { useIsFocused, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
+  Button,
   Image,
   Modal,
   ScrollView,
@@ -23,6 +24,7 @@ import { getMedal } from "../Utils/MedalUtils";
 import AnimatedLottieView from "lottie-react-native";
 import LottieView from "lottie-react-native";
 import { setUser } from "../Store/reducers/UserSlice";
+import { useToast } from "react-native-toast-notifications";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -34,8 +36,9 @@ const HomeScreen = () => {
     useState(false);
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
   const [userLevel, setUserLevel] = useState("🏅");
+  const [isGoalAchieveable, setGoalAchieveable] = useState(null);
   const dispatch = useDispatch();
-
+  const toast = useToast();
   const navigation = useNavigation();
   const userId = currentUser.uid;
   const fetchExpenses = async () => {
@@ -219,25 +222,15 @@ const HomeScreen = () => {
 
         // Check if savings amount is greater than or equal to the total amount of the selected goal
         if (savingsAmount >= selectedGoal.totalAmount) {
-          Alert.alert(
-            "Congratulations",
-            `Goal ${selectedGoal.goalName} can now be achieved. Do you want to proceed?`,
-            [
-              {
-                text: "Cancel",
-                onPress: () => {
-                  // Handle cancel action
-                },
-                style: "cancel"
-              },
-              {
-                text: "OK",
-                onPress: () => {
-                  moveGoalToAchievemnt(selectedGoal);
-                }
-              }
-            ],
-            { cancelable: false }
+          setGoalAchieveable(selectedGoal);
+          toast.show(
+            `Congratulations ${selectedGoal.goalName} can now be achieved`,
+            {
+              type: "success",
+              placement: "top",
+              offset: 30,
+              animationType: "slide-in "
+            }
           );
         } else {
         }
@@ -329,7 +322,23 @@ const HomeScreen = () => {
         allGoals.map((goal) => {
           return (
             <View style={styles.currentGoalContainer} key={goal.id}>
-              <Text style={styles.currentGoalText}>Current Goal</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Text style={styles.currentGoalText}>Current Goal</Text>
+                {isGoalAchieveable != null && allGoals[0].id == goal.id && (
+                  <Button
+                    onPress={() => {
+                      moveGoalToAchievemnt(isGoalAchieveable);
+                    }}
+                    title="Achieve"
+                  />
+                )}
+              </View>
+
               <View style={styles.goalBox}>
                 <View style={styles.goalDetailContainer}>
                   <Text style={styles.goalDetailLabel}>Goal Name:</Text>

@@ -13,15 +13,17 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { firebase } from "@react-native-firebase/app";
 import firestore from "@react-native-firebase/firestore";
+import { useAuthContext } from "../Hooks/UseAuth";
 
 const Achievements = () => {
   const [shareDialogVisible, setShareDialogVisible] = useState(false);
   const [starsAnimation] = useState(new Animated.Value(0));
   const [achievements, setAchievements] = useState([]);
+  const { currentUser } = useAuthContext();
 
   useEffect(() => {
     const fetchAchievements = async () => {
-      const userId = "N8S2toD244XhjY78jIq3ty8Bv2J3"; // Replace with actual user ID
+      const userId = currentUser.uid; // Replace with actual user ID
       try {
         const querySnapshot = await firestore()
           .collection(`users/${userId}/achievements`)

@@ -3,7 +3,7 @@ import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -21,6 +21,11 @@ import myColor from "../Components/Color";
 import { useAuthContext } from "../Hooks/UseAuth";
 import { setCurrency } from "../Store/reducers/currenncyReducer";
 import { setUser } from "../Store/reducers/UserSlice";
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes
+} from "@react-native-google-signin/google-signin";
 
 const UserIcon = () => {
   return (
@@ -146,10 +151,15 @@ export default function LoginScreen() {
     }
   };
 
+  useEffect(() => {
+    GoogleSignin.configure();
+  }, []);
+
   const handleSignInWithGoogle = async () => {
     try {
       const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
+
       const userCollection = firestore().collection("users");
       const userDoc = doc(userCollection, userInfo.user.uid);
       const userSnapshot = await getDoc(userDoc);
