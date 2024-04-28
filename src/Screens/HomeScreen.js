@@ -320,7 +320,7 @@ const HomeScreen = () => {
         <View style={styles.curvedBox}>
           <Text style={styles.savingsAmount}>
             {selectedCurrency.symbol}
-            {savingsAmount}
+            {savingsAmount.toFixed(1)}
           </Text>
         </View>
       </View>

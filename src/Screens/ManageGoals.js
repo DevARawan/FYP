@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -30,10 +31,50 @@ const ManageGoals = () => {
     totalAmount: "",
     dueDate: ""
   });
+  const [selectedGoal, setSelectedGoal] = useState();
 
   const selectedCurrency = useSelector((state) => state.currency.currency);
   const { currentUser } = useAuthContext();
   const userId = currentUser.uid;
+  const handleDeleteGoal = (goalId) => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this goal?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try {
+              const userCollection = firestore().collection("users");
+              const userDoc = userCollection.doc(userId);
+              const goalsRef = userDoc.collection("goals");
+              await goalsRef.doc(goalId).delete();
+              // Refetch data after deletion
+              fetchData();
+            } catch (error) {
+              console.error("Error deleting goal:", error);
+            }
+          },
+          style: "destructive"
+        }
+      ]
+    );
+  };
+  const handleEditGoal = (goal) => {
+    setSelectedGoal(goal);
+    setNewGoal({
+      goalName: goal.goalName,
+      description: goal.goalDescription,
+      totalAmount: goal.totalAmount,
+      dueDate: goal.dueDate || ""
+    });
+    setPriority(goal.priority);
+    setShowAddGoal(true);
+  };
 
   const fetchData = async () => {
     setIsLoading(true); // Set loading to true before fetching data
@@ -59,7 +100,7 @@ const ManageGoals = () => {
           }
         });
       }
-
+      console.log("All goals are", goals);
       setAllGoals(goals);
       setIsLoading(false); // Set loading to false after data is fetched
     } catch (error) {
@@ -101,20 +142,31 @@ const ManageGoals = () => {
     }
 
     try {
-      const goal_id = uuid.v4();
-      const usersCollection = firestore().collection("users");
-      const userDocRef = usersCollection.doc(userId);
-      const goalsCollection = userDocRef.collection("goals");
-      const goalsDocRef = goalsCollection.doc(goal_id);
-
-      await goalsDocRef.set({
-        newGoal: {
-          ...newGoal,
-          priority: priority
-        },
-        user_id: userId,
-        goal_id
-      });
+      if (selectedGoal != null) {
+        const userCollection = firestore().collection("users");
+        const userDoc = userCollection.doc(userId);
+        const goalsRef = userDoc.collection("goals");
+        await goalsRef.doc(selectedGoal.id).update({
+          newGoal: {
+            ...newGoal,
+            priority: priority
+          }
+        });
+      } else {
+        const goal_id = uuid.v4();
+        const usersCollection = firestore().collection("users");
+        const userDocRef = usersCollection.doc(userId);
+        const goalsCollection = userDocRef.collection("goals");
+        const goalsDocRef = goalsCollection.doc(goal_id);
+        await goalsDocRef.set({
+          newGoal: {
+            ...newGoal,
+            priority: priority
+          },
+          user_id: userId,
+          goal_id
+        });
+      }
 
       setNewGoal({
         goalName: "",
@@ -122,10 +174,19 @@ const ManageGoals = () => {
         totalAmount: "",
         dueDate: ""
       });
+      setSelectedGoal(null);
       setPriority("");
       fetchData();
       setShowAddGoal(false);
     } catch (error) {
+      setNewGoal({
+        goalName: "",
+        description: "",
+        totalAmount: "",
+        dueDate: ""
+      });
+      setSelectedGoal(null);
+      setPriority("");
       setShowAddGoal(false);
       console.error(error);
     }
@@ -153,6 +214,7 @@ const ManageGoals = () => {
             style={styles.input}
             placeholder="Goal Name"
             onChangeText={(text) => setNewGoal({ ...newGoal, goalName: text })}
+            value={newGoal.goalName}
           />
           <TextInput
             style={styles.input}
@@ -160,6 +222,7 @@ const ManageGoals = () => {
             onChangeText={(text) =>
               setNewGoal({ ...newGoal, description: text })
             }
+            value={newGoal.description}
           />
           <View>
             <Text
@@ -180,6 +243,7 @@ const ManageGoals = () => {
               onChangeText={(text) =>
                 setNewGoal({ ...newGoal, totalAmount: text })
               }
+              value={newGoal.totalAmount}
             />
           </View>
 
@@ -272,7 +336,11 @@ const ManageGoals = () => {
               </View>
 
               <View style={styles.row}>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleEditGoal(goal);
+                  }}
+                >
                   <FontAwesome
                     name="pencil"
                     size={32}
@@ -280,7 +348,11 @@ const ManageGoals = () => {
                     style={{ marginLeft: "10%", marginTop: 10 }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleDeleteGoal(goal.id);
+                  }}
+                >
                   <FontAwesome
                     name="trash"
                     size={32}
