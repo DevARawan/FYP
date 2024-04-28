@@ -240,9 +240,11 @@ const ManageGoals = () => {
               style={[styles.input, { paddingLeft: 40 }]}
               placeholder="Total Amount"
               keyboardType="number-pad"
-              onChangeText={(text) =>
-                setNewGoal({ ...newGoal, totalAmount: text })
-              }
+              onChangeText={(text) => {
+                if (/^\d*\.?\d*$/.test(text)) {
+                  setNewGoal({ ...newGoal, totalAmount: text });
+                }
+              }}
               value={newGoal.totalAmount}
             />
           </View>
