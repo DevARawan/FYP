@@ -333,6 +333,7 @@ const HomeScreen = () => {
                   <Button
                     onPress={() => {
                       moveGoalToAchievemnt(isGoalAchieveable);
+                      setGoalAchieveable(null);
                     }}
                     title="Achieve"
                   />
