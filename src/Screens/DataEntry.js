@@ -20,7 +20,7 @@ const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [incomeAmount1, setIncomeAmount1] = useState(null);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [incomeAmount2, setIncomeAmount2] = useState(null);
   const [incomeAmount3, setIncomeAmount3] = useState(null);
   const [expenseAmounts, setExpenseAmounts] = useState({

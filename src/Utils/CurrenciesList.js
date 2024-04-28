@@ -29,10 +29,19 @@ const currencyList = {
       { name: "EasyPaisa", url: "https://www.easypaisa.com.pk/" },
       { name: "JazzCash", url: "https://www.jazzcash.com.pk/" },
       { name: "Rizq", url: "https://www.rizq.com/" },
-      { name: "Meezan Bank", url: "https://www.meezanbank.com/" },
-      { name: "UBL", url: "https://www.ubldigital.com/" },
-      { name: "Bank Alfalah", url: "https://www.bankalfalah.com/" },
-      { name: "Askari Bank", url: "https://askaribank.com/" }
+      { name: "Meezan Bank", url: "https://www.meezanbank.com/easy-home/" },
+      {
+        name: "UBL",
+        url: "https://www.ubldigital.com/Loans/Consumer-Loans/UBL-Cash-Plus"
+      },
+      {
+        name: "Bank Alfalah",
+        url: "https://www.bankalfalah.com/personal-banking/loans/alfalah-personal-loan/"
+      },
+      {
+        name: "Askari Bank",
+        url: "https://askaribank.com/personal/consumer-products/personal-finance/"
+      }
     ]
   }
   // Add more currencies here as needed

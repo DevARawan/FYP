@@ -115,10 +115,9 @@ const Achievements = () => {
       <FlatList
         data={achievements}
         renderItem={renderAchievementItem}
-        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.flatListContent}
       />
-      <Animated.View
+      {/* <Animated.View
         style={[
           styles.starsContainer,
           {
@@ -146,7 +145,7 @@ const Achievements = () => {
           style={{ position: "absolute", top: 200, left: 150 }}
         />
         {/* Add more stars as needed */}
-      </Animated.View>
+      {/* </Animated.View> */}
       {/* Share Dialog */}
       {shareDialogVisible && (
         <View style={styles.dialogOverlay}>
