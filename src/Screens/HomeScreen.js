@@ -229,7 +229,9 @@ const HomeScreen = () => {
               type: "success",
               placement: "top",
               offset: 30,
-              animationType: "slide-in "
+              // animationType: "slide-in ",
+              animationType: "zoom-in",
+              duration: 3500
             }
           );
         } else {
