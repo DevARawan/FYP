@@ -6,7 +6,7 @@ import { TouchableOpacity, View } from "react-native";
 import { Logo } from "../Components/Logo";
 import Home from "../Components/Navigation";
 import { useAuthContext } from "../Hooks/UseAuth";
-import Achievements from "../Screens/Achievements";
+import Achievements from "../Screens/Achievements/Achievements";
 import DataEntry from "../Screens/DataEntry";
 import General from "../Screens/CurrencyPreferences";
 import LoginScreen from "../Screens/LoginScreen";
