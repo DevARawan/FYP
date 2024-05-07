@@ -313,10 +313,14 @@ const HomeScreen = () => {
       <View style={styles.savingsContainer}>
         <Text style={styles.savingsText}>Savings Amount: </Text>
         <View style={styles.curvedBox}>
-          <Text style={styles.savingsAmount}>
+          {/* <Text style={styles.savingsAmount}>
             {selectedCurrency.symbol}
             {savingsAmount.toFixed(1)}
-          </Text>
+          </Text> */}
+          <Text style={styles.currencySymbol}>{selectedCurrency.symbol}</Text>
+    <Text style={styles.savingsAmountValue}>
+      {savingsAmount.toFixed(1)}
+    </Text>
         </View>
       </View>
 
@@ -509,12 +513,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    width: 150
+    width: 150, flexDirection:'row',
   },
   savingsAmount: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff"
+  },
+  currencySymbol: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 7, 
+  },
+  savingsAmountValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   currentGoalContainer: {
     marginTop: 20,

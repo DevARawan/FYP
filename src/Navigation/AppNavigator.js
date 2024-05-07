@@ -21,6 +21,7 @@ import ExpenseReportScreen from "../Screens/ExpenseReports";
 import AdminScreen from "../Screens/Admin/ViewController";
 import GoalsChartScreen from "../Screens/Admin/GoalCompletionsReport";
 import { Loans } from "../Screens/Loans";
+import UpdateIncomeAndExpenses from "../Screens/UpdateIncomeAndExpenses";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -87,6 +88,24 @@ const AppNavigator = () => {
           component={DataEntry}
           options={({ navigation }) => ({
             title: "Data Entry",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <View style={{ marginLeft: 10 }}>
+                  <FontAwesome5
+                    name="arrow-left"
+                    style={{ fontSize: 24, color: "black" }}
+                  />
+                </View>
+              </TouchableOpacity>
+            ),
+            headerRight: () => <Logo />
+          })}
+        />
+         <Stack.Screen
+          name="UpdateIncomeAndExpenses"
+          component={UpdateIncomeAndExpenses}
+          options={({ navigation }) => ({
+            title: "Update Amount",
             headerLeft: () => (
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <View style={{ marginLeft: 10 }}>
