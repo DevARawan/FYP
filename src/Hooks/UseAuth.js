@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import auth from "@react-native-firebase/auth";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 const AuthContext = React.createContext();
 
@@ -7,6 +8,9 @@ export const useAuth = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    GoogleSignin.configure({
+      // Configure Google Sign-In options if needed
+    });
     const unsubscribe = auth().onAuthStateChanged(async (user) => {
       try {
         setCurrentUser(user);
@@ -22,6 +26,7 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       await auth().signOut();
+      await GoogleSignin.signOut();
       // setCurrentUser(null); // Update state after successful signout
     } catch (error) {
       console.error("Error signing out:", error);
@@ -29,7 +34,20 @@ export const useAuth = () => {
     }
   };
 
-  return { currentUser, signOut };
+  const signInWithGoogle = async () => {
+    const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
+    try {
+      // Initiate Google Sign-In and get user info
+      const response = await GoogleSignin.signIn();
+      const firebaseUid = response.user.id;
+      setCurrentUser({ uid: firebaseUid, ...response.user });
+      return response;
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
+
+  return { currentUser, signOut, signInWithGoogle };
 };
 
 export const AuthProvider = ({ children }) => {

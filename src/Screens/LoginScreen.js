@@ -1,9 +1,10 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
+import { statusCodes } from "@react-native-google-signin/google-signin";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -19,13 +20,8 @@ import {
 import { useDispatch } from "react-redux";
 import myColor from "../Components/Color";
 import { useAuthContext } from "../Hooks/UseAuth";
-import { setCurrency } from "../Store/reducers/currenncyReducer";
 import { setUser } from "../Store/reducers/UserSlice";
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  statusCodes
-} from "@react-native-google-signin/google-signin";
+import { setCurrency } from "../Store/reducers/currenncyReducer";
 
 const UserIcon = () => {
   return (
@@ -50,6 +46,7 @@ export default function LoginScreen() {
   const navigation = useNavigation();
   const { signOut } = useAuthContext();
   const dispatch = useDispatch();
+  const { signInWithGoogle } = useAuthContext();
   const handleLogin = async () => {
     setValidationError(true);
     if (email.length > 0 && password.length > 0) {
@@ -151,29 +148,58 @@ export default function LoginScreen() {
     }
   };
 
-  useEffect(() => {
-    GoogleSignin.configure();
-  }, []);
-
   const handleSignInWithGoogle = async () => {
     try {
-      const PLAY_SERVICES = await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
+      const user = await signInWithGoogle();
+      const userInfo = user.currentuser;
+      try {
+        const usersCollection = firestore().collection("users");
+        const userDocRef = usersCollection.doc(userInfo.user.id);
 
-      const userCollection = firestore().collection("users");
-      const userDoc = doc(userCollection, userInfo.user.uid);
-      const userSnapshot = await getDoc(userDoc);
-      if (userSnapshot.exists()) {
-        const user = userSnapshot.data();
-        const userData = {
-          id: userInfo.user.uid,
-          ...user
-        };
-        await AsyncStorage.setItem("user", JSON.stringify(userData));
-        setLoad(false);
-        navigation.navigate("main");
-      } else {
-        setLoad(false);
+        const userDocSnapshot = await userDocRef.get();
+
+        if (userDocSnapshot.exists) {
+          const userData = userDocSnapshot.data();
+          if (userData.isDisabled) {
+            Alert.alert(
+              "Account Disabled",
+              "Your account has been disabled. Please contact support for assistance."
+            );
+            auth().signOut();
+          } else {
+            navigation.replace("main");
+
+            if (userData.currency) {
+              dispatch(setCurrency(userData.currency));
+            } else {
+              Alert.alert(
+                "No Currency is currently selected by User",
+                "Go to general settings and select current currency"
+              );
+            }
+          }
+        } else {
+          try {
+            const userData = {
+              email: userInfo.user.email,
+              user_id: userInfo.user.id,
+              isSuperAdmin: false,
+              isAdmin: false,
+              isDisabled: false
+              // Add any additional user information you want to store
+            };
+
+            console.log("data to be stored:", userData);
+            dispatch(setUser(userData));
+            // Set the document data in Firestore
+            await userDocRef.set(userData);
+            navigation.replace("main");
+          } catch (error) {
+            console.error("Error storing user information:", error);
+          }
+        }
+      } catch (error) {
+        console.error(error);
       }
     } catch (error) {
       console.log("Google Sign In Error:", error);

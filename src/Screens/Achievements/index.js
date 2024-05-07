@@ -1,46 +1,21 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  StyleSheet,
-  Linking,
-  Animated,
-  FlatList
-} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { firebase } from "@react-native-firebase/app";
-import firestore from "@react-native-firebase/firestore";
-import { useAuthContext } from "../Hooks/UseAuth";
+import React from "react";
+import {
+  FlatList,
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 
-const Achievements = () => {
-  const [shareDialogVisible, setShareDialogVisible] = useState(false);
-  const [starsAnimation] = useState(new Animated.Value(0));
-  const [achievements, setAchievements] = useState([]);
-  const { currentUser } = useAuthContext();
-
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      const userId = currentUser.uid; // Replace with actual user ID
-      try {
-        const querySnapshot = await firestore()
-          .collection(`users/${userId}/achievements`)
-          .get();
-        const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setAchievements(data);
-      } catch (error) {
-        console.error("Error fetching achievements:", error);
-      }
-    };
-
-    fetchAchievements();
-  }, []);
-
+const AchievementsView = ({
+  navigation,
+  shareDialogVisible,
+  setShareDialogVisible,
+  achievements,
+  shareAchievement
+}) => {
   const renderAchievementItem = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
@@ -60,57 +35,6 @@ const Achievements = () => {
     </View>
   );
 
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(starsAnimation, {
-        toValue: 1,
-        duration: 20000, // Adjust duration as needed
-        useNativeDriver: true
-      })
-    ).start();
-  }, []);
-
-  const shareAchievement = (platform, item) => {
-    // Logic to open respective platform for sharing
-    switch (platform) {
-      case "Facebook":
-        // Open Facebook sharing screen (placeholder)
-        openFacebook(item.goalName, item.goalDescription);
-        break;
-      case "Twitter":
-        // Open Twitter sharing screen (placeholder)
-        openTwitter(item.goalName, item.goalDescription);
-        break;
-      case "Email":
-        // Open email app with a prefilled message (placeholder)
-        openEmail(item.goalName, item.goalDescription);
-        break;
-      default:
-        break;
-    }
-    setShareDialogVisible(false); // Close the share dialog after handling
-  };
-
-  const openFacebook = () => {
-    // Placeholder for opening Facebook sharing screen
-    // You can integrate with Facebook SDK or use deep linking if available
-    Alert.alert("Opening Facebook for sharing...");
-  };
-
-  const openTwitter = () => {
-    // Placeholder for opening Twitter sharing screen
-    // You can integrate with Twitter SDK or use deep linking if available
-    Alert.alert("Opening Twitter for sharing...");
-  };
-
-  const openEmail = () => {
-    // Placeholder for opening email app with a prefilled message
-    // You can use the `Linking` API to open email apps
-    Linking.openURL(
-      "mailto:?subject=Check%20out%20my%20achievement&body=I%20have%20achieved%20something%20great!"
-    );
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.screenHeading}>Achievements</Text>
@@ -119,36 +43,7 @@ const Achievements = () => {
         renderItem={renderAchievementItem}
         contentContainerStyle={styles.flatListContent}
       />
-      {/* <Animated.View
-        style={[
-          styles.starsContainer,
-          {
-            transform: [
-              {
-                translateY: starsAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, -500] // Adjust the range as needed
-                })
-              }
-            ]
-          }
-        ]}
-      >
-        <FontAwesome
-          name="star"
-          size={20}
-          color="#ffd700"
-          style={{ position: "absolute", top: 100, left: 50 }}
-        />
-        <FontAwesome
-          name="star"
-          size={20}
-          color="#ffd700"
-          style={{ position: "absolute", top: 200, left: 150 }}
-        />
-        {/* Add more stars as needed */}
-      {/* </Animated.View> */}
-      {/* Share Dialog */}
+
       {shareDialogVisible && (
         <View style={styles.dialogOverlay}>
           <View style={styles.shareDialog}>
@@ -188,6 +83,7 @@ const Achievements = () => {
     </View>
   );
 };
+export default AchievementsView;
 
 const styles = StyleSheet.create({
   container: {
@@ -283,5 +179,3 @@ const styles = StyleSheet.create({
     height: "100%"
   }
 });
-
-export default Achievements;

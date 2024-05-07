@@ -38,7 +38,8 @@ const SignupView = ({
   validateEmail,
   validatePassword,
   handleRegister,
-  goBack
+  goBack,
+  handleSignInWithGoogle
 }) => {
   return (
     <View style={styles.container}>
@@ -120,7 +121,7 @@ const SignupView = ({
         </TouchableOpacity>
 
         <View style={styles.google}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleSignInWithGoogle}>
             <Text style={styles.buttonText}>Sign up with Google</Text>
           </TouchableOpacity>
         </View>
