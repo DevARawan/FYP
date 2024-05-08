@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,10 +20,11 @@ import DatePicker from "react-native-date-picker";
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [incomeAmount1, setIncomeAmount1] = useState("");
+  const [incomeAmount, setIncomeAmount] = useState([""]);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [incomeAmount2, setIncomeAmount2] = useState("");
-  const [incomeAmount3, setIncomeAmount3] = useState("");
+  const [incomes, setIncomes] = useState([{ amount: "" }]);
+  const [totalIncome, setTotalIncome] = useState(0);
+
   const [expenseAmounts, setExpenseAmounts] = useState({
     Electricity: "",
     Gas: "",
@@ -38,11 +40,28 @@ const DataEntry = () => {
   const selectedCurrency = useSelector((state) => state.currency.currency);
   const currencySymbol = selectedCurrency.symbol;
   const [isOpen, setOpen] = useState(false);
+  const addIncomeField = () => {
+    setIncomes([...incomes, { amount: "" }]);
+  };
+  const handleIncomeChange = (index, amount) => {
+    if (/^\d*\.?\d*$/.test(amount)) {
+      const newIncomes = [...incomes];
+      newIncomes[index].amount = amount;
+
+      // Calculate total income
+      let updatedTotalIncome = 0;
+      newIncomes.forEach((income) => {
+        const incomeAmount = parseFloat(income.amount) || 0;
+        updatedTotalIncome += incomeAmount;
+      });
+
+      setIncomes(newIncomes);
+      setTotalIncome(updatedTotalIncome);
+    }
+  };
 
   const clearData = () => {
-    setIncomeAmount1("");
-    setIncomeAmount2("");
-    setIncomeAmount3("");
+    setIncomeAmount([""]);
     setDate(new Date().toISOString().split("T")[0]);
     setExpenseAmounts({
       Electricity: "",
@@ -57,62 +76,45 @@ const DataEntry = () => {
   const renderAddIncome = () => {
     if (showAddIncome) {
       return (
-        <View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Income 1:</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.dollarSign}>{currencySymbol}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter income"
-                keyboardType="numeric"
-                value={incomeAmount1}
-                onChangeText={(text) => {
-                  // Validate input to allow only numbers (integers or floats)
-                  if (/^\d*\.?\d*$/.test(text)) {
-                    setIncomeAmount1(text);
-                  }
-                }}
-              />
-            </View>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Income 2:</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.dollarSign}>{currencySymbol}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter income"
-                keyboardType="numeric"
-                value={incomeAmount2}
-                onChangeText={(text) => {
-                  // Validate input to allow only numbers (integers or floats)
-                  if (/^\d*\.?\d*$/.test(text)) {
-                    setIncomeAmount2(text);
-                  }
-                }}
-              />
-            </View>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Income 3:</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.dollarSign}>{currencySymbol}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter income"
-                keyboardType="numeric"
-                value={incomeAmount3}
-                onChangeText={(text) => {
-                  // Validate input to allow only numbers (integers or floats)
-                  if (/^\d*\.?\d*$/.test(text)) {
-                    setIncomeAmount3(text);
-                  }
-                }}
-              />
-            </View>
-          </View>
-        </View>
+        <FlatList
+          renderItem={({ item, index }) => {
+            return (
+              <View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Income :</Text>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.dollarSign}>{currencySymbol}</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter income"
+                      keyboardType="numeric"
+                      value={item.amount}
+                      onChangeText={(text) => handleIncomeChange(index, text)}
+                    />
+                  </View>
+                </View>
+              </View>
+            );
+          }}
+          data={incomes}
+          keyExtractor={(item, index) => index.toString()}
+          ListFooterComponent={() => {
+            return (
+              <TouchableOpacity onPress={addIncomeField}>
+                <Text
+                  style={{
+                    color: "blue",
+                    fontSize: 16,
+                    marginBottom: 20,
+                    marginLeft: 20
+                  }}
+                >
+                  Add More
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
       );
     }
     return null;
@@ -154,11 +156,6 @@ const DataEntry = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     setIsButtonDisabled(true);
-
-    const incomes = [incomeAmount1, incomeAmount2, incomeAmount3]
-      .filter(Boolean)
-      .map(parseFloat);
-    const totalIncome = incomes.reduce((acc, curr) => acc + curr, 0);
 
     if (totalIncome === 0) {
       Alert.alert("Please provide income details");
@@ -259,10 +256,7 @@ const DataEntry = () => {
       <TouchableOpacity style={styles.row} onPress={handleToggleIcon}>
         <View style={styles.categoryContainer}>
           <Text style={styles.category}>My Income:</Text>
-          <Text style={styles.value}>{incomeAmount1}</Text>
-          <Text style={styles.value}>{incomeAmount2}</Text>
-          <Text style={styles.value}>{incomeAmount3}</Text>
-
+          <Text style={styles.value}>{totalIncome}</Text>
           <Feather
             name={plusIcon ? "plus" : "minus"}
             size={28}
@@ -370,7 +364,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 9,
-    width: "17%" // Adjust the width as needed
+    width: "50%" // Adjust the width as needed
   },
   inputContainer: {
     width: "59.5%", // Adjust the width as needed

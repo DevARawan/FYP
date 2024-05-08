@@ -101,15 +101,28 @@ const HomeScreen = () => {
           dueDate: goalData.newGoal.dueDate || null,
           user_id: goalData.user_id,
           goal_id: goalData.goal_id,
-          priority: goalData.newGoal.priority || 11
+          priority: goalData.newGoal.priority || 0
         };
         goals.push(goal);
       });
 
       // Do whatever you need with the fetched goals (e.g., set state)
-      const sortedData = goals.sort(
-        (a, b) => parseInt(a.priority) - parseInt(b.priority)
-      );
+      const sortedData = goals.sort((a, b) => {
+        const priorityA = parseInt(a.priority);
+        const priorityB = parseInt(b.priority);
+
+        // If both priorities are 0 or both are non-zero, sort normally
+        if (
+          (priorityA === 0 && priorityB === 0) ||
+          (priorityA !== 0 && priorityB !== 0)
+        ) {
+          return priorityA - priorityB;
+        }
+
+        // If one of them is 0, place the non-zero priority first
+        return priorityA === 0 ? 1 : -1;
+      });
+
       setAllGoals(sortedData);
       // You can set the fetched goals to state or perform any other actions here
     } catch (error) {
@@ -304,9 +317,6 @@ const HomeScreen = () => {
         <CircularProgressBar
           currentAmount={savingsAmount} // Assuming savingsAmount represents the current amount saved
           totalAmount={allGoals.length > 0 ? allGoals[0].totalAmount : 0} // Assuming allGoals is an array of goals and you want to show progress for the first goal
-          // nextGoal={NextGoalHandler}
-          // ForwardToAchieveHandler={ForwardToAchieveHandler}
-          // celebrationHandler={setshowCelebration}
         />
       </View>
 
@@ -378,6 +388,12 @@ const HomeScreen = () => {
                     <Text style={styles.goalDetailValue}>
                       {goal.dueDate || "No Due Date"}
                     </Text>
+                  </View>
+                </View>
+                <View style={styles.goalDetailContainer}>
+                  <Text style={styles.goalDetailLabel}>Priority:</Text>
+                  <View style={styles.textbox}>
+                    <Text style={styles.goalDetailValue}>{goal.priority}</Text>
                   </View>
                 </View>
               </View>

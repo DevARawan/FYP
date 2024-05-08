@@ -10,7 +10,7 @@ import Achievements from "../Screens/Achievements/Achievements";
 import DataEntry from "../Screens/DataEntry";
 import General from "../Screens/CurrencyPreferences";
 import LoginScreen from "../Screens/LoginScreen";
-import ManageGoals from "../Screens/ManageGoals";
+import ManageGoals from "../Screens/ManageGoals/ManageGoals";
 import FrontScreen from "../Screens/IntroScreen";
 import SignUpScreen from "../Screens/SignUpScreen/ViewController";
 import UserProfile from "../Screens/UserProfile";
