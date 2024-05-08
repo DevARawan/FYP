@@ -16,7 +16,7 @@ import { useAuthContext } from "../Hooks/UseAuth";
 const CurrencySelectionModal = ({ visible, onClose }) => {
   const { currentUser } = useAuthContext();
   const dispatch = useDispatch();
-  const handleSetCurrency = async (currencyCode) => {
+  const handleSetCurrency = async (currencyCode) => {            // currency code is complete object
     dispatch(setCurrency(currencyCode)); // Update Redux state
     await firestore().collection("users").doc(currentUser.uid).update({
       currency: currencyCode

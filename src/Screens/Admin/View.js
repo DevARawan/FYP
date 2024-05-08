@@ -37,7 +37,7 @@ const AdminView = ({
 
           {
             backgroundColor:
-              item.user_id == currentUser.uid ? "#007AFF" : "white"
+              item.user_id == currentUser.uid ? "lightgrey" : "white"
           }
         ]}
       >

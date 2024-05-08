@@ -55,7 +55,13 @@ const ManageGoalsView = ({
           <TextInput
             style={styles.input}
             placeholder="Goal Name"
-            onChangeText={(text) => setNewGoal({ ...newGoal, goalName: text })}
+            onChangeText={(text) => {
+              // Check if text contains only letters and numbers
+              if (/^[a-zA-Z0-9]+$/.test(text)) {
+                setNewGoal({ ...newGoal, goalName: text });
+              }
+            }}
+            
             value={newGoal.goalName}
           />
           <TextInput

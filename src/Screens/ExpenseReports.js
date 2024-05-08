@@ -137,7 +137,7 @@ const ExpenseReportScreen = () => {
           {/* Expenses LineChart */}
           {(expensesData.length > 0 ||
             incomeData.length > 0 ||
-            savingsData.length > 0) && (
+            savingsData.length > 0) ? (
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
@@ -180,7 +180,7 @@ const ExpenseReportScreen = () => {
               />
               <Text style={styles.label}>Summary</Text>
             </View>
-          )}
+          ) : <View><Text>Not enough data</Text></View> }
           {expensesData.length > 0 && (
             <View style={styles.chartContainer}>
               <LineChart
