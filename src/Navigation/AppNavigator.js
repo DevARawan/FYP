@@ -9,11 +9,11 @@ import { useAuthContext } from "../Hooks/UseAuth";
 import Achievements from "../Screens/Achievements/Achievements";
 import DataEntry from "../Screens/DataEntry";
 import General from "../Screens/CurrencyPreferences";
-import LoginScreen from "../Screens/LoginScreen";
+import LoginScreen from "../Screens/LoginScreen/Controller";
 import ManageGoals from "../Screens/ManageGoals/ManageGoals";
 import FrontScreen from "../Screens/IntroScreen";
 import SignUpScreen from "../Screens/SignUpScreen/ViewController";
-import UserProfile from "../Screens/UserProfile";
+import UserProfile from "../Screens/UserProfile/Controller";
 import PrivacyPolicy from "../Screens/PrivacyPolicy";
 import LeaderboardScreen from "../Screens/Leaderboard";
 import FinancialReport from "../Screens/FinancialReports";
@@ -21,7 +21,6 @@ import ExpenseReportScreen from "../Screens/ExpenseReports";
 import AdminScreen from "../Screens/Admin/ViewController";
 import GoalsChartScreen from "../Screens/Admin/GoalCompletionsReport";
 import { Loans } from "../Screens/Loans";
-import UpdateIncomeAndExpenses from "../Screens/UpdateIncomeAndExpenses";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -101,24 +100,7 @@ const AppNavigator = () => {
             headerRight: () => <Logo />
           })}
         />
-         <Stack.Screen
-          name="UpdateIncomeAndExpenses"
-          component={UpdateIncomeAndExpenses}
-          options={({ navigation }) => ({
-            title: "Update Amount",
-            headerLeft: () => (
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <View style={{ marginLeft: 10 }}>
-                  <FontAwesome5
-                    name="arrow-left"
-                    style={{ fontSize: 24, color: "black" }}
-                  />
-                </View>
-              </TouchableOpacity>
-            ),
-            headerRight: () => <Logo />
-          })}
-        />
+
         <Stack.Screen
           name="manageGoals"
           component={ManageGoals}

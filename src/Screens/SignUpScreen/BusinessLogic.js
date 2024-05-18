@@ -25,7 +25,7 @@ const SignUpBusinessLogic = ({ children, navigation }) => {
   const validateEmail = (email, type) => {
     setEmail(email);
     // Regular expression for email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9]+[^\s@]*@[^\s@]+\.[^\s@]+$/;
     // Test the email against the regex
     setIsEmailValid(emailRegex.test(email));
   };

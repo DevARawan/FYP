@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ScrollView, Text } from "react-native";
-import { LineChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
 import firestore from "@react-native-firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
+import { LineChart } from "react-native-chart-kit";
 import { useAuthContext } from "../Hooks/UseAuth";
-import { useIsFocused } from "@react-navigation/native";
 import Loader from "../Utils/Loader";
 
 const screenWidth = Dimensions.get("window").width;
@@ -135,9 +133,9 @@ const ExpenseReportScreen = () => {
       ) : (
         <>
           {/* Expenses LineChart */}
-          {(expensesData.length > 0 ||
-            incomeData.length > 0 ||
-            savingsData.length > 0) ? (
+          {expensesData.length > 0 ||
+          incomeData.length > 0 ||
+          savingsData.length > 0 ? (
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
@@ -180,7 +178,11 @@ const ExpenseReportScreen = () => {
               />
               <Text style={styles.label}>Summary</Text>
             </View>
-          ) : <View><Text>Not enough data</Text></View> }
+          ) : (
+            <View>
+              <Text>Not enough data</Text>
+            </View>
+          )}
           {expensesData.length > 0 && (
             <View style={styles.chartContainer}>
               <LineChart
