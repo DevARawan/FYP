@@ -25,6 +25,7 @@ import AnimatedLottieView from "lottie-react-native";
 import LottieView from "lottie-react-native";
 import { setUser } from "../Store/reducers/UserSlice";
 import { useToast } from "react-native-toast-notifications";
+import { setSavingAmount } from "../Store/reducers/SavingsSlice";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -41,6 +42,7 @@ const HomeScreen = () => {
   const toast = useToast();
   const navigation = useNavigation();
   const userId = currentUser.uid;
+
   const fetchExpenses = async () => {
     try {
       // Get a reference to the Firestore collection of expenses under the user's collection
@@ -170,9 +172,11 @@ const HomeScreen = () => {
         const sumAchievemnts = sumAchievemntsAmount(achievements);
         const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
+        dispatch(setSavingAmount(savingsWithoutAchievements - sumAchievemnts));
         const medal = getMedal(achievements.length);
         setUserLevel(medal);
       } else {
+        dispatch(setSavingAmount(totalIncome - totalOverallExpenses));
         setSavingsAmount(totalIncome - totalOverallExpenses);
       }
       // You can set the fetched achievements to state or perform any other actions here
@@ -328,9 +332,9 @@ const HomeScreen = () => {
             {savingsAmount.toFixed(1)}
           </Text> */}
           <Text style={styles.currencySymbol}>{selectedCurrency.symbol}</Text>
-    <Text style={styles.savingsAmountValue}>
-      {savingsAmount.toFixed(1)}
-    </Text>
+          <Text style={styles.savingsAmountValue}>
+            {savingsAmount.toFixed(1)}
+          </Text>
         </View>
       </View>
 
@@ -529,7 +533,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    width: 150, flexDirection:'row',
+    width: 150,
+    flexDirection: "row"
   },
   savingsAmount: {
     fontSize: 18,
@@ -538,13 +543,13 @@ const styles = StyleSheet.create({
   },
   currencySymbol: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 7, 
+    fontWeight: "bold",
+    marginRight: 7
   },
   savingsAmountValue: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff"
   },
   currentGoalContainer: {
     marginTop: 20,

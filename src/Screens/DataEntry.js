@@ -41,6 +41,7 @@ const DataEntry = () => {
   const selectedCurrency = useSelector((state) => state.currency.currency);
   const currencySymbol = selectedCurrency.symbol;
   const [isOpen, setOpen] = useState(false);
+  const savingAmount = useSelector((state) => state.saving.savingAmount);
 
   const addIncomeField = () => {
     setIncomes([...incomes, { amount: "" }]);
@@ -159,12 +160,6 @@ const DataEntry = () => {
     setIsLoading(true);
     setIsButtonDisabled(true);
 
-    if (totalIncome === 0) {
-      Alert.alert("Please provide income details");
-      setIsButtonDisabled(false);
-      return;
-    }
-
     let totalExpense = 0;
     for (const key in expenseAmounts) {
       const value = expenseAmounts[key];
@@ -173,7 +168,15 @@ const DataEntry = () => {
       }
     }
 
-    if (totalIncome < totalExpense) {
+    console.log("====================================");
+    console.log("expenseAmounts", expenseAmounts);
+    console.log("totalIncome", totalIncome);
+    console.log("savingAmount", savingAmount);
+    console.log("totalExpense", totalExpense);
+    console.log("====================================");
+    console.log(totalIncome + savingAmount < totalExpense);
+
+    if (totalIncome + savingAmount < totalExpense) {
       setIsLoading(false);
       clearData();
       Alert.alert(
