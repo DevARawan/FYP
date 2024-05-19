@@ -21,6 +21,7 @@ import AdminScreen from "../Screens/Admin/ViewController";
 import GoalsChartScreen from "../Screens/Admin/GoalCompletionsReport";
 import Loans from "../Screens/Loans/Controller";
 import CurrencyPreferences from "../Screens/CurrencyPreferences/Controller";
+import Reviews from "../Screens/Reviews/Controller";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -66,6 +67,14 @@ const AppNavigator = () => {
           component={FrontScreen}
           options={({ navigation }) => ({
             title: "BudgetSupervisor",
+            headerRight: () => <Logo />
+          })}
+        />
+        <Stack.Screen
+          name="Reviews"
+          component={Reviews}
+          options={({ navigation }) => ({
+            title: "Reviews",
             headerRight: () => <Logo />
           })}
         />

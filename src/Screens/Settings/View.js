@@ -4,15 +4,21 @@ import {
   Ionicons,
   MaterialIcons
 } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  TextInput,
+  Button
 } from "react-native";
 import LottieView from "lottie-react-native";
+import firestore from "@react-native-firebase/firestore";
+import Loader from "../../Utils/Loader";
+import { useAuthContext } from "../../Hooks/UseAuth";
 
 const SettingsView = ({
   navigation,
@@ -38,6 +44,32 @@ const SettingsView = ({
   handleGeneral,
   startBlinkingAnimation
 }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [reviewText, setReviewText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { currentUser } = useAuthContext();
+  const submitReview = async () => {
+    try {
+      setIsLoading(true);
+      const reviewCollection = firestore().collection("reviews"); // Change here
+
+      const reviewCollectionRef = reviewCollection.doc();
+
+      await reviewCollectionRef.set({
+        review: reviewText,
+        rating: 0,
+        email: currentUser.email
+      });
+
+      setReviewText("");
+
+      setModalVisible(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -192,6 +224,25 @@ const SettingsView = ({
         <></>
       )}
 
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => {
+          if (user.isAdmin) {
+            // setModalVisible(true);
+            // navigation.navigate("Reviews");
+          } else {
+            // navigation.navigate("Reviews");
+            setModalVisible(true);
+          }
+        }}
+      >
+        <Text style={styles.link}>Reviews</Text>
+        <FontAwesome5
+          name="user-shield"
+          style={[styles.rowIcon, { color: "#8E44AD" }]}
+        />
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
         <MaterialIcons
@@ -199,6 +250,50 @@ const SettingsView = ({
           style={[styles.logoutIcon, { color: "#ffffff" }]}
         />
       </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.5)"
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 20,
+              borderRadius: 10,
+              width: "80%"
+            }}
+          >
+            <TextInput
+              placeholder="Enter your review"
+              value={reviewText}
+              onChangeText={(text) => setReviewText(text)}
+              multiline={true}
+              maxLength={70}
+              style={{
+                height: 100,
+                borderColor: "gray",
+                borderWidth: 1,
+                marginBottom: 10
+              }}
+            />
+            <Text>{reviewText.length}/70</Text>
+            <Button title="Submit" onPress={submitReview} />
+            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
+      <Loader isLoading={isLoading} />
     </ScrollView>
   );
 };
