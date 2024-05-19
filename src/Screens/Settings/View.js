@@ -229,14 +229,14 @@ const SettingsView = ({
         onPress={() => {
           if (user.isAdmin) {
             // setModalVisible(true);
-            // navigation.navigate("Reviews");
+            navigation.navigate("Reviews");
           } else {
             // navigation.navigate("Reviews");
             setModalVisible(true);
           }
         }}
       >
-        <Text style={styles.link}>Reviews</Text>
+        <Text style={styles.link}>Review</Text>
         <FontAwesome5
           name="user-shield"
           style={[styles.rowIcon, { color: "#8E44AD" }]}
