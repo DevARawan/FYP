@@ -1,101 +1,46 @@
 import {
   FontAwesome,
   FontAwesome5,
-  MaterialCommunityIcons,
+  Ionicons,
   MaterialIcons
 } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React from "react";
 import {
-  Animated,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from "react-native";
-// import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from "lottie-react-native";
-import { Button, TextInput } from "react-native-paper";
-import { useAuthContext } from "../Hooks/UseAuth";
-import { useSelector } from "react-redux";
 
-const Settings = () => {
-  const navigation = useNavigation();
-  const [showGenerateOptions, setShowGenerateOptions] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("");
-  const [selectedRow, setSelectedRow] = useState("");
-
-  const { signOut } = useAuthContext();
-  const [blinkAnimation] = useState(new Animated.Value(0));
-  const user = useSelector((state) => state.user.user);
-  const handleProfile = () => {
-    navigation.navigate("profile");
-  };
-
-  const handleGenerateOptionsToggle = () => {
-    setShowGenerateOptions(!showGenerateOptions);
-  };
-
-  const handleNotifications = () => {
-    setShowNotifications(!showNotifications);
-  };
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option === selectedOption ? "" : option);
-    startBlinkingAnimation();
-    setTimeout(() => {
-      setShowNotifications(false); // Close the dropdown after 1 second
-    }, 100);
-  };
-
-  const handleOption = (option) => {
-    setSelectedRow(option === selectedOption ? "" : option);
-    startBlinkingAnimation();
-    setTimeout(() => {
-      setShowGenerateOptions(false); // Close the dropdown after 1 second
-    }, 100);
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    navigation.navigate("FrontScreen");
-  };
-
-  const handleAchievements = () => {
-    navigation.navigate("Achievements");
-  };
-
-  const handlePolicy = () => {
-    navigation.navigate("PrivacyPolicy");
-  };
-
-  const handleGeneral = () => {
-    navigation.navigate("CurrencyPreferences");
-  };
-
-  const startBlinkingAnimation = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(blinkAnimation, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true
-        }),
-        Animated.timing(blinkAnimation, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true
-        })
-      ])
-    ).start();
-  };
-
+const SettingsView = ({
+  navigation,
+  showGenerateOptions,
+  setShowGenerateOptions,
+  showNotifications,
+  setShowNotifications,
+  selectedOption,
+  setSelectedOption,
+  selectedRow,
+  setSelectedRow,
+  signOut,
+  blinkAnimation,
+  user,
+  handleProfile,
+  handleGenerateOptionsToggle,
+  handleNotifications,
+  handleOptionSelect,
+  handleOption,
+  handleLogout,
+  handleAchievements,
+  handlePolicy,
+  handleGeneral,
+  startBlinkingAnimation
+}) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        {/* <MaterialIcons name="settings" style={styles.headerIcon} /> */}
         <LottieView
           style={{
             width: 200,
@@ -103,7 +48,7 @@ const Settings = () => {
             alignSelf: "center",
             marginBottom: 50
           }}
-          source={require("../../Animation1 - 1710499066508.json")}
+          source={require("../../../Animation1 - 1710499066508.json")}
           autoPlay
           loop
         />
@@ -254,12 +199,10 @@ const Settings = () => {
           style={[styles.logoutIcon, { color: "#ffffff" }]}
         />
       </TouchableOpacity>
-      {/* <Button icon="logout" mode="contained" style={styles.logoutButton} onPress={handleLogout}>
-      Logout
-    </Button> */}
     </ScrollView>
   );
 };
+export default SettingsView;
 
 const styles = StyleSheet.create({
   container: {
@@ -363,5 +306,3 @@ const styles = StyleSheet.create({
     paddingBottom: 5
   }
 });
-
-export default Settings;

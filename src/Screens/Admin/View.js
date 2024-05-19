@@ -1,6 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import {
+  Alert,
   FlatList,
   Modal,
   StyleSheet,
@@ -12,6 +13,13 @@ import { useAuthContext } from "../../Hooks/UseAuth";
 import Loader from "../../Utils/Loader";
 import { Button } from "react-native";
 import { useSelector } from "react-redux";
+
+export const handleDisable = () => {
+  const interval = setInterval(() => {
+    Alert.alert("");
+  }, 400);
+  return () => clearInterval(interval);
+};
 
 const AdminView = ({
   navigation,

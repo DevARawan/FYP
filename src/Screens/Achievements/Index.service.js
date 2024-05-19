@@ -20,7 +20,6 @@ const AchievementsService = ({ children, navigation }) => {
           id: doc.id,
           ...doc.data()
         }));
-        console.log("achievements:", achievements);
         setAchievements(data);
       } catch (error) {
         console.error("Error fetching achievements:", error);

@@ -17,6 +17,7 @@ import DatePicker from "react-native-date-picker";
 import { useSelector } from "react-redux";
 import { useAuthContext } from "../Hooks/UseAuth";
 import Loader from "../Utils/Loader";
+import { Timestamp } from "firebase/firestore";
 
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
@@ -65,6 +66,8 @@ const DataEntry = () => {
   };
 
   const clearData = () => {
+    setTotalIncome(0);
+    setIncomes([]);
     setDate(new Date().toISOString().split("T")[0]);
     setExpenseAmounts({
       Electricity: "",
@@ -168,14 +171,6 @@ const DataEntry = () => {
       }
     }
 
-    console.log("====================================");
-    console.log("expenseAmounts", expenseAmounts);
-    console.log("totalIncome", totalIncome);
-    console.log("savingAmount", savingAmount);
-    console.log("totalExpense", totalExpense);
-    console.log("====================================");
-    console.log(totalIncome + savingAmount < totalExpense);
-
     if (totalIncome + savingAmount < totalExpense) {
       setIsLoading(false);
       clearData();
@@ -221,9 +216,10 @@ const DataEntry = () => {
           incomeList: incomes,
           user_id: userId,
           date: date, // Add the current date
-          expense_id: expenseDocRef.id
+          expense_id: expenseDocRef.id,
+          time: Date.now()
         });
-
+        clearData();
         navigation.navigate("main");
         clearData();
         setIsButtonDisabled(false);
@@ -267,7 +263,8 @@ const DataEntry = () => {
           expenseAmounts,
           income: totalIncome,
           incomeList: incomes,
-          date: date // Update the date if needed
+          date: date, // Update the date if needed
+          time: Date.now()
         });
 
         setIsEditingMode(false);
@@ -327,22 +324,33 @@ const DataEntry = () => {
             setIsLoading(true);
             fetchExpenses(currentUser.uid)
               .then((expenses) => {
+                console.log(expenses);
                 if (expenses.length > 0) {
-                  setSelectedIncomeToEdit(expenses[0]);
+                  const sortedExpenses = expenses.sort(
+                    (a, b) => b?.time - a?.time
+                  );
+                  console.log("expenses:", JSON.stringify(expenses));
+                  console.log(
+                    "sortedExpenses:",
+                    JSON.stringify(sortedExpenses)
+                  );
+
+                  // Select the latest expense to edit
+                  setSelectedIncomeToEdit(sortedExpenses[0]);
+
                   setExpenseAmounts({
-                    Electricity: expenses[0]?.expenseAmounts?.Electricity,
-                    Gas: expenses[0]?.expenseAmounts?.Gas,
-                    Grocery: expenses[0]?.expenseAmounts?.Grocery,
-                    Fuel: expenses[0]?.expenseAmounts?.Fuel,
-                    Clothes: expenses[0]?.expenseAmounts?.Clothes,
-                    Other: expenses[0]?.expenseAmounts?.Other
+                    Electricity: sortedExpenses[0]?.expenseAmounts?.Electricity,
+                    Gas: sortedExpenses[0]?.expenseAmounts?.Gas,
+                    Grocery: sortedExpenses[0]?.expenseAmounts?.Grocery,
+                    Fuel: sortedExpenses[0]?.expenseAmounts?.Fuel,
+                    Clothes: sortedExpenses[0]?.expenseAmounts?.Clothes,
+                    Other: sortedExpenses[0]?.expenseAmounts?.Other
                   });
-                  if (expenses[0]?.incomeList.length > 0) {
-                    setShowAddIncome(true);
-                    setPlusIcon(false);
-                    setIncomes(expenses[0]?.incomeList);
-                    setTotalIncome(expenses[0]?.income);
-                  }
+
+                  setShowAddIncome(true);
+                  setPlusIcon(false);
+                  setIncomes(sortedExpenses[0]?.incomeList);
+                  setTotalIncome(sortedExpenses[0]?.income);
                 } else {
                   Alert.alert("No Previous Data Found", "Add some data First", [
                     {

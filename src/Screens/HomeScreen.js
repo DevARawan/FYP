@@ -1,10 +1,7 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Button,
-  Image,
   Modal,
   ScrollView,
   StatusBar,
@@ -14,23 +11,19 @@ import {
   View
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-
-// import Toast from 'react-native-toast-message';
 import firestore from "@react-native-firebase/firestore";
+import LottieView from "lottie-react-native";
+import { useToast } from "react-native-toast-notifications";
 import { CircularProgressBar } from "../Components/CircularProgressBar";
 import { useAuthContext } from "../Hooks/UseAuth";
+import { setSavingAmount } from "../Store/reducers/SavingsSlice";
+import { setUser } from "../Store/reducers/UserSlice";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 import { getMedal } from "../Utils/MedalUtils";
-import AnimatedLottieView from "lottie-react-native";
-import LottieView from "lottie-react-native";
-import { setUser } from "../Store/reducers/UserSlice";
-import { useToast } from "react-native-toast-notifications";
-import { setSavingAmount } from "../Store/reducers/SavingsSlice";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
   const [allGoals, setAllGoals] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
   const { currentUser } = useAuthContext();
   const [isCelebrationsDialogVisible, setIsCelebrationsDialogVisible] =
@@ -41,11 +34,10 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
   const toast = useToast();
   const navigation = useNavigation();
-  const userId = currentUser.uid;
+  const userId = currentUser?.uid;
 
   const fetchExpenses = async () => {
     try {
-      // Get a reference to the Firestore collection of expenses under the user's collection
       const expensesCollectionRef = firestore().collection(
         `users/${userId}/expenses`
       );

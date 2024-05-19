@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
-import { useSelector } from "react-redux";
-
+import React, { useState } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import CurrencySelectionModal from "../../Utils/CurrencySelectionModal";
 const Dropdown = ({ data, selectedValue, onSelect }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
@@ -60,20 +57,15 @@ const ClosedDropdown = ({ text, iconName = "caret-down-outline", onPress }) => {
     </TouchableOpacity>
   );
 };
-
-const General = () => {
-  // const [selectedCurrency, setSelectedCurrency] = useState("USD");
-  const [selectedTheme, setSelectedTheme] = useState("light"); // Default theme
-  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
-
-  // const storedCurrency = await AsyncStorage.getItem("selectedCurrency");
-  // if (storedCurrency) setSelectedCurrency(storedCurrency);
-
-  const handleThemeChange = async (value) => {
-    setSelectedTheme(value);
-    await AsyncStorage.setItem("selectedTheme", value);
-  };
-  const selectedCurrency = useSelector((state) => state.currency.currency); // A
+const CurrencyPreferencesView = ({
+  navigation,
+  selectedTheme,
+  setSelectedTheme,
+  showCurrencyModal,
+  setShowCurrencyModal,
+  handleThemeChange,
+  selectedCurrency
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.section}>
@@ -102,6 +94,7 @@ const General = () => {
     </View>
   );
 };
+export default CurrencyPreferencesView;
 
 const styles = StyleSheet.create({
   container: {
@@ -155,13 +148,9 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   customDropDownText: {
-    // Renamed the text style
-    flex: 1 // Makes text occupy most of the space
+    flex: 1
   },
   customDropDownIcon: {
-    // Renamed the icon style
-    marginLeft: 10 // Adds some space between text and icon
+    marginLeft: 10
   }
 });
-
-export default General;

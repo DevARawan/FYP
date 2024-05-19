@@ -1,25 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
-import myColor from "../Components/Color";
+import myColor from "../../Components/Color";
 
-const FrontScreen = () => {
-  const navigation = useNavigation();
-
-  const handleLogin = () => {
-    navigation.replace("login");
-  };
-
-  const handleSignup = () => {
-    navigation.replace("Signup");
-  };
-
+const IntroView = ({ navigation, handleLogin, handleSignup }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../Images/myimg1.jpg")}
+        source={require("../../Images/myimg1.jpg")}
         style={styles.headerImage}
         resizeMode="cover"
       />
@@ -32,8 +20,14 @@ const FrontScreen = () => {
         </Text>
 
         <View style={styles.iconContainer}>
-          <Image source={require("../Images/budget.png")} style={styles.icon} />
-          <Image source={require("../Images/money.png")} style={styles.icon} />
+          <Image
+            source={require("../../Images/budget.png")}
+            style={styles.icon}
+          />
+          <Image
+            source={require("../../Images/money.png")}
+            style={styles.icon}
+          />
         </View>
 
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
@@ -48,6 +42,7 @@ const FrontScreen = () => {
     </View>
   );
 };
+export default IntroView;
 
 const styles = StyleSheet.create({
   container: {
@@ -68,15 +63,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#333333",
-    fontFamily: "Roboto" // Replace with your desired font family
-    // marginBottom: 1,
+    fontFamily: "Roboto"
   },
   descriptionText: {
     textAlign: "center",
     fontSize: 18,
     marginBottom: 20,
     color: "#302f2f",
-    fontFamily: "Nunito" // Replace with your desired font family
+    fontFamily: "Nunito"
   },
   iconContainer: {
     flexDirection: "row",
@@ -106,8 +100,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontFamily: "Roboto-Bold" // Replace with your desired font family
+    fontFamily: "Roboto-Bold"
   }
 });
-
-export default FrontScreen;

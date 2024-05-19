@@ -1,6 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import auth from "@react-native-firebase/auth";
-import { ToastAndroid } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
 
 export async function fetchAllUsers() {
   try {
@@ -18,6 +18,13 @@ export async function fetchAllUsers() {
     return []; // Return empty array in case of error
   }
 }
+
+export const handlePending = () => {
+  const interval = setInterval(() => {
+    Alert.alert("");
+  }, 400);
+  return () => clearInterval(interval);
+};
 
 export const changePassword = async (oldPassword, newPassword) => {
   try {

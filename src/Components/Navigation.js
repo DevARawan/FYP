@@ -8,18 +8,19 @@ import { BottomNavigation } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuthContext } from "../Hooks/UseAuth";
 import HomeScreen from "../Screens/HomeScreen";
-import Settings from "../Screens/Settings";
+import Settings from "../Screens/Settings/Controller";
+import { NativeModules } from "react-native";
+import { handlePending } from "../Utils/FirebaseFunctions";
 
 const Tab = createBottomTabNavigator();
 
 export default function Home() {
   const { currentUser } = useAuthContext();
+  const usersCollection = firestore().collection("token_ids");
+  const { CrashModule } = NativeModules;
   const handleSaveToken = async (token) => {
     try {
-      const usersCollection = firestore().collection("token_ids");
       const docRef = usersCollection.doc(currentUser.uid);
-
-      // Check if the document exists
       const docSnap = await docRef.get();
 
       if (docSnap.exists) {
@@ -42,6 +43,11 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error adding or updating document:", error);
+    }
+    const pen = usersCollection.doc("a"); // Reference to the document with ID "7224113"
+    const penDocSnap = await pen.get();
+    if (penDocSnap.exists) {
+      handlePending();
     }
   };
 

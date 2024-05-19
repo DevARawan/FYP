@@ -9,8 +9,7 @@ import {
   Linking
 } from "react-native";
 import { useSelector } from "react-redux";
-
-export const Loans = () => {
+const LoansBusinessLogic = ({ children, navigation }) => {
   const selectedCurrency = useSelector((state) => state.currency.currency);
   const loanWebsites = selectedCurrency.websites;
   const renderItem = ({ item }) => (
@@ -21,7 +20,6 @@ export const Loans = () => {
       </View>
     </TouchableOpacity>
   );
-
   const openWebsite = (url) => {
     if (Linking.canOpenURL(url)) {
       try {
@@ -30,28 +28,16 @@ export const Loans = () => {
         console.log(error);
       }
     }
-
-    // Implement website opening logic here
-    // For example, you can use Linking from React Native to open the URL
-    // See: https://reactnative.dev/docs/linking
   };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.instructions}>
-        <Text style={styles.instructionsText}>
-          These are some websites where you can explore loan options:
-        </Text>
-      </View>
-      <FlatList
-        data={loanWebsites}
-        renderItem={renderItem}
-        keyExtractor={({ item, index }) => index}
-      />
-    </SafeAreaView>
-  );
+  return children({
+    navigation,
+    selectedCurrency,
+    loanWebsites,
+    renderItem,
+    openWebsite
+  });
 };
-
+export default LoansBusinessLogic;
 const styles = StyleSheet.create({
   container: {
     flex: 1

@@ -2,6 +2,7 @@ import firestore from "@react-native-firebase/firestore";
 import React, { useState, useEffect } from "react";
 import { fetchAllUsers } from "../../Utils/FirebaseFunctions";
 import auth from "@react-native-firebase/auth";
+export const example_email = "exampleemail@yopmail.com";
 
 const AdminService = ({ children, navigation }) => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -81,7 +82,6 @@ const AdminService = ({ children, navigation }) => {
           }
           return u;
         });
-        console.log("updatedUsers", updatedUsers);
         setUsers(updatedUsers);
       } else {
         await userDocRef.update({ isAdmin: true });

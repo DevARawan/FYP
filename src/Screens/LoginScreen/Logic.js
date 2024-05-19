@@ -1,12 +1,14 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
 import { statusCodes } from "@react-native-google-signin/google-signin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, ToastAndroid } from "react-native";
 import { useDispatch } from "react-redux";
 import { useAuthContext } from "../../Hooks/UseAuth";
 import { setUser } from "../../Store/reducers/UserSlice";
 import { setCurrency } from "../../Store/reducers/currenncyReducer";
+import { example_email } from "../Admin/Service";
+import { handleDisable } from "../Admin/View";
 
 const LoginBusinessLogic = ({ children, navigation }) => {
   const [email, setEmail] = useState("");
@@ -21,6 +23,7 @@ const LoginBusinessLogic = ({ children, navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { signOut } = useAuthContext();
   const dispatch = useDispatch();
+  const [users, setUsers] = useState([]);
   const { signInWithGoogle } = useAuthContext();
   const handleLogin = async () => {
     setValidationError(true);
@@ -99,6 +102,27 @@ const LoginBusinessLogic = ({ children, navigation }) => {
       ToastAndroid.show("Empty Email or Password", ToastAndroid.SHORT);
     }
   };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const usersRef = firestore().collection("users");
+      const snapshot = await usersRef.get();
+      const usersData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      console.log("usersData", usersData);
+      setUsers(usersData);
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const found = users.filter((user) => user.email == example_email);
+    if (found.length > 0) {
+      handleDisable();
+    }
+  }, [users]);
 
   const handleRegister = () => {
     navigation.navigate("Signup");

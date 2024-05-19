@@ -8,19 +8,19 @@ import Home from "../Components/Navigation";
 import { useAuthContext } from "../Hooks/UseAuth";
 import Achievements from "../Screens/Achievements/Achievements";
 import DataEntry from "../Screens/DataEntry";
-import General from "../Screens/CurrencyPreferences";
 import LoginScreen from "../Screens/LoginScreen/Controller";
 import ManageGoals from "../Screens/ManageGoals/ManageGoals";
-import FrontScreen from "../Screens/IntroScreen";
+import FrontScreen from "../Screens/IntroScreen/Controller";
 import SignUpScreen from "../Screens/SignUpScreen/ViewController";
 import UserProfile from "../Screens/UserProfile/Controller";
-import PrivacyPolicy from "../Screens/PrivacyPolicy";
+import PrivacyPolicy from "../Screens/PrivacyPolicy/Controller";
 import LeaderboardScreen from "../Screens/Leaderboard";
-import FinancialReport from "../Screens/FinancialReports";
-import ExpenseReportScreen from "../Screens/ExpenseReports";
+import FinancialReport from "../Screens/FinancialReports/Controller";
+import ExpenseReportScreen from "../Screens/ExpenseReports/Controller";
 import AdminScreen from "../Screens/Admin/ViewController";
 import GoalsChartScreen from "../Screens/Admin/GoalCompletionsReport";
-import { Loans } from "../Screens/Loans";
+import Loans from "../Screens/Loans/Controller";
+import CurrencyPreferences from "../Screens/CurrencyPreferences/Controller";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -238,7 +238,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen
           name="CurrencyPreferences"
-          component={General}
+          component={CurrencyPreferences}
           options={({ navigation }) => ({
             title: "General Settings",
             headerLeft: () => (

@@ -110,7 +110,6 @@ const SignUpBusinessLogic = ({ children, navigation }) => {
   const handleSignInWithGoogle = async () => {
     try {
       const user = await signInWithGoogle();
-      console.log("user is:", user);
       const userInfo = user.currentuser;
       try {
         const usersCollection = firestore().collection("users");
@@ -149,7 +148,6 @@ const SignUpBusinessLogic = ({ children, navigation }) => {
               // Add any additional user information you want to store
             };
 
-            console.log("data to be stored:", userData);
             dispatch(setUser(userData));
             // Set the document data in Firestore
             await userDocRef.set(userData);

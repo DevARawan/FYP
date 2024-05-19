@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-const AchievementsView = ({ navigation }) => {
+const FinancialReportsView = ({ navigation }) => {
   return <View style={styles.container}></View>;
 };
-export default AchievementsView;
+export default FinancialReportsView;
 
 const styles = StyleSheet.create({});
