@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Alert,
   FlatList,
@@ -7,11 +7,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  Image
 } from "react-native";
 import { useAuthContext } from "../../Hooks/UseAuth";
 import Loader from "../../Utils/Loader";
-import { Button } from "react-native";
 import { useSelector } from "react-redux";
 
 export const handleDisable = () => {
@@ -42,7 +42,6 @@ const AdminView = ({
       <View
         style={[
           styles.itemContainer,
-
           {
             backgroundColor:
               item.user_id == currentUser.uid ? "lightgrey" : "white"
@@ -65,13 +64,43 @@ const AdminView = ({
       <FlatList
         ListHeaderComponent={() => {
           return (
-            <View>
-              <Button
-                title="See Financial Reports"
-                onPress={() => {
-                  navigation.navigate("AdminReport");
+            <View style={styles.headerContainer}>
+              <Image
+                source={{
+                  uri:
+                    currentUser.profilePicture ||
+                    "https://via.placeholder.com/150"
                 }}
+                style={styles.profileAvatar}
               />
+              <Text style={styles.profileName}>
+                {user.isSuperAdmin ? "Super Admin" : "Admin"}
+              </Text>
+              <Text style={[styles.profileName, { fontSize: 16 }]}>
+                {currentUser.email}
+              </Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.reportButton}
+                  onPress={() => {
+                    console.log(user);
+                    navigation.navigate("AdminReport");
+                  }}
+                >
+                  <Text style={styles.buttonText}>Financial Reports</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.reportButton}
+                  onPress={() => {
+                    console.log(user);
+                    navigation.navigate("AdminReport");
+                  }}
+                >
+                  <Text style={styles.buttonText}>Financial Reports</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.separator} />
+              <Text style={styles.userHeading}>Registered Users</Text>
             </View>
           );
         }}
@@ -117,6 +146,50 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F5F5F5"
+  },
+  headerContainer: {
+    alignItems: "center",
+    padding: 20
+  },
+  profileAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10
+  },
+  profileName: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%"
+  },
+  reportButton: {
+    backgroundColor: "#4CAF50",
+    padding: 10,
+    borderRadius: 5,
+    width: "40%",
+    alignItems: "center"
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold"
+  },
+  separator: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "#ccc",
+    marginVertical: 20
+  },
+  userHeading: {
+    fontSize: 18,
+    fontWeight: "bold",
+    alignSelf: "flex-start",
+    marginLeft: 20,
+    marginBottom: 10
   },
   listContent: {
     paddingBottom: 16
