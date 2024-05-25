@@ -23,7 +23,8 @@ const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [incomes, setIncomes] = useState([{ amount: "" }]);
+  const [incomes, setIncomes] = useState([{ name: "", amount: "" }]);
+
   const [totalIncome, setTotalIncome] = useState(0);
   const [expenseAmounts, setExpenseAmounts] = useState({
     Electricity: "",
@@ -45,7 +46,7 @@ const DataEntry = () => {
   const savingAmount = useSelector((state) => state.saving.savingAmount);
 
   const addIncomeField = () => {
-    setIncomes([...incomes, { amount: "" }]);
+    setIncomes([...incomes, { name: "", amount: "" }]);
   };
 
   const handleIncomeChange = (index, amount) => {
@@ -87,12 +88,27 @@ const DataEntry = () => {
             return (
               <View>
                 <View style={styles.row}>
-                  <Text style={styles.label}>Income :</Text>
+                  <Text style={styles.label}>Income Name:</Text>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter income name"
+                      value={item.name}
+                      onChangeText={(text) => {
+                        const newIncomes = [...incomes];
+                        newIncomes[index].name = text;
+                        setIncomes(newIncomes);
+                      }}
+                    />
+                  </View>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>Income Amount:</Text>
                   <View style={styles.inputContainer}>
                     <Text style={styles.dollarSign}>{currencySymbol}</Text>
                     <TextInput
                       style={styles.input}
-                      placeholder="Enter income"
+                      placeholder="Enter income amount"
                       keyboardType="numeric"
                       value={item.amount}
                       onChangeText={(text) => handleIncomeChange(index, text)}
