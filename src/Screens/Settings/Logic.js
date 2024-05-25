@@ -3,6 +3,7 @@ import { Animated } from "react-native";
 // import { LinearGradient } from 'expo-linear-gradient';
 import { useSelector } from "react-redux";
 import { useAuthContext } from "../../Hooks/UseAuth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SettingsBusinessLogic = ({ children, navigation }) => {
   const [showGenerateOptions, setShowGenerateOptions] = useState(false);
@@ -41,6 +42,7 @@ const SettingsBusinessLogic = ({ children, navigation }) => {
 
   const handleLogout = async () => {
     await signOut();
+    await AsyncStorage.setItem("hasGivenReviews", "false");
     navigation.navigate("FrontScreen");
   };
 

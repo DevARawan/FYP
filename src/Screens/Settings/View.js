@@ -53,9 +53,7 @@ const SettingsView = ({
     try {
       setIsLoading(true);
       const reviewCollection = firestore().collection("reviews"); // Change here
-
       const reviewCollectionRef = reviewCollection.doc();
-
       await reviewCollectionRef.set({
         review: reviewText,
         rating: 0,
@@ -63,7 +61,6 @@ const SettingsView = ({
       });
 
       setReviewText("");
-
       setModalVisible(false);
     } catch (error) {
       console.log(error);
@@ -228,7 +225,7 @@ const SettingsView = ({
       <TouchableOpacity
         style={styles.row}
         onPress={() => {
-          if (!user.isAdmin) {
+          if (user.isAdmin) {
             // setModalVisible(true);
             navigation.navigate("Reviews");
           } else {

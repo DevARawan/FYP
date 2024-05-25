@@ -187,8 +187,7 @@ const HomeScreen = () => {
 
       // Do whatever you need with the fetched achievements (e.g., set state)
 
-      if (achievements.length > 0) {
-        console.log("achievements", achievements.length);
+      if (achievements.length > 2) {
         const sumAchievemnts = sumAchievemntsAmount(achievements);
         const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
@@ -202,7 +201,6 @@ const HomeScreen = () => {
 
       AsyncStorage.getItem("hasGivenReviews").then((hasGivenReviews) => {
         if (!hasGivenReviews || hasGivenReviews !== "true") {
-          // Alert will only be shown if hasGivenReviews is not available or its value is not true
           if (achievements.length > 1) {
             Alert.alert(
               "FeedBack",
@@ -228,7 +226,6 @@ const HomeScreen = () => {
           }
         }
       });
-      // You can set the fetched achievements to state or perform any other actions here
     } catch (error) {
       console.error("Error fetching achievements:", error);
     }
@@ -253,10 +250,8 @@ const HomeScreen = () => {
   }, []);
 
   const moveGoalToAchievemnt = async (selectedGoal) => {
-    // Make a Firebase call to delete the selected goal from the goals collection
     const goalsCollectionRef = firestore().collection(`users/${userId}/goals`);
     await goalsCollectionRef.doc(selectedGoal.id).delete();
-    // Add the selected goal to the achievements collection under the user's collection
     const achievementsCollectionRef = firestore().collection(
       `users/${userId}/achievements`
     );
@@ -273,11 +268,8 @@ const HomeScreen = () => {
 
   const checkAndUpdateGoals = async (savingsAmount, goals) => {
     try {
-      // Check if there are any goals
       if (goals.length > 0) {
-        const selectedGoal = goals[0]; // Selecting the first goal for now
-
-        // Check if the goal has already been moved to achievements
+        const selectedGoal = goals[0];
         const isGoalAchieved = await isGoalMovedToAchievements(
           selectedGoal.goal_id
         );
@@ -286,7 +278,6 @@ const HomeScreen = () => {
           return;
         }
 
-        // Check if savings amount is greater than or equal to the total amount of the selected goal
         if (savingsAmount >= selectedGoal.totalAmount) {
           setGoalAchieveable(selectedGoal);
           toast.show(
@@ -295,7 +286,6 @@ const HomeScreen = () => {
               type: "success",
               placement: "top",
               offset: 30,
-              // animationType: "slide-in ",
               animationType: "zoom-in",
               duration: 3500
             }
@@ -311,17 +301,14 @@ const HomeScreen = () => {
 
   const isGoalMovedToAchievements = async (goalId) => {
     try {
-      // Query the achievements collection to check if a document with the given goalId exists
       const achievementsSnapshot = await firestore()
         .collection(`users/${userId}/achievements`)
         .where("goal_id", "==", goalId)
         .get();
-
-      // Check if any documents were found
       return !achievementsSnapshot.empty;
     } catch (error) {
       console.error("Error checking if goal is moved to achievements:", error);
-      return false; // Return false in case of error
+      return false;
     }
   };
 

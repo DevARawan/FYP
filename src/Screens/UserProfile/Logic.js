@@ -1,22 +1,12 @@
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytes
-} from "@firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  collection,
-  doc,
-  getFirestore,
-  updateDoc
-} from "@react-native-firebase/firestore";
+import firestore from "@react-native-firebase/firestore";
+import storage from "@react-native-firebase/storage";
 import { useEffect, useState } from "react";
-
 import * as ImagePicker from "expo-image-picker";
-import { useSelector } from "react-redux";
-import { FIREBASE_APP } from "../../../firebaseConfig";
+import { useDispatch, useSelector } from "react-redux";
 import { useAuthContext } from "../../Hooks/UseAuth";
+import { Alert } from "react-native";
+import { updateUser } from "../../Store/reducers/UserSlice";
 
 const ProfileBusinessLogic = ({ children, navigation }) => {
   const [userData, setUserData] = useState(null);
@@ -25,23 +15,26 @@ const ProfileBusinessLogic = ({ children, navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showUploadButton, setShowUploadButton] = useState(false);
-
+  const { currentUser } = useAuthContext();
+  const [isLoading, setIsloading] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
   const { signOut } = useAuthContext();
+
   const user = useSelector((state) => state.user.user);
   const toggleBottomSheet = () => {
     setIsBottomSheetVisible(!isBottomSheetVisible);
   };
+  const dispatch = useDispatch();
   const handleImagePicker = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1
     });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
     }
   };
@@ -70,36 +63,42 @@ const ProfileBusinessLogic = ({ children, navigation }) => {
   const handleLogout = () => {
     signOut();
     AsyncStorage.removeItem("user");
+    AsyncStorage.removeItem("hasGivenReviews");
     navigation.navigate("FrontScreen");
   };
 
-  const handleSaveProfile = async () => {
-    const app = FIREBASE_APP;
-    const storage = getStorage(app);
-    const db = getFirestore(app);
-    const timestamp = new Date().getTime();
-    const fileExtension = selectedImage.split(".").pop().toLowerCase();
-    const fileName = `userProfiles_${timestamp}.${fileExtension}`;
-    const storageRef = ref(storage, `userProfiles/${fileName}`);
+  const handleSaveProfile = async (imageUri) => {
     try {
+      setIsloading(true);
+      // Generate a unique filename based on the current timestamp
+      const timestamp = new Date().getTime();
+      const fileExtension = selectedImage.split(".").pop();
+      const fileName = `userProfiles_${timestamp}.${fileExtension}`;
+      const storageRef = storage().ref(`userProfiles/${fileName}`);
+      // Convert the image URI to a blob
       const response = await fetch(selectedImage);
       const blob = await response.blob();
-      await uploadBytes(storageRef, blob);
-      const downloadURL = await getDownloadURL(storageRef);
-
-      const userDocRef = doc(collection(db, "users"), userData.id);
-
-      updateDoc(userDocRef, {
+      // Upload the blob to Firebase Storage
+      await storageRef.put(blob);
+      // Get the download URL
+      const downloadURL = await storageRef.getDownloadURL();
+      // Log or use the download URL
+      console.log("File available at:", downloadURL);
+      const userDocRef = firestore().collection("users").doc(currentUser.uid);
+      await userDocRef.update({
         profile_url: downloadURL
       });
-      const updated_local_storage = { ...userData, profile_url: downloadURL };
-      const updated_userData = JSON.stringify(updated_local_storage);
-      AsyncStorage.setItem("user", updated_userData);
-
-      setIsEditMode(false);
-      setShowUploadButton(false);
+      const newUserData = {
+        profile_url: downloadURL
+      };
+      dispatch(updateUser(newUserData));
+      console.log("success File available at:", downloadURL);
+      return downloadURL;
     } catch (error) {
-      console.error("Error saving profile:", error);
+      console.error("Error uploading image:", error);
+      throw error;
+    } finally {
+      setIsloading(false);
     }
   };
 
@@ -127,7 +126,9 @@ const ProfileBusinessLogic = ({ children, navigation }) => {
     handleImagePicker,
     handleManageProfile,
     handleLogout,
-    handleSaveProfile
+    handleSaveProfile,
+    isLoading,
+    setIsloading
   });
 };
 export default ProfileBusinessLogic;

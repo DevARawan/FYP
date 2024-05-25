@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { BottomSheet } from "react-native-elements";
 import ChangePasswordBottomSheet from "../../Components/ChangePasswordBottomSheet";
+import Loader from "../../Utils/Loader";
 
 const ProfileView = ({
   navigation,
@@ -35,7 +36,9 @@ const ProfileView = ({
   handleImagePicker,
   handleManageProfile,
   handleLogout,
-  handleSaveProfile
+  handleSaveProfile,
+  isLoading,
+  setIsloading
 }) => {
   return (
     <View style={styles.container}>
@@ -44,8 +47,11 @@ const ProfileView = ({
         <View style={styles.userImageOutline}>
           {selectedImage ? (
             <Image source={{ uri: selectedImage }} style={styles.userImage} />
-          ) : userData?.profile_url ? (
-            <Image source={userData.profile_url} style={styles.userImage} />
+          ) : user?.profile_url ? (
+            <Image
+              source={{ uri: user.profile_url }}
+              style={styles.userImage}
+            />
           ) : (
             <FontAwesome5 name="user" size={80} color="black" />
           )}
@@ -106,24 +112,6 @@ const ProfileView = ({
         )}
       </View>
 
-      {/* <View style={styles.inputContainer}>
-          <FontAwesome5
-            name="key"
-            size={24}
-            color="black"
-            style={styles.icon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="change password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!isEditMode}
-            editable={isEditMode}
-          />
-        </View> 
-      </View> */}
-
       <TouchableOpacity
         style={styles.manageProfileButton}
         onPress={isEditMode ? handleSaveProfile : handleManageProfile}
@@ -145,6 +133,7 @@ const ProfileView = ({
           setIsBottomSheetVisible={setIsBottomSheetVisible}
         />
       </BottomSheet>
+      <Loader isLoading={isLoading} />
     </View>
   );
 };
