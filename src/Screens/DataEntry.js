@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { useAuthContext } from "../Hooks/UseAuth";
 import Loader from "../Utils/Loader";
 import { Timestamp } from "firebase/firestore";
+import { useToast } from "react-native-toast-notifications";
 
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);
@@ -44,7 +45,7 @@ const DataEntry = () => {
   const currencySymbol = selectedCurrency.symbol;
   const [isOpen, setOpen] = useState(false);
   const savingAmount = useSelector((state) => state.saving.savingAmount);
-
+  const toast = useToast();
   const addIncomeField = () => {
     setIncomes([...incomes, { name: "", amount: "" }]);
   };
@@ -237,6 +238,13 @@ const DataEntry = () => {
             time: Date.now()
           });
           clearData();
+          toast.show(`Data Added Successfully`, {
+            type: "success",
+            placement: "top",
+            offset: 30,
+            animationType: "zoom-in",
+            duration: 3500
+          });
           navigation.navigate("main");
           clearData();
           setIsButtonDisabled(false);
@@ -297,6 +305,14 @@ const DataEntry = () => {
       }
       setIsLoading(false);
       clearData();
+      navigation.navigate("main");
+      toast.show(`Data Updated Successfully`, {
+        type: "success",
+        placement: "top",
+        offset: 30,
+        animationType: "zoom-in",
+        duration: 3500
+      });
     } catch (error) {
       clearData();
       setIsLoading(false);
