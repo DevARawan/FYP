@@ -1,6 +1,7 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   Modal,
   ScrollView,
@@ -20,6 +21,8 @@ import { setSavingAmount } from "../Store/reducers/SavingsSlice";
 import { setUser } from "../Store/reducers/UserSlice";
 import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 import { getMedal } from "../Utils/MedalUtils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ReviewModal from "../Components/ReviewModel";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -31,11 +34,35 @@ const HomeScreen = () => {
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
   const [userLevel, setUserLevel] = useState("🏅");
   const [isGoalAchieveable, setGoalAchieveable] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const toast = useToast();
+  const [reviewText, setReviewText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const userId = currentUser?.uid;
+  const submitReview = async () => {
+    try {
+      setIsLoading(true);
+      const reviewCollection = firestore().collection("reviews"); // Change here
 
+      const reviewCollectionRef = reviewCollection.doc();
+
+      await reviewCollectionRef.set({
+        review: reviewText,
+        rating: 0,
+        email: currentUser.email
+      });
+
+      setReviewText("");
+
+      setModalVisible(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const fetchExpenses = async () => {
     try {
       const expensesCollectionRef = firestore().collection(
@@ -161,6 +188,7 @@ const HomeScreen = () => {
       // Do whatever you need with the fetched achievements (e.g., set state)
 
       if (achievements.length > 0) {
+        console.log("achievements", achievements.length);
         const sumAchievemnts = sumAchievemntsAmount(achievements);
         const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
@@ -171,6 +199,35 @@ const HomeScreen = () => {
         dispatch(setSavingAmount(totalIncome - totalOverallExpenses));
         setSavingsAmount(totalIncome - totalOverallExpenses);
       }
+
+      AsyncStorage.getItem("hasGivenReviews").then((hasGivenReviews) => {
+        if (!hasGivenReviews || hasGivenReviews !== "true") {
+          // Alert will only be shown if hasGivenReviews is not available or its value is not true
+          if (achievements.length > 1) {
+            Alert.alert(
+              "FeedBack",
+              "Please give a feedback for improvements in application",
+              [
+                {
+                  text: "OK",
+                  onPress: async () => {
+                    console.log("OK Pressed");
+                    await AsyncStorage.setItem("hasGivenReviews", "true");
+                    setModalVisible(true);
+                  }
+                },
+                {
+                  text: "Cancel",
+                  onPress: async () => {
+                    console.log("Cancel Pressed");
+                    await AsyncStorage.setItem("hasGivenReviews", "true");
+                  }
+                }
+              ]
+            );
+          }
+        }
+      });
       // You can set the fetched achievements to state or perform any other actions here
     } catch (error) {
       console.error("Error fetching achievements:", error);
@@ -469,6 +526,13 @@ const HomeScreen = () => {
           </Modal>
         </View>
       )}
+      <ReviewModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        reviewText={reviewText}
+        setReviewText={setReviewText}
+        submitReview={submitReview}
+      />
     </ScrollView>
   );
 };

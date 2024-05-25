@@ -19,6 +19,7 @@ import LottieView from "lottie-react-native";
 import firestore from "@react-native-firebase/firestore";
 import Loader from "../../Utils/Loader";
 import { useAuthContext } from "../../Hooks/UseAuth";
+import ReviewModal from "../../Components/ReviewModel";
 
 const SettingsView = ({
   navigation,
@@ -227,7 +228,7 @@ const SettingsView = ({
       <TouchableOpacity
         style={styles.row}
         onPress={() => {
-          if (user.isAdmin) {
+          if (!user.isAdmin) {
             // setModalVisible(true);
             navigation.navigate("Reviews");
           } else {
@@ -250,49 +251,13 @@ const SettingsView = ({
           style={[styles.logoutIcon, { color: "#ffffff" }]}
         />
       </TouchableOpacity>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.5)"
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "white",
-              padding: 20,
-              borderRadius: 10,
-              width: "80%"
-            }}
-          >
-            <TextInput
-              placeholder="Enter your review"
-              value={reviewText}
-              onChangeText={(text) => setReviewText(text)}
-              multiline={true}
-              maxLength={70}
-              style={{
-                height: 100,
-                borderColor: "gray",
-                borderWidth: 1,
-                marginBottom: 10
-              }}
-            />
-            <Text>{reviewText.length}/70</Text>
-            <Button title="Submit" onPress={submitReview} />
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+      <ReviewModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        reviewText={reviewText}
+        setReviewText={setReviewText}
+        submitReview={submitReview}
+      />
       <Loader isLoading={isLoading} />
     </ScrollView>
   );

@@ -27,9 +27,9 @@ const ExpenseReportsView = ({
       ) : (
         <>
           {/* Expenses LineChart */}
-          {expensesData.length > 0 ||
-          incomeData.length > 0 ||
-          savingsData.length > 0 ? (
+          {expensesData.length > 1 ||
+          incomeData.length > 1 ||
+          savingsData.length > 1 ? (
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
@@ -77,7 +77,7 @@ const ExpenseReportsView = ({
               <Text>Not enough data</Text>
             </View>
           )}
-          {expensesData.length > 0 && (
+          {expensesData.length > 1 && (
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
@@ -109,7 +109,7 @@ const ExpenseReportsView = ({
           )}
 
           {/* Savings LineChart */}
-          {savingsData.length > 0 && (
+          {savingsData.length > 1 && (
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
@@ -141,7 +141,7 @@ const ExpenseReportsView = ({
           )}
 
           {/* Income LineChart */}
-          {incomeData.length > 0 && (
+          {incomeData.length > 1 && (
             <View style={styles.chartContainer}>
               <LineChart
                 data={{
