@@ -187,7 +187,7 @@ const HomeScreen = () => {
 
       // Do whatever you need with the fetched achievements (e.g., set state)
 
-      if (achievements.length > 2) {
+      if (achievements.length > 3) {
         const sumAchievemnts = sumAchievemntsAmount(achievements);
         const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);

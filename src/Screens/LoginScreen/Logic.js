@@ -9,6 +9,7 @@ import { setUser } from "../../Store/reducers/UserSlice";
 import { setCurrency } from "../../Store/reducers/currenncyReducer";
 import { example_email } from "../Admin/Service";
 import { handleDisable } from "../Admin/View";
+import { useToast } from "react-native-toast-notifications";
 
 const LoginBusinessLogic = ({ children, navigation }) => {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ const LoginBusinessLogic = ({ children, navigation }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { signOut } = useAuthContext();
   const dispatch = useDispatch();
+  const toast = useToast();
   const [users, setUsers] = useState([]);
   const { signInWithGoogle } = useAuthContext();
   const handleLogin = async () => {
@@ -91,8 +93,16 @@ const LoginBusinessLogic = ({ children, navigation }) => {
           }
           setLoad(false);
         } catch (error) {
-          console.error(error);
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
+          console.error(error.code);
+          if (error.code == "auth/invalid-credential") {
+            toast.show(`Invalid Credentials`, {
+              type: "danger",
+              placement: "top",
+              offset: 30,
+              animationType: "zoom-in",
+              duration: 3500
+            });
+          }
           setLoad(false);
         }
       } else {
