@@ -1,4 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import {
   Alert,
@@ -65,14 +66,17 @@ const AdminView = ({
         ListHeaderComponent={() => {
           return (
             <View style={styles.headerContainer}>
-              <Image
-                source={{
-                  uri:
-                    currentUser.profilePicture ||
-                    "https://via.placeholder.com/150"
-                }}
-                style={styles.profileAvatar}
-              />
+              {user.profile_url ? (
+                <Image
+                  source={{
+                    uri: user.profile_url
+                  }}
+                  style={styles.profileAvatar}
+                />
+              ) : (
+                <FontAwesome5 name="user" size={80} color="black" />
+              )}
+
               <Text style={styles.profileName}>
                 {user.isSuperAdmin ? "Super Admin" : "Admin"}
               </Text>
