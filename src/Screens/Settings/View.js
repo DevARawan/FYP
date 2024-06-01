@@ -125,7 +125,7 @@ const SettingsView = ({
         style={styles.row}
         onPress={handleGenerateOptionsToggle}
       >
-        <Text style={styles.link}>Generate Reports</Text>
+        <Text style={styles.link}>Financial Summaries</Text>
         <MaterialIcons
           name={showGenerateOptions ? "keyboard-arrow-up" : "chevron-right"}
           style={[styles.rowIcon, { color: "black" }]}
@@ -143,7 +143,7 @@ const SettingsView = ({
             ]}
             onPress={() => navigation.navigate("FinancialReport")}
           >
-            <Text>Generate Financial Report</Text>
+            <Text>Generate Financial Summary</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -154,7 +154,7 @@ const SettingsView = ({
             ]}
             onPress={() => navigation.navigate("ExpensesReport")}
           >
-            <Text>Generate Expense Report</Text>
+            <Text>Generate Expense Summary</Text>
           </TouchableOpacity>
         </View>
       )}
