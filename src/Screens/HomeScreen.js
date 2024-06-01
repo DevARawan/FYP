@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import uuid from "react-native-uuid";
 import { useDispatch, useSelector } from "react-redux";
 import firestore from "@react-native-firebase/firestore";
 import LottieView from "lottie-react-native";
@@ -23,6 +24,7 @@ import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
 import { getMedal } from "../Utils/MedalUtils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReviewModal from "../Components/ReviewModel";
+import Loader from "../Utils/Loader";
 
 const HomeScreen = () => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -32,6 +34,8 @@ const HomeScreen = () => {
   const [isCelebrationsDialogVisible, setIsCelebrationsDialogVisible] =
     useState(false);
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
+  const [AllAchievements, setAllAchievements] = useState([]);
+
   const [userLevel, setUserLevel] = useState("🏅");
   const [isGoalAchieveable, setGoalAchieveable] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +47,6 @@ const HomeScreen = () => {
   const userId = currentUser?.uid;
   const submitReview = async () => {
     try {
-      setIsLoading(true);
       const reviewCollection = firestore().collection("reviews"); // Change here
 
       const reviewCollectionRef = reviewCollection.doc();
@@ -60,7 +63,6 @@ const HomeScreen = () => {
     } catch (error) {
       console.log(error);
     } finally {
-      setIsLoading(false);
     }
   };
   const fetchExpenses = async () => {
@@ -94,26 +96,28 @@ const HomeScreen = () => {
         (total, expense) => total + expense,
         0
       );
-
-      fetchAchievements(totalIncome, totalOverallExpenses);
+      console.log(
+        "totalIncome:",
+        totalIncome,
+        " totalOverallExpenses:",
+        totalOverallExpenses
+      );
+      await fetchAchievements(totalIncome, totalOverallExpenses);
     } catch (error) {
       console.error("Error fetching and logging expenses:", error);
     }
   };
   const fetchGoals = async () => {
     try {
-      // Get a reference to the Firestore collection of goals under the user's collection
       const goalsCollectionRef = firestore().collection(
         `users/${userId}/goals`
       );
-
-      // Fetch documents from the goals collection
       const goalsSnapshot = await goalsCollectionRef.get();
       let goals = [];
 
-      // Log each document in the goals collection
       goalsSnapshot.forEach((doc) => {
         const goalData = doc.data();
+
         const goal = {
           id: doc.id,
           goalName: goalData.newGoal.goalName,
@@ -124,6 +128,7 @@ const HomeScreen = () => {
           goal_id: goalData.goal_id,
           priority: goalData.newGoal.priority || 0
         };
+
         goals.push(goal);
       });
 
@@ -145,6 +150,7 @@ const HomeScreen = () => {
       });
 
       setAllGoals(sortedData);
+      checkAndUpdateGoals(savingsAmount, allGoals);
       // You can set the fetched goals to state or perform any other actions here
     } catch (error) {
       console.error("Error fetching goals:", error);
@@ -173,6 +179,7 @@ const HomeScreen = () => {
       // Log each document in the achievements collection
       achievementsSnapshot.forEach((doc) => {
         const achievementData = doc.data();
+
         const achievement = {
           id: achievementData.id,
           dueDate: achievementData.dueDate,
@@ -184,10 +191,13 @@ const HomeScreen = () => {
 
         achievements.push(achievement);
       });
-
+      const achievementsSorted = achievements.sort((a, b) => {
+        return new Date(b.achievedAt) - new Date(a.achievedAt);
+      });
+      setAllAchievements(achievementsSorted);
       // Do whatever you need with the fetched achievements (e.g., set state)
-
-      if (achievements.length > 3) {
+      console.log("achievments.length:", achievements.length);
+      if (achievements.length > 0) {
         const sumAchievemnts = sumAchievemntsAmount(achievements);
         const savingsWithoutAchievements = totalIncome - totalOverallExpenses;
         setSavingsAmount(savingsWithoutAchievements - sumAchievemnts);
@@ -201,7 +211,7 @@ const HomeScreen = () => {
 
       AsyncStorage.getItem("hasGivenReviews").then((hasGivenReviews) => {
         if (!hasGivenReviews || hasGivenReviews !== "true") {
-          if (achievements.length > 1) {
+          if (achievements.length > 3) {
             Alert.alert(
               "FeedBack",
               "Please give a feedback for improvements in application",
@@ -250,14 +260,31 @@ const HomeScreen = () => {
   }, []);
 
   const moveGoalToAchievemnt = async (selectedGoal) => {
+    console.log("selectedGoal", selectedGoal);
     const goalsCollectionRef = firestore().collection(`users/${userId}/goals`);
-    await goalsCollectionRef.doc(selectedGoal.id).delete();
+
+    const querySnapshot = await goalsCollectionRef
+      .where("goal_id", "==", selectedGoal.id)
+      .get();
+    querySnapshot.forEach(async (doc) => {
+      await doc.ref.delete();
+    });
+
     const achievementsCollectionRef = firestore().collection(
       `users/${userId}/achievements`
     );
-    await achievementsCollectionRef.add(selectedGoal);
-    fetchExpenses();
-    fetchGoals();
+
+    await achievementsCollectionRef.add({
+      ...selectedGoal,
+      achievedAt: new Date().toISOString(),
+      isAchieved: true
+    });
+    console.log("here:1");
+    await fetchExpenses();
+    console.log("here:2");
+    await fetchGoals();
+    console.log("here:3");
+
     setIsCelebrationsDialogVisible(true);
     await new Promise((resolve) => setTimeout(resolve, 3000));
     setIsCelebrationsDialogVisible(false);
@@ -266,9 +293,56 @@ const HomeScreen = () => {
     setIsCelebrationsVisible(false);
   };
 
+  const revertMoveGoalToAchievement = async (achievedGoal) => {
+    setIsLoading(true);
+    console.log("achievedGoal", achievedGoal);
+    try {
+      const achievementsCollectionRef = firestore().collection(
+        `users/${userId}/achievements`
+      );
+
+      // Get the document reference based on the nested id
+      const querySnapshot = await achievementsCollectionRef
+        .where("id", "==", achievedGoal.id)
+        .get();
+      querySnapshot.forEach(async (doc) => {
+        await doc.ref.delete();
+      });
+      await fetchExpenses();
+      await fetchGoals();
+      const goalsCollectionRef = firestore().collection(
+        `users/${userId}/goals`
+      );
+      const goal_id = uuid.v4();
+
+      const goal = {
+        user_id: userId,
+        goal_id: goal_id,
+        newGoal: {
+          goalName: achievedGoal?.goalName,
+          description: achievedGoal?.goalDescription,
+          totalAmount: achievedGoal?.totalAmount,
+          dueDate: achievedGoal?.dueDate,
+          priority: achievedGoal?.priority ? achievedGoal?.priority : 0
+        }
+      };
+      await goalsCollectionRef.add({
+        isAchieved: false,
+        ...goal,
+        achievedAt: null // Assuming you have a field like achievedAt to mark when a goal was achieved
+      });
+      await fetchExpenses();
+      await fetchGoals();
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log("Error in reverting goal to achievemnt", error);
+    }
+  };
+
   const checkAndUpdateGoals = async (savingsAmount, goals) => {
     try {
-      if (goals.length > 0) {
+      if (goals?.length > 0) {
         const selectedGoal = goals[0];
         const isGoalAchieved = await isGoalMovedToAchievements(
           selectedGoal.goal_id
@@ -315,6 +389,7 @@ const HomeScreen = () => {
   const handleDataEntry = () => {
     navigation.navigate("dataEntry");
   };
+
   const handleManageGoals = () => {
     navigation.navigate("manageGoals");
   };
@@ -327,8 +402,14 @@ const HomeScreen = () => {
   useEffect(() => {
     checkAndUpdateGoals(savingsAmount, allGoals);
   }, [savingsAmount, allGoals]);
-
   const selectedCurrency = useSelector((state) => state.currency.currency);
+
+  useEffect(() => {
+    console.log("savingsAmount", savingsAmount);
+    if (savingsAmount < 0) {
+      revertMoveGoalToAchievement(AllAchievements[0]);
+    }
+  }, [savingsAmount]);
 
   return (
     <ScrollView style={styles.container}>
@@ -363,10 +444,6 @@ const HomeScreen = () => {
       <View style={styles.savingsContainer}>
         <Text style={styles.savingsText}>Savings Amount: </Text>
         <View style={styles.curvedBox}>
-          {/* <Text style={styles.savingsAmount}>
-            {selectedCurrency.symbol}
-            {savingsAmount.toFixed(1)}
-          </Text> */}
           <Text style={styles.currencySymbol}>{selectedCurrency.symbol}</Text>
           <Text style={styles.savingsAmountValue}>
             {savingsAmount.toFixed(1)}
@@ -384,7 +461,12 @@ const HomeScreen = () => {
                   justifyContent: "space-between"
                 }}
               >
-                <Text style={styles.currentGoalText}>Current Goal</Text>
+                <Text
+                  onPress={() => {
+                    console.log("isGoal:", isGoalAchieveable);
+                  }}
+                  style={styles.currentGoalText}
+                ></Text>
                 {isGoalAchieveable != null && allGoals[0].id == goal.id && (
                   <Button
                     onPress={() => {
@@ -520,6 +602,7 @@ const HomeScreen = () => {
         setReviewText={setReviewText}
         submitReview={submitReview}
       />
+      <Loader isLoading={isLoading} />
     </ScrollView>
   );
 };

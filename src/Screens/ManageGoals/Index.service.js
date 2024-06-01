@@ -85,7 +85,8 @@ const ManageGoalsService = ({ children, navigation }) => {
               goalDescription: goalData.newGoal.description,
               totalAmount: goalData.newGoal.totalAmount,
               dueDate: goalData.newGoal.dueDate || null,
-              priority: goalData.newGoal.priority || 0
+              priority: goalData.newGoal.priority || 0,
+              createdAt: new Date().toISOString()
             });
           }
         });

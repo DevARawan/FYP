@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuthContext } from "../../Hooks/UseAuth";
-import { Alert } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
 import { updateUser } from "../../Store/reducers/UserSlice";
 
 const ProfileBusinessLogic = ({ children, navigation }) => {
@@ -92,7 +92,7 @@ const ProfileBusinessLogic = ({ children, navigation }) => {
         profile_url: downloadURL
       };
       dispatch(updateUser(newUserData));
-      console.log("success File available at:", downloadURL);
+      ToastAndroid.show("Image Uploaded");
       return downloadURL;
     } catch (error) {
       console.error("Error uploading image:", error);
