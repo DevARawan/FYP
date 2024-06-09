@@ -22,6 +22,7 @@ import GoalsChartScreen from "../Screens/Admin/GoalCompletionsReport";
 import Loans from "../Screens/Loans/Controller";
 import CurrencyPreferences from "../Screens/CurrencyPreferences/Controller";
 import Reviews from "../Screens/Reviews/Controller";
+import UserGrowthReport from "../Screens/Admin/UserGrowthReport";
 
 const AppNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -285,6 +286,7 @@ const AppNavigator = () => {
 
         <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
         <Stack.Screen name="Admin" component={AdminScreen} />
+        <Stack.Screen name="UserGrowth" component={UserGrowthReport} />
         <Stack.Screen
           name="Loans"
           component={Loans}

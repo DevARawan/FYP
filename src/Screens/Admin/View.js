@@ -87,7 +87,6 @@ const AdminView = ({
                 <TouchableOpacity
                   style={styles.reportButton}
                   onPress={() => {
-                    console.log(user);
                     navigation.navigate("AdminReport");
                   }}
                 >
@@ -97,10 +96,10 @@ const AdminView = ({
                   style={styles.reportButton}
                   onPress={() => {
                     console.log(user);
-                    navigation.navigate("AdminReport");
+                    navigation.navigate("UserGrowth");
                   }}
                 >
-                  <Text style={styles.buttonText}>Financial Reports</Text>
+                  <Text style={styles.buttonText}>Users Reports</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.separator} />
