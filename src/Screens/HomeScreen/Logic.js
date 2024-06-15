@@ -9,6 +9,7 @@ import { useAuthContext } from "../../Hooks/UseAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setUser } from "../../Store/reducers/UserSlice";
 import { getMedal } from "../../Utils/MedalUtils";
+import { setSavingAmount } from "../../Store/reducers/SavingsSlice";
 
 const HomeScreensBusinessLogic = ({ children }) => {
   const [savingsAmount, setSavingsAmount] = useState(0);
