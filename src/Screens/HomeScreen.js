@@ -165,6 +165,28 @@ const HomeScreen = () => {
     return total;
   };
 
+  const checkHasGivenReviews = async (userEmail) => {
+    try {
+      // Query the reviews collection to see if there is a review with the user's email
+      const reviewQuerySnapshot = await firestore()
+        .collection("reviews")
+        .where("email", "==", userEmail)
+        .get();
+
+      // If there are any documents, the user has submitted a review
+      if (!reviewQuerySnapshot.empty) {
+        return true; // User has submitted a review
+      } else {
+        return false; // User has not submitted a review
+      }
+    } catch (error) {
+      console.error("Error checking for user review:", error);
+      throw error;
+    }
+  };
+
+  const hasGivenReviewsOnFirestore = checkHasGivenReviews(currentUser.email);
+
   const fetchAchievements = async (totalIncome, totalOverallExpenses) => {
     try {
       // Get a reference to the Firestore collection of achievements under the user's collection
@@ -210,29 +232,31 @@ const HomeScreen = () => {
       }
 
       AsyncStorage.getItem("hasGivenReviews").then((hasGivenReviews) => {
-        if (!hasGivenReviews || hasGivenReviews !== "true") {
-          if (achievements.length > 3) {
-            Alert.alert(
-              "FeedBack",
-              "Please give a feedback for improvements in application",
-              [
-                {
-                  text: "OK",
-                  onPress: async () => {
-                    console.log("OK Pressed");
-                    await AsyncStorage.setItem("hasGivenReviews", "true");
-                    setModalVisible(true);
+        if (!hasGivenReviewsOnFirestore) {
+          if (!hasGivenReviews || hasGivenReviews !== "true") {
+            if (achievements.length > 3) {
+              Alert.alert(
+                "FeedBack",
+                "Please give a feedback for improvements in application",
+                [
+                  {
+                    text: "OK",
+                    onPress: async () => {
+                      console.log("OK Pressed");
+                      await AsyncStorage.setItem("hasGivenReviews", "true");
+                      setModalVisible(true);
+                    }
+                  },
+                  {
+                    text: "Cancel",
+                    onPress: async () => {
+                      console.log("Cancel Pressed");
+                      await AsyncStorage.setItem("hasGivenReviews", "true");
+                    }
                   }
-                },
-                {
-                  text: "Cancel",
-                  onPress: async () => {
-                    console.log("Cancel Pressed");
-                    await AsyncStorage.setItem("hasGivenReviews", "true");
-                  }
-                }
-              ]
-            );
+                ]
+              );
+            }
           }
         }
       });
