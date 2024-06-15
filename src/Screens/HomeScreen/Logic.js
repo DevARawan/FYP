@@ -5,10 +5,10 @@ import { Alert } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 import uuid from "react-native-uuid";
 import { useDispatch, useSelector } from "react-redux";
-import { useAuthContext } from "../Hooks/UseAuth";
+import { useAuthContext } from "../../Hooks/UseAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setUser } from "../Store/reducers/UserSlice";
-import { getMedal } from "../Utils/MedalUtils";
+import { setUser } from "../../Store/reducers/UserSlice";
+import { getMedal } from "../../Utils/MedalUtils";
 
 const HomeScreensBusinessLogic = ({ children }) => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -443,7 +443,6 @@ const HomeScreensBusinessLogic = ({ children }) => {
     setReviewText,
     isLoading,
     setIsLoading,
-    navigation,
     userId,
     submitReview,
     fetchExpenses,

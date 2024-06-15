@@ -10,10 +10,10 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { CircularProgressBar } from "../Components/CircularProgressBar";
-import ReviewModal from "../Components/ReviewModel";
-import CurrencySelectionModal from "../Utils/CurrencySelectionModal";
-import Loader from "../Utils/Loader";
+import { CircularProgressBar } from "../../Components/CircularProgressBar";
+import ReviewModal from "../../Components/ReviewModel";
+import CurrencySelectionModal from "../../Utils/CurrencySelectionModal";
+import Loader from "../../Utils/Loader";
 
 const HomeScreenView = ({
   navigation,
@@ -42,7 +42,6 @@ const HomeScreenView = ({
   setReviewText,
   isLoading,
   setIsLoading,
-  navigation,
   userId,
   submitReview,
   fetchExpenses,
@@ -199,7 +198,7 @@ const HomeScreenView = ({
               alignSelf: "center",
               marginBottom: 50
             }}
-            source={require("../../Animations/Stars.json")}
+            source={require("../../../Animations/Stars.json")}
             autoPlay
             loop
           />
@@ -210,7 +209,7 @@ const HomeScreenView = ({
               alignSelf: "center",
               position: "absolute"
             }}
-            source={require("../../Animations/fireworks.json")}
+            source={require("../../../Animations/fireworks.json")}
             autoPlay
             loop
           />
