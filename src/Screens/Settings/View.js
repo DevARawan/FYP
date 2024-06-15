@@ -12,6 +12,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Switch,
   TextInput,
   Button
 } from "react-native";
@@ -48,6 +49,7 @@ const SettingsView = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
   const { currentUser } = useAuthContext();
   const submitReview = async () => {
     try {
@@ -99,7 +101,21 @@ const SettingsView = ({
       </TouchableOpacity>
       {showNotifications && (
         <View style={styles.dropdown}>
-          <TouchableOpacity
+          <View style={styles.toggleContainer}>
+            <Text style={styles.toggleText}>Enable Notifications</Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={isNotificationsEnabled ? "#0000FF" : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() =>
+                setIsNotificationsEnabled(!isNotificationsEnabled)
+              }
+              value={isNotificationsEnabled}
+              style={styles.toggleSwitch}
+            />
+          </View>
+
+          {/* <TouchableOpacity
             style={[
               styles.dropdownOption,
               selectedOption === "Goal progress" && styles.selectedOption
@@ -107,9 +123,9 @@ const SettingsView = ({
             onPress={() => handleOptionSelect("Goal progress")}
           >
             <Text>Goal progress</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[
               styles.dropdownOption,
               selectedOption === "Achieving goal" && styles.selectedOption
@@ -117,7 +133,7 @@ const SettingsView = ({
             onPress={() => handleOptionSelect("Achieving goal")}
           >
             <Text>Achieving goal</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       )}
 
@@ -306,9 +322,23 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderRadius: 5
   },
-  dropdownOption: {
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
     paddingVertical: 10
   },
+  toggleText: {
+    fontSize: 16,
+    color: "#333333"
+  },
+  oggleSwitch: {
+    transform: [{ scaleX: 2 }, { scaleY: 1.5 }]
+  },
+  // dropdownOption: {
+  //   paddingVertical: 10
+  // },
   logoutButton: {
     flexDirection: "row",
     backgroundColor: "blue",

@@ -76,21 +76,6 @@ const CurrencyPreferencesView = ({
         />
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.heading}>Select Theme</Text>
-        <Dropdown
-          data={[
-            { label: "Light Mode", value: "light" },
-            { label: "Dark Mode", value: "dark" }
-          ]}
-          selectedValue={selectedTheme}
-          onSelect={handleThemeChange}
-        />
-        <CurrencySelectionModal
-          visible={showCurrencyModal}
-          onClose={() => setShowCurrencyModal(false)}
-        />
-      </View>
     </View>
   );
 };

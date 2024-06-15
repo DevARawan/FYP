@@ -90,7 +90,7 @@ const AdminView = ({
                     navigation.navigate("AdminReport");
                   }}
                 >
-                  <Text style={styles.buttonText}>Financial Reports</Text>
+                  <Text style={styles.buttonText}>Financial Summary</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.reportButton}
@@ -99,7 +99,7 @@ const AdminView = ({
                     navigation.navigate("UserGrowth");
                   }}
                 >
-                  <Text style={styles.buttonText}>Users Reports</Text>
+                  <Text style={styles.buttonText}>Users Growth Summary</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.separator} />
