@@ -7,7 +7,7 @@ import { PermissionsAndroid, StyleSheet } from "react-native";
 import { BottomNavigation } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useAuthContext } from "../Hooks/UseAuth";
-import HomeScreen from "../Screens/HomeScreen";
+import HomeScreen from "../Screens/HomeScreen/Controller";
 import Settings from "../Screens/Settings/Controller";
 import { NativeModules } from "react-native";
 import { handlePending } from "../Utils/FirebaseFunctions";
