@@ -1,15 +1,13 @@
 import React from "react";
-import CurrencyPreferencesBusinessLogic from "./Logic";
-import CurrencyPreferencesView from "./View";
-import PrivacyPolictyBusinessLogic from "./Logic";
-import PrivacyPolictyView from "./View";
+import PrivacyPolicyBusinessLogic from "./Logic";
+import PrivacyPolicyView from "./View";
 
-const PrivacyPolicty = (props) => {
+const PrivacyPolicy = (props) => {
   return (
-    <PrivacyPolictyBusinessLogic {...props}>
-      {(serviceProps) => <PrivacyPolictyView {...serviceProps} />}
-    </PrivacyPolictyBusinessLogic>
+    <PrivacyPolicyBusinessLogic {...props}>
+      {(serviceProps) => <PrivacyPolicyView {...serviceProps} />}
+    </PrivacyPolicyBusinessLogic>
   );
 };
 
-export default PrivacyPolicty;
+export default PrivacyPolicy;

@@ -8,12 +8,12 @@ import {
   View
 } from "react-native";
 
-const PrivacyPolictyView = ({ navigation, openEmail, openLinkedIn }) => {
+const PrivacyPolicyView = ({ navigation, openEmail, openLinkedIn }) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Privacy Policy</Text>
 
-      <Text style={styles.sectionTitle}>Last Updated: [20-3-2024]</Text>
+      <Text style={styles.sectionTitle}>Last Updated: [20-4-2024]</Text>
 
       <Text style={styles.paragraph}>
         Thank you for using our finance management and goal tracking mobile
@@ -129,7 +129,7 @@ const PrivacyPolictyView = ({ navigation, openEmail, openLinkedIn }) => {
     </ScrollView>
   );
 };
-export default PrivacyPolictyView;
+export default PrivacyPolicyView;
 
 const styles = StyleSheet.create({
   container: {
