@@ -14,11 +14,10 @@ import {
   View
 } from "react-native";
 import DatePicker from "react-native-date-picker";
+import { useToast } from "react-native-toast-notifications";
 import { useSelector } from "react-redux";
 import { useAuthContext } from "../Hooks/UseAuth";
 import Loader from "../Utils/Loader";
-import { Timestamp } from "firebase/firestore";
-import { useToast } from "react-native-toast-notifications";
 
 const DataEntry = () => {
   const [showAddIncome, setShowAddIncome] = useState(false);

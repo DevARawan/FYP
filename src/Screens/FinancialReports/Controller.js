@@ -1,12 +1,12 @@
 import React from "react";
-import CurrencyPreferencesBusinessLogic from "./Logic";
-import CurrencyPreferencesView from "./View";
+import FinancialReportsBusinessLogic from "./Logic";
+import FinancialReportsView from "./View";
 
 const FinancialReports = (props) => {
   return (
-    <CurrencyPreferencesBusinessLogic {...props}>
-      {(serviceProps) => <CurrencyPreferencesView {...serviceProps} />}
-    </CurrencyPreferencesBusinessLogic>
+    <FinancialReportsBusinessLogic {...props}>
+      {(serviceProps) => <FinancialReportsView {...serviceProps} />}
+    </FinancialReportsBusinessLogic>
   );
 };
 
