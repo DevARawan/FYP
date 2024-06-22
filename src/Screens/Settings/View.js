@@ -111,7 +111,6 @@ const SettingsView = ({
                 setIsNotificationsEnabled(!isNotificationsEnabled)
               }
               value={isNotificationsEnabled}
-              style={styles.toggleSwitch}
             />
           </View>
 
@@ -153,7 +152,7 @@ const SettingsView = ({
           <TouchableOpacity
             style={[
               styles.dropdownOption,
-              selectedRow === "Generate Financial Report"
+              selectedRow === "Generate Financial Summary"
                 ? styles.selectedOption
                 : null
             ]}
@@ -164,7 +163,7 @@ const SettingsView = ({
           <TouchableOpacity
             style={[
               styles.dropdownOption,
-              selectedRow === "Generate Expense Report"
+              selectedRow === "Generate Expense Summary"
                 ? styles.selectedOption
                 : null
             ]}
@@ -245,7 +244,6 @@ const SettingsView = ({
             // setModalVisible(true);
             navigation.navigate("Reviews");
           } else {
-            // navigation.navigate("Reviews");
             setModalVisible(true);
           }
         }}
@@ -333,7 +331,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333333"
   },
-  oggleSwitch: {
+  toggleSwitch: {
     transform: [{ scaleX: 2 }, { scaleY: 1.5 }]
   },
   // dropdownOption: {

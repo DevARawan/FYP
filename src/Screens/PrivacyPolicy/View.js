@@ -41,11 +41,11 @@ const PrivacyPolicyView = ({ navigation, openEmail, openLinkedIn }) => {
         income, expenses, savings, and financial goals that you input into the
         App for the purpose of managing your finances and tracking your goals.
       </Text>
-      <Text style={styles.listItem}>
+      {/* <Text style={styles.listItem}>
         - Usage Data: We may automatically collect certain information about
         your device and how you interact with the App, such as your IP address,
         device type, operating system, and browsing actions.
-      </Text>
+      </Text> */}
 
       <Text style={styles.sectionTitle}>Use of Your Information</Text>
 
