@@ -19,22 +19,24 @@ const GoalsChartScreen = () => {
       try {
         setloading(true);
         const usersSnapshot = await firestore().collection("users").get();
-        usersSnapshot.forEach((userDoc) => {
-          const goalsSnapshot = userDoc.ref.collection("goals").get();
-          goalsSnapshot.then((snapshot) => {
-            const goalsCount = snapshot.size;
-            updateUserGoalsData(goalsCount);
-          });
-        });
+        const updatedData = { ...userGoalsData };
+
+        for (const userDoc of usersSnapshot.docs) {
+          const goalsSnapshot = await userDoc.ref.collection("goals").get();
+          const goalsCount = goalsSnapshot.size;
+          console.log("goals count:", goalsCount);
+          updateUserGoalsData(goalsCount, updatedData);
+        }
+
+        setUserGoalsData(updatedData);
+        setloading(false);
       } catch (error) {
         setloading(false);
         console.error("Error fetching user goals data:", error);
-      } finally {
       }
     };
 
-    const updateUserGoalsData = (goalsCount) => {
-      let updatedData = { ...userGoalsData };
+    const updateUserGoalsData = (goalsCount, updatedData) => {
       if (goalsCount >= 1 && goalsCount <= 5) {
         updatedData["1-5"] += 1;
       } else if (goalsCount >= 6 && goalsCount <= 10) {
@@ -46,8 +48,6 @@ const GoalsChartScreen = () => {
       } else if (goalsCount >= 21 && goalsCount <= 25) {
         updatedData["21-25"] += 1;
       }
-      setUserGoalsData(updatedData);
-      setloading(false);
     };
 
     fetchUserGoalsData();
