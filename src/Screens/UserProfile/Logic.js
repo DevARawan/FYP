@@ -22,6 +22,7 @@ const ProfileBusinessLogic = ({ children, navigation }) => {
   const { signOut } = useAuthContext();
 
   const user = useSelector((state) => state.user.user);
+  console.log(user);
   const toggleBottomSheet = () => {
     setIsBottomSheetVisible(!isBottomSheetVisible);
   };
@@ -67,7 +68,7 @@ const ProfileBusinessLogic = ({ children, navigation }) => {
     navigation.navigate("FrontScreen");
   };
 
-  const handleSaveProfile = async (imageUri) => {
+  const handleSaveProfile = async () => {
     try {
       setIsloading(true);
       // Generate a unique filename based on the current timestamp
