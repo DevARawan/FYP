@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { setUser } from "../../Store/reducers/UserSlice";
 import { getMedal } from "../../Utils/MedalUtils";
 import { setSavingAmount } from "../../Store/reducers/SavingsSlice";
+import { getNotificationEnabled } from "../../Utils/NotificationPreferencesUtils";
 
 const HomeScreensBusinessLogic = ({ children }) => {
   const [savingsAmount, setSavingsAmount] = useState(0);
@@ -20,6 +21,7 @@ const HomeScreensBusinessLogic = ({ children }) => {
     useState(false);
   const [isCelebrationsVisible, setIsCelebrationsVisible] = useState(false);
   const [AllAchievements, setAllAchievements] = useState([]);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   const [userLevel, setUserLevel] = useState("🏅");
   const [isGoalAchieveable, setGoalAchieveable] = useState(null);
@@ -30,6 +32,15 @@ const HomeScreensBusinessLogic = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const userId = currentUser?.uid;
+  useEffect(() => {
+    // Fetch the notification setting when the component mounts
+    const fetchNotificationSetting = async () => {
+      const enabled = await getNotificationEnabled();
+      setNotificationsEnabled(enabled);
+    };
+
+    fetchNotificationSetting();
+  }, []);
   const submitReview = async () => {
     try {
       const reviewCollection = firestore().collection("reviews"); // Change here
@@ -361,16 +372,18 @@ const HomeScreensBusinessLogic = ({ children }) => {
 
         if (savingsAmount >= selectedGoal.totalAmount) {
           setGoalAchieveable(selectedGoal);
-          toast.show(
-            `Congratulations ${selectedGoal.goalName} can now be achieved`,
-            {
-              type: "success",
-              placement: "top",
-              offset: 30,
-              animationType: "zoom-in",
-              duration: 3500
-            }
-          );
+          if (notificationsEnabled) {
+            toast.show(
+              `Congratulations ${selectedGoal.goalName} can now be achieved`,
+              {
+                type: "success",
+                placement: "top",
+                offset: 30,
+                animationType: "zoom-in",
+                duration: 3500
+              }
+            );
+          }
         } else {
         }
       } else {
@@ -404,6 +417,7 @@ const HomeScreensBusinessLogic = ({ children }) => {
   useEffect(() => {
     fetchExpenses();
     fetchGoals();
+    checkAndUpdateGoals(savingsAmount, allGoals);
   }, [useIsFocused()]);
 
   useEffect(() => {

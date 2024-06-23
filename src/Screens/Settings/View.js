@@ -4,7 +4,7 @@ import {
   Ionicons,
   MaterialIcons
 } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   ScrollView,
@@ -21,6 +21,10 @@ import firestore from "@react-native-firebase/firestore";
 import Loader from "../../Utils/Loader";
 import { useAuthContext } from "../../Hooks/UseAuth";
 import ReviewModal from "../../Components/ReviewModel";
+import {
+  getNotificationEnabled,
+  setNotificationEnabled
+} from "../../Utils/NotificationPreferencesUtils";
 
 const SettingsView = ({
   navigation,
@@ -49,7 +53,7 @@ const SettingsView = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
+  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const { currentUser } = useAuthContext();
   const submitReview = async () => {
     try {
@@ -70,6 +74,14 @@ const SettingsView = ({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchNotificationSetting = async () => {
+      const enabled = await getNotificationEnabled();
+      setIsNotificationsEnabled(enabled);
+    };
+    fetchNotificationSetting();
+  }, []);
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -107,9 +119,11 @@ const SettingsView = ({
               trackColor={{ false: "#767577", true: "#81b0ff" }}
               thumbColor={isNotificationsEnabled ? "#0000FF" : "#f4f3f4"}
               ios_backgroundColor="#3e3e3e"
-              onValueChange={() =>
-                setIsNotificationsEnabled(!isNotificationsEnabled)
-              }
+              onValueChange={async () => {
+                const newVal = !isNotificationsEnabled;
+                setIsNotificationsEnabled(newVal);
+                await setNotificationEnabled(newVal);
+              }}
               value={isNotificationsEnabled}
             />
           </View>

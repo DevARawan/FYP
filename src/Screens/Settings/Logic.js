@@ -44,6 +44,7 @@ const SettingsBusinessLogic = ({ children, navigation }) => {
     await signOut();
     await AsyncStorage.setItem("hasGivenReviews", "false");
     navigation.navigate("FrontScreen");
+    await setNotificationEnabled(true);
   };
 
   const handleAchievements = () => {
