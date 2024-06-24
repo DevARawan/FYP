@@ -71,7 +71,7 @@ const HomeScreenView = ({
       </TouchableOpacity>
       <View style={styles.navbar}>
         <TouchableOpacity style={styles.navButton} onPress={handleDataEntry}>
-          <Text style={styles.navButtonText}>Manage Data Entry</Text>
+          <Text style={styles.navButtonText}>Manage Budget</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navButton} onPress={handleManageGoals}>
           <Text style={styles.navButtonText}>Manage Goals</Text>
