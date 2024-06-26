@@ -75,7 +75,10 @@ const CurrencyPreferencesView = ({
           onPress={() => setShowCurrencyModal(true)}
         />
       </View>
-
+      <CurrencySelectionModal
+        visible={showCurrencyModal}
+        onClose={() => setShowCurrencyModal(false)}
+      />
     </View>
   );
 };
