@@ -3,7 +3,7 @@ Group Member:  Abdul Rafay
 Roll no:       sp20-bse-041
 
 how to start?
-Run 'yarn' command on vscode terminal to install node_modules if not installed already. 
+Run 'yarn' command on vscode terminal to install node_modules. 
 After installation run 'yarn android' command on vs code terminal to create a development build. 
 Open emulator on android studio software. Once build in created and the metro server starts, press 'a'.
 It will open the app in emulator.
